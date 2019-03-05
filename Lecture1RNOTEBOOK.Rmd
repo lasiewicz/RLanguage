@@ -1,0 +1,68 @@
+---
+title: "Week 1 R Notebook"
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+# I'm A Level 1 Header
+
+## I'm A Level 2 Header
+
+### I'm A Level 3 Header
+
+Here's some text
+
+Here's a code chunk:
+```{r}
+# This is a comment
+a <-1
+b <-1
+1 + 7
+c(4,3,34,33)
+```
+
+This text is in *italics*.
+
+This text is in **boldface**.
+
+Now for some bullet points:
+
+* This is the first bullet point.
+
+* This is the second bullet point.
+
+* This is the third bullet point.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

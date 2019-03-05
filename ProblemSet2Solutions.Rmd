@@ -1,0 +1,761 @@
+---
+title: "Problem Set 2 Solutions"
+subtitle: 'Type your name here'
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+
+# Instructions
+
+**Due:** Wednesday, February 13, 2019
+
+#Instructions
+
+First, save this notebook with a title consisting of "ProblemSet2" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet2Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+
+
+
+
+# Problem 1
+
+## Problem Statement
+
+**Part a) **
+
+The Chevalier de Mere would like to play his dice game in which he rolls multiple dice and wins if at least one of them is a 1. Unfortunately, he only has 3 dice. Using the formal mathematical methods we saw in lecture, calculate the exact value of the probability that he will win this game.
+
+**Part b)**
+
+Using a simulation, calculate an approximate value for the probability that the Chevalier de Mere will win this game with only three dice. You are welcome to copy the code from the lecture and modify it, although you should write a comment indicating where you made any changes.
+
+
+## Problem Solution
+
+**Part a)**
+
+We saw in lecture that a nice way to solve this problem is to use the complement trick: instead of trying to work with the complex event "at least one roll is a 1", it was easier to calculate the probability of the event "all the dice rolls are not 1" and then subtract from 1. By the classical theory of probability we know that the probability of a single roll not coming up 1 is 5/6, and since the dice rolls are all independent we can calculate the probability of the event "All three rolls came up something other than 1" as the product of the 3 events "The die came up somthing other than 1". Thus, we have:
+
+
+```{r}
+1 - (5/6)^3
+```
+We conclude that the probability of winning this dice game is 42%.
+
+Compare this with what we did in lecture with four dice; you should notice that the only difference between that calculation and this problem is that now we are raising the value 5/6 to the power 3 instead of the power 4. This reflects the fact that we are rolling 3 dice instead of 4. 
+
+
+
+**Part b)**
+
+Here's a basic simulation to solve this problem, based on the code from the Lecture 2 Notebook:
+```{r}
+# First, we'll set the number of replications of the game:
+
+number.replications <- 10000
+
+# Next, we create the vector that will hold the results of each experiment. Remember
+# that when we create a vector with the logical() function, all the elements have
+# the initial value of FALSE.
+
+result.vector <- logical( number.replications )
+
+# Now we can run a for loop over all replications
+
+for( replication.index in 1:number.replications ) {
+  
+  # Here we directly simulate rolling 4 dice
+  
+  dice.roll <- sample( 1:6, 3, replace = TRUE )
+  
+  # This is the one place were I modified the code from lecture: in the sample()
+  # function, I changed the number of items from 4 to 3.
+  
+  # Now we'll use some vectorized operations. When we run the test "dice.roll == 1",
+  # this will create a logical vector in which each element will be TRUE if and only if
+  # the corresponding element in the dice.roll vector is equal to 1. We then apply the
+  # any() function to this logical vector, and this will return TRUE if and only if
+  # at least element in the logical vector is TRUE. Thus, this will model rolling 
+  # four dice and returning TRUE if and only if at least one of them is a 1.
+  
+  if( any(dice.roll == 1) ) {
+    result.vector[ replication.index ] <- TRUE
+  }
+}
+
+mean( result.vector )
+```
+When you run this simulation, you should end up with a value that is close to the value that you calculated in Part a) i.e. it should be close to about 0.42.
+
+
+
+Here's an alternative approach, similar to what the textbook does. It relies more on vectorized operations:
+```{r}
+number.replications <- 10000  # Let's start by setting the number of replications.
+
+# We'll "roll" each die repeatedly, which means that we'll generate a random
+# sample using the sample() function:
+
+die.1.vector <- sample( c(1:6), number.replications, replace = TRUE)
+die.2.vector <- sample( c(1:6), number.replications, replace = TRUE)
+die.3.vector <- sample( c(1:6), number.replications, replace = TRUE)
+
+# I modified the lecture code by removing the die.4.vector
+
+# Now we'll use vectorized operations to test to see if at least one of the
+# die was a 1:
+
+result.vector <-
+  (die.1.vector == 1) | (die.2.vector == 1) |
+  (die.3.vector == 1)
+
+# I modified the lecture code by removing the die.4.vector.
+
+# Notice that result.vector is actually a logical vector; that is, it consists of
+# the values TRUE or FALSE.
+
+# When we apply the mean() function to a logical vector, it will return the
+# proportion of elements in the vector that are TRUE
+
+mean( result.vector )
+```
+
+This value should be very close to the value that you calculated in Part a) i.e. it should be close to about 0.42.
+
+
+
+# Problem 2
+
+## Problem Statement
+
+**Part a)**
+
+The Chevalier de Mere just searched in his waistcoat and found two more dice, so now he has a total of 5 dice to roll. He will win the game if at least one of the five dice is a 1. Using the formal mathematical methods we saw in lecture, caluclate the exact value of the probability that he will win this game.
+
+**Part b)**
+
+Using a simulation, calculate an approximate value for the probability that the Chevalier de Mere will win this game with five dice. Again, you are welcome to modify the code from the lecture, but be sure to comment on where you changed it.
+
+
+
+
+## Problem Solution
+
+
+**Part a)**
+
+This is the same as with Problem 1, except that now we have 5 dice instead of 3, so we should raise 5/6 to the power 5 instead of 3:
+```{r}
+1 - (5/6)^5
+```
+We conclude that the probability of winning the game is about 60%.
+
+
+**Part b)**
+
+Here's a basic simulation to solve this problem, based on the code from the Lecture 2 Notebook:
+```{r}
+# First, we'll set the number of replications of the game:
+
+number.replications <- 10000
+
+# Next, we create the vector that will hold the results of each experiment. Remember
+# that when we create a vector with the logical() function, all the elements have
+# the initial value of FALSE.
+
+result.vector <- logical( number.replications )
+
+# Now we can run a for loop over all replications
+
+for( replication.index in 1:number.replications ) {
+  
+  # Here we directly simulate rolling 5 dice
+  
+  dice.roll <- sample( 1:6, 5, replace = TRUE )
+  
+  # This is the one place were I modified the code from lecture: in the sample()
+  # function, I changed the number of items from 4 to 5.
+  
+  # Now we'll use some vectorized operations. When we run the test "dice.roll == 1",
+  # this will create a logical vector in which each element will be TRUE if and only if
+  # the corresponding element in the dice.roll vector is equal to 1. We then apply the
+  # any() function to this logical vector, and this will return TRUE if and only if
+  # at least element in the logical vector is TRUE. Thus, this will model rolling 
+  # four dice and returning TRUE if and only if at least one of them is a 1.
+  
+  if( any(dice.roll == 1) ) {
+    result.vector[ replication.index ] <- TRUE
+  }
+}
+
+mean( result.vector )
+```
+When you run this simulation, you should end up with a value that is close to the value that you calculated in Part a) i.e. it should be close to about 0.60.
+
+
+Here's an alternative approach, similar to what the textbook does. It relies more on vectorized operations:
+```{r}
+number.replications <- 10000  # Let's start by setting the number of replications.
+
+# We'll "roll" each die repeatedly, which means that we'll generate a random
+# sample using the sample() function:
+
+die.1.vector <- sample( c(1:6), number.replications, replace = TRUE)
+die.2.vector <- sample( c(1:6), number.replications, replace = TRUE)
+die.3.vector <- sample( c(1:6), number.replications, replace = TRUE)
+die.4.vector <- sample( c(1:6), number.replications, replace = TRUE)
+die.5.vector <- sample( c(1:6), number.replications, replace = TRUE)
+
+# I modified the lecture code by adding in the die.5.vector
+
+# Now we'll use vectorized operations to test to see if at least one of the
+# die was a 1:
+
+result.vector <-
+  (die.1.vector == 1) | (die.2.vector == 1) |
+  (die.3.vector == 1) | (die.4.vector == 1) | (die.5.vector == 1)
+
+# I modified the lecture code by adding in the die.5.vector
+
+# Notice that result.vector is actually a logical vector; that is, it consists of 
+# the values TRUE or FALSE.
+
+# When we apply the mean() function to a logical vector, it will return the
+# proportion of elements in the vector that are TRUE
+
+mean( result.vector )
+```
+Again, when you run this simulation, you should end up with a value that is close to the value that you calculated in Part a) i.e. it should be close to about 0.42.
+
+# Problem 3
+
+### Problem Statement
+
+The Chevalier de Mere would like to play his second dice game, where he rolls a set of dice and wins if they all come up as 1. However, he now has 3 dice instead of 2. To compensate for the difficulty of having all 3 dice come up as 1, the game consists of rolling the dice 140 times. Note that there are now $6^3 = 216$ elements in the sample space.
+
+**Part a)**
+
+Using the formal mathematical methods we saw in lecture, what is the exact value of the probability that the Chevalier will win the game?
+
+**Part b)**
+
+Using a simulation approach, calculate an approximate value for the probability that the Chevalier will win the game.
+
+### Problem Solution
+
+**Part a)**
+
+Once again, it's easier to do this problem by using the complement trick, and so we will calculate the probability of losing the game, and then subtract from 1 to obtain the probability of winning the game. For any single roll, there is only 1 outcome in the event "All three dice come up 1", so there are 215 outcomes in the event "Not all three dice come up 1". Since there are 140 rolls, and all of them are independent, the probability of losing the game will be (215/216) raised to the power 140. Thus, the probability of winning the game is one minus this quantity:
+```{r}
+1 - (215/216)^140
+```
+We conclude that the probability of winning this game is slightly less than 48%.
+
+
+**Part b)**
+
+Here's a simple simulation using nested `for` loops to obtain an approximate value for the probability of winning this game:
+```{r}
+# First, let's specify the number of replications
+
+number.replications <- 10000
+
+# We'll also need a vector to store the results of our simulation. Remember that
+# when we create a logical vector this way, all the elements of the vector
+# will initially have the value `FALSE`:
+
+result.vector <- logical( number.replications )
+
+# Now we'll create a for loop that will iterate over all the replications:
+
+for( replication.index in 1:number.replications ) {
+
+  # I'm modifying the code from the Lecture 2 Notebook so that the number of rolls is
+  # now 140 instead of 24:
+  
+  for( roll.index in 1:140 ) {
+    
+    # I modified the code from the Lecture 2 Notebook so that the number of dice rolled
+    # is 3 instead of 2:
+    
+    dice.roll.vector <- sample( 1:6, 3, replace = TRUE )
+    
+    # Now we test to see if the two dice both came up as a 1:
+    
+    if( all(dice.roll.vector == 1) ) {
+      result.vector[ replication.index ] <- TRUE
+    }
+  }
+}
+
+mean( result.vector )
+```
+
+Your code should produce a value around 0.48, which is the value we calculated in Part a).
+
+
+
+Here's an alternative approach, similar to what the textbook does. It relies more on vectorized operations:
+```{r}
+# First, let's set up the number of simulation replications
+
+number.replications <- 10000
+
+# Next, we need to create a vector to hold the results of our simulated games.
+
+result.vector <- numeric( number.replications )
+
+# Now we iterate over the number of replications
+
+for( replication.index in 1:number.replications ) {
+  
+  # For each of the three dice, "roll" it 140 times:
+  
+  die.1.vector <- sample( 1:6, 140, replace = TRUE )
+  die.2.vector <- sample( 1:6, 140, replace = TRUE )
+  die.3.vector <- sample( 1:6, 140, replace = TRUE)
+  
+  # I modified the code in the Lecture 2 R notebook by creating the vector die.3.vector
+  
+  # Now we use vectorized operations to determine the result of each roll. First, the
+  # code "die.1.vector == 1" will create a logical vector that is TRUE exactly when the
+  # corresponding die roll is 1, and 0 otherwise. The same holds for the code
+  # "die.2.vector == 1" and "die.3.vector == 1". When we combine these using the logical
+  # operator "&", we obtain a logical vector such that an element is TRUE precisely 
+  # when each of the corresponding elements of the 3 logical vectors are TRUE, and this
+  # represents rolling 3 dice and having each one come up a 1. Finally, we use the 
+  # and() function with this logical vector, and this will return TRUE exactly if at 
+  # least one of the elements is TRUE. Thus, this code simulates rolling 3 dice for
+  # 140 times, and obtaining a value of TRUE if at least once all three rolls come up
+  # as a 1.
+  
+  result.vector[ replication.index ] <- 
+    any( (die.1.vector == 1) & (die.2.vector == 1) & (die.3.vector == 1) )
+}
+
+mean( result.vector )
+```
+
+This value should be close to 49%.
+
+
+# Problem 4
+
+### Problem Statement
+
+The Chevalier de Mere would like to have a definite advantage in the 3 dice game from Problem 3 but not so big that it is noticeable, and he decides that he would like to set the game up so that the probability of winning is 52\%. He has asked you to determine the smallest number of rolls so that the probability of winning the game is at least 52\%.
+
+In this problem, we don't want to see every step that you took. Just tell us what the final answer is, and provide code that verifies this value.
+
+**Part a)**
+
+Solve this by using the formal mathematical methods we saw in lecture. You'll have to make a guess about how many rolls are required, calculate the probability of winning the game, and then see if it's bigger than 52\%. Use trial-and-error to find the smallest number of rolls that will still have a probability of at least 52\%.
+
+**Part b)**
+
+Take the answer that you calculated in Part a) and use that in a simulation to verify that the probability of winning is very close to 52\%.
+
+### Problem Solution
+
+**Part a)**
+
+For this problem, you just need to copy the code from Part a) of Problem 3, and then start experimenting with the exponent. Clearly 140 rolls is too low, because that results in a winning probability of less than 49%, so we need to increase the number of rolls. If you play around with this for a little bit, you should find that 159 rolls will give a winning probability of greater than 52%: 
+```{r}
+1 - (215/216)^159
+```
+On the other hand, rolling the dice only 158 gives a winning probability of less than 52%:
+```{r}
+1 - (215/216)^158
+```
+So 159 rolls is the minimum number of rolls for the game so that the winning percentage is at least 52%.
+
+
+
+**Part b)**
+
+This simulation is exactly the same as the one in Part b) of Problem 3, except that now we replace the 140 rolls with 159 rolls.
+```{r}
+# First, let's specify the number of replications
+
+number.replications <- 10000
+
+# We'll also need a vector to store the results of our simulation. Remember that
+# when we create a logical vector this way, all the elements of the vector
+# will initially have the value `FALSE`:
+
+result.vector <- logical( number.replications )
+
+# Now we'll create a for loop that will iterate over all the replications:
+
+for( replication.index in 1:number.replications ) {
+
+  # I'm modifying the code from Part b) of Problem 3 so that the number of rolls is
+  # now 159 instead of 24:
+  
+  for( roll.index in 1:159 ) {
+    
+    # I modified the code from the Lecture 2 Notebook so that the number of dice rolled
+    # is 3 instead of 2:
+    
+    dice.roll.vector <- sample( 1:6, 3, replace = TRUE )
+    
+    # Now we test to see if the two dice both came up as a 1:
+    
+    if( all(dice.roll.vector == 1) ) {
+      result.vector[ replication.index ] <- TRUE
+    }
+  }
+}
+
+mean( result.vector )
+```
+
+This value should be close to 52%. Note that due to random sampling it might be a little
+less than 52%, which is fine, but it should be close.
+
+
+# Problem 5
+
+### Problem Statement
+
+The Chevalier de Mere finds the dice games in Problems 3 and 4 to be extremely tedious, so he has devised a new game. He has 3 urns, each of which contains 5 balls labelled from 1 to 5. The balls in the urns are mixed up and one ball is drawn from each urn. The Chevalier wins if at least one of the balls has the value 1.
+
+**Part a)**
+
+Using the formal methods we saw in lecture, calculate the exact probability that the Chevalier will win the game.
+
+**Part b)**
+
+Using a simulation, calculate an approximate value for the probability that the Chevalier will win the game.
+
+
+### Problem Solution
+
+**Part a)**
+
+We're going to use the complement trick once again, calculating the probability of *losing* the game and then subtracting this value from 1. In this game the player loses if none of the balls drawn from the run has the value 1. There are 5 possible outcomes for a single urn draw, so the probability of not drawing a 1 from a particular urn is 4/5. We independently draw from 3 urns, so the probability of not drawing a 1 from any of the urns is (4/5)^3. Thus, the probability of winning the game is 1 - (4/5)^3:
+```{r}
+1 - (4/5)^3
+```
+
+Note that this problem is very similar to the first dice game, except that now the sample space has 5 outcomes instead of 6.
+
+
+
+**Part b)**
+
+Now let's construct a simulation to model this game:
+```{r}
+# First, we'll set the number of replications of the game:
+
+number.replications <- 10000
+
+# Next, we create the vector that will hold the results of each experiment. Remember
+# that when we create a vector with the logical() function, all the elements have
+# the initial value of FALSE.
+
+result.vector <- logical( number.replications )
+
+# Now we can run a for loop over all replications
+
+for( replication.index in 1:number.replications ) {
+  
+  # Here we directly sampling from 3 urns.
+  # I modified this code so that the sample() function is sampling from
+  # the range 1 through 5, and drawing from 3 urns.
+  
+  three.urn.sample <- sample( 1:5, 3, replace = TRUE )
+  
+  # Now we'll use some vectorized operations. When we run the test 
+  # "three.urn.sample == 1",
+  # this will create a logical vector in which each element will be TRUE if and only if
+  # the corresponding element in the dice.roll vector is equal to 1. We then apply the
+  # any() function to this logical vector, and this will return TRUE if and only if
+  # at least element in the logical vector is TRUE. Thus, this will model rolling 
+  # four dice and returning TRUE if and only if at least one of them is a 1.
+  
+  if( any(three.urn.sample == 1) ) {
+    result.vector[ replication.index ] <- TRUE
+  }
+}
+
+mean( result.vector )
+```
+This result should be close to 0.49, which is what you should have calculated in Part a).
+
+Here's an alternative approach to simulating this game using vectorized operations:
+```{r}
+number.replications <- 10000  # Let's start by setting the number of replications.
+
+# We'll "roll" each die repeatedly, which means that we'll generate a random
+# sample using the sample() function:
+
+urn.1.vector <- sample( c(1:5), number.replications, replace = TRUE)
+urn.2.vector <- sample( c(1:5), number.replications, replace = TRUE)
+urn.3.vector <- sample( c(1:5), number.replications, replace = TRUE)
+
+# I modified the lecture code by renaming the vectors, and changing the first 
+# argument (which represents the sample space) from 1:6 to 1:5.
+
+# Now we'll use vectorized operations to test to see if at least one of the
+# die was a 1:
+
+result.vector <-
+  (urn.1.vector == 1) | (urn.2.vector == 1) | (urn.3.vector == 1)
+
+# I modified the lecture code by just having three vectors in this expression
+
+# Notice that result.vector is actually a logical vector; that is, it consists of 
+# the values TRUE or FALSE.
+
+# When we apply the mean() function to a logical vector, it will return the
+# proportion of elements in the vector that are TRUE
+
+mean( result.vector )
+```
+
+This value should be close to 49%.
+
+
+
+
+# Problem 6
+
+### Problem Statement
+
+In clinical trials, researchers often compare two treatments to see if one is better than the other. However, sometimes even when there is no real difference between the two treatments, the statistical test can indicate that there is a difference. This is called a *false positive* result, and in statistical theory it is known as a *Type I error*. Typically, a clinical trial is designed so that the probability of a Type I error is 5%.
+
+**Part a)**
+
+Suppose 10 independent clinical trials are conducted, but in each trial there is no real difference between the two treatments. What is the probability that at least one of them will result in a Type I error? Use the methods from lecture to calculate the exact value of this probability.
+
+**Part b)**
+
+Verify your answer in Part a) by constructing a simulation that will provide an approximation to the the true probability.
+
+
+### Problem Solution
+
+**Part a)**
+
+The phrase "at least" in the problem statement should tip you off that the complement trick will be useful here. Instead of calculating the probability of getting a Type I error, we should instead calculate the probability of *not* getting a TYpe I error over the 10 independent studies, and then subtracting from 1. For any individual study, the probability of a Type I error is 5\%, so the probability of not getting a Type I error is 95%, and since the trials are independent the probability of not getting a Type I error over all 10 is (0.95)^10. Thus, the probability of getting at least one Type I error is:
+```{r}
+1 - (1 - 0.05)^10
+```
+So there is a 40% chance that at least one of the 10 independent clinical trials will have Type I error.
+
+Notice here that we do not think of typically think of a clincal trial as a "game". Yet the mathematical theory that we developed by studying games is still applicable here. This is what I mean when I say that gambling and casino games are an ideal "laboratory" for the study of probability theory, because they provide concrete examples that we can study and use to develop our tools.
+
+
+**Part b)**
+
+The only issue with this simulation is that we need a way to model the fact that the Type I error occurs with probability 5%. Since 5% is the same thing as 1/20, we can sample from a range of 20 elements and consider a Type I error has occurred if a random sample equals a particular number. In this simulation, we'll sample from the range 1 through 20, and we'll consider a Type I error to occur if an element equals 1. Note that we could have chosen any other particular value in the range 1 through 20 such as 4 or 17; the important thing is that we have a way of randomly generating the values TRUE and FALSE such that TRUE occurs 5% of the time, and that will model the performance of the clinical trial hypothesis test.
+```{r}
+# We first determine the number of replications
+
+number.replications <- 10000
+
+# Next, we create storage for our experimental results:
+
+result.vector <- logical( number.replications )
+
+for( replication.index in 1:number.replications ) {
+  
+  # Here is where we model the occurence of a Type I error. We draw a random sample of
+  # size 10 from the range 1 through 20. We then use a vectorized operation to compare
+  # each element to the value 1; this will generate a logical vector where each element
+  # is TRUE if and only if the corresponding value in the random sample is equal to 1.
+  # We then use the any() function to determine if at least one of the values in the
+  # logical vector is TRUE, and if so that would simulate a Type I error among the 10
+  # clinical trials.
+  
+  result.vector[ replication.index ] <- any( sample(1:20, 10, replace = TRUE) == 1 )
+}
+
+# Finally, we calculate the proportion of results that are TRUE, and this represents
+# an approximate estimate of the probability of getting at least 1 Type I error rate
+# among 10 independent clinical trials.
+
+mean( result.vector )
+```
+
+This value should be close to 40%.
+
+
+
+
+
+# Problem 7
+
+An insurance company has 20 policyholders. Each year, each policyholder submits a claim amount that ranges from $1 to $2,000, with each claim amount equally likely.
+
+
+### Problem Statement
+
+**Part a)**
+
+What is the probability that all policyholders will submit a claim that is strictly greater than $100? Use the methods from lecture to calculate the exact value of this probability. **Hint:** Notice that this is different from many of the other problems that we've seen. Previously, you had to calculate the probability that *at least* 1 thing occurred, but now you have to calculate the probability that *all* the things are occurring. Remember that the policyholders are all independent.
+
+**Part b)**
+
+Verify your answer in Part a) by constructing a simulation to model the annual claims for the insurance company.
+
+
+
+### Problem Solution
+
+**Part a)**
+
+This problem is actually simpler than some of the previous ones, but you might get confused because it looks unfamiliar. As the hint said, before we've generally been concerned with questions which involved something happening *at least* once, but now we have to consider the case where something happens with *every* policyholder. This is actually very easy to do: by the classical theory of probability, the probability that a claim will be greater than 100 is 1900/2000, and all the policyholders are independent, so we simply raise 1900/2000 to the power of 20:
+```{r}
+(1900/2000)^20
+```
+Thus, the probability that each policyholder will have a claim that is at least 100 is a little less than 36%.
+
+
+
+**Part b)**
+
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+for( replication.index in 1:number.replications ) {
+  result.vector[ replication.index ] <- 
+    all( sample(1:2000, 20, replace = TRUE) > 100 )
+}
+
+mean( result.vector )
+```
+
+This value should be close to 36%.
+
+
+
+# Problem 8
+
+### Problem Statement
+
+In Renaissance Florence, there was a popular dice game in which three dice were rolled, and players bet on the sum of the dice. In this problem, you will calculate the probability that the three dice will sum to 10.
+
+**Part a)**
+
+In the first, we will perform an exact calculation of this probability using the classical theory of probability. To do this, it is necessary to count the number of outcomes in the event "The sum of the dice is 10", and unfortunately there is no simple trick for doing this -- instead, you just have to explicitly list every possibility, so there's some labor involved in solving this problem. Assume that the three dice are colored red, white, and blue. Then systematically enumerate all the outcomes in the event, and display them in an R markdown table. **Hint:** pick a value for the red die, and then consider all possible combinations of the white and blue dice that will lead to a sum of 10. I'll get you started with setting up the table and considering all the outcomes where the red die equals 1:
+
+|Count|Red Die|White Die|Blue Die|Sum|
+|----:|:-----:|:-------:|:------:|:-:|
+|1|1|3|6|10|
+|2|1|4|5|10|
+|3|1|5|4|10|
+|4|1|6|3|10|
+
+Finish this table, and then tell me how many outcomes there are where all three dice sum to 10.
+
+**Part b)**
+
+What is the exact value of the probability of rolling the three dice and observing a total sum of 10?
+
+
+**Part c)**
+
+Verify your answer in Part b) by constructing a simulation to provide an approximate estimate of the true probability. Here are some things to think about:
+
+* How can you write R code to simulate rolling three dice?
+
+* How can you add up the values of the three dice?
+
+* How can you write R code that will evaluate to TRUE if the sum equals 10, and FALSE otherwise?
+
+* How can you store the results of your simulation, and how can you calculate the final proportion of experimental results that are TRUE?
+
+
+### Problem Solution
+
+**Part a) **
+
+I counted 27 distinct outcomes that give a total of 10:
+
+|Count|Red Die|White Die|Blue Die|Sum|
+|----:|:-----:|:-------:|:------:|:-:|
+|    1|   1   |    3    |    6   | 10|
+|    2|   1   |    4    |    5   | 10|
+|    3|   1   |    5    |    4   | 10|
+|    4|   1   |    6    |    3   | 10|
+|    5|   2   |    2    |    6   | 10|
+|    6|   2   |    3    |    5   | 10|
+|    7|   2   |    4    |    4   | 10|
+|    8|   2   |    5    |    3   | 10|
+|    9|   2   |    6    |    2   |10|
+|   10|   3   |    1    |    6   |10|
+|   11|   3   |    2    |    5   |10|
+|   12|   3   |    3    |    4   |10|
+|   13|   3   |    4    |    3   |10|
+|   14|   3   |    5    |    2   |10|
+|   15|   3   |    6    |    1   |10|
+|   16|   4   |    1    |    5   |10|
+|   17|   4   |    2    |    4   |10|
+|   18|   4   |    3    |    3   |10|
+|   19|   4   |    4    |    2   |10|
+|   20|   4   |    5    |    1   |10|
+|   21|   5   |    1    |    4   |10|
+|   22|   5   |    2    |    3   |10|
+|   23|   5   |    3    |    2   |10|
+|   24|   5   |    4    |    1   |10|
+|   25|   6   |    1    |    3   |10|
+|   26|   6   |    2    |    2   |10|
+|   27|   6   |    3    |    1   |10|
+
+
+**Part b)**
+
+There are total of 216 possible outcomes, and there are 27 outcomes where the sum of the dice equals 10, so by the classical theory of probability the probability of the event of obtaining a sum of 10 is:
+```{r}
+27/216
+```
+Thus, the probability is 0.125, or 1/8.
+
+**Part c)**
+
+
+Here's a simple simulation:
+```{r}
+
+number.replications <- 10000
+# First, create a logical vector in which to store the simulation results:
+
+result.vector <- logical( number.replications )
+
+# Now we'll run a for loop:
+
+for( replication.index in 1:number.replications) {
+  
+  # Let's first simulate rolling 3 independent dice:
+  
+  roll.3.dice <- sample(1:6, 3, replace = TRUE)
+  
+  # Now we'll sum the three values of the dice using the sum() function, and then
+  # test to see if this equals 10. Then the current value of the result.vector will
+  # TRUE if and only if the three dice all summed to the value 10.
+  
+  result.vector[ replication.index ] <- (sum(roll.3.dice) == 10)
+  
+  # I actually didn't need to put the right-hand side in parentheses, because the
+  # operator precedence relations will parse the expression so that the equality
+  # test == binds more tightly than the assignment operator <-. However, I think
+  # it's a good idea to do this, so that I can be sure that it's going to work
+  # right, rather than relying on my shaky understanding of the precedence rules.
+}
+
+mean(result.vector)
+```
+
+Your estimate should be close to 0.125.
+

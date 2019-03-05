@@ -1,0 +1,567 @@
+---
+title: "Problem Set 3 Solutions"
+subtitle: 'Type your name here'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+
+#Instructions
+
+**Due:** Wednesday, February 20, 2019
+
+
+First, save this notebook with a title consisting of "ProblemSet3" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet3Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+
+# Problem 1
+
+### Problem Statement
+
+In lecture, we saw that if there are 23 people in a room, there is a 50\% chance that at least 2 of them will have the same birthday. Now we would like to determine how many people have to be in the room in order that there is a 90\% probability that at least 2 of them will have the same birthday.
+
+**Part a)**
+
+Using the exact method, calculate the smallest number of people in the room so that the probability of at least two people having the same birthday is 90\%. You'll have to solve this by trial-and-error: make a guess for the number, see if the resulting probability is too high or too low, adjust your guess, try again . . .
+
+**Part b)**
+
+Using a simulation approach, calculate an approximate value for the smallest number of people in the room so that the probability of at least two people having the same birthday is 90\%.
+
+
+### Problem Solution
+
+**Part a)**
+
+```{r}
+1 - prod( seq( from = 1, by = -1/365, length.out = 41 ) )
+```
+
+
+
+
+
+**Part b)**
+
+Now we'll construct a simulation to verify our calculation in Part a). Notice how we still use the `sample()` function to randomly sample, but now we sample from the range 1 to 365 to represent the birthdays in a year. Also pay attention to how we're using the `duplicated()` function to test for at least two people having the same birthday.
+```{r}
+
+# As before, let's first set the number of replications:
+
+number.replications <- 10000
+
+# We'll need a vector to store the results of our simulations:
+
+result.vector <- logical( number.replications )
+
+
+# Now we're going to run this experiment repeatedly:
+
+for(replication.index in 1:number.replications) {
+  
+  # For each time through the for loop, we generate a new random sample:
+  
+  birthday.sample <- sample(1:365, 41, replace = TRUE)
+  
+  # Now let's test to see if the random sample has any duplicate elements. If
+  # if does, then set the corresponding value of result.vector equal to TRUE.
+  # Otherwise, do nothing, because by default when we created result.vector it
+  # will be populated with FALSE values
+  
+  if( any( duplicated(birthday.sample) ) ) {
+    result.vector[replication.index] <- TRUE
+  }
+}
+
+# As before, we calculate the proportion of TRUE elements by using
+# the mean() function:
+
+mean( result.vector )
+```
+
+
+
+
+
+# Problem 2
+
+### Problem Statement
+
+WiDgT is a dynamic new disruptive startup dedicated to producing the finest hand-crafted artisinal widgets using only all-organic, gluten-free, fair trade ingredients. The company has 200 employees, and would like to randomly assign each employee a five-digit identification number, where each employee is equally likely to be assigned any particular five-digit sequence. 
+
+
+**Part a)**
+
+Using the mathematical methods we saw in lecture, calculate the exact probability that at least two employees will be assigned the same identification number.
+
+
+**Part b)**
+
+Construct a simulation to show that you calculated the correct value in Part a).
+
+
+
+
+### Problem Solution
+
+**Part a)**
+
+Using the mathematical methods we saw in lecture, calculate the exact probability that at least two employees will be assigned the same identification number?
+
+**Answer**
+
+This is essentially the same problem as the birthday problem, except that now instead of 365 possible birthdays we have 100000 possible ID sequences.
+```{r}
+1 - prod( seq( from = 1, by = -1/100000, length.out = 200 ) )
+```
+
+
+**Part b)**
+
+Construct a simulation to show that you calculated the correct value in Part a).
+
+```{r}
+# First, we set up the number of replications:
+
+number.replications <- 10000
+
+# Next, we allocate storage for our result:
+
+result.vector <- logical( number.replications )
+
+# Now we run our *for* loop:
+
+for( replication.index in 1:number.replications ) {
+  
+  # Here is where we randomly and independently assign ID sequences to the 200 employees.
+  # Note that this is the same as the birthday problem, except that we are now working
+  # with 10,000 potential "birthdays".
+  
+  employee.id.vector <- sample(1:100000, 200, replace = TRUE)
+  
+  # We check our vector of employees IDs, and assign the result to the appropriate
+  # location of *result.vector*:
+  
+  result.vector[ replication.index ] <- any( duplicated( employee.id.vector ) )
+}
+
+# Finally, let's calculate the proportion of samples that have at least one
+# duplicated ID:
+
+mean( result.vector )
+```
+Your simulated answer should be very close to 0.18
+
+
+
+
+
+
+
+# Problem 3
+
+### Problem Statement
+
+A large urn contains 100 balls of four colors: 60 are red, 20 are white, 15 are blue, and 5 are purple. The balls are completely mixed up, and the player draws one ball at random.
+
+* If the ball is red, then the player receives nothing.
+
+* If the ball is white, then the player receives a payout of $2.
+
+* If the ball is blue, then the player receives a payout of $5.
+
+* If the ball is purple, then the player receives a payout of $10.
+
+The player pays $1 for each play of the game.
+
+**Part a)** Calculate the exact values of the expected value of the profit.
+
+**Part b)** Construct a simulation to verify that your answer in Part a) was correct.
+
+
+### Problem Solution
+
+**Part a)**
+
+First, let's calculate the expected value of the profit. Remember that the player has to pay \$1 for each play of the game, so the profit is different from the payout:
+```{r}
+# First, we create a vecgtor with the profits for each color:
+
+problem.3.profit.vector <- c(-1, 1, 4, 9)
+
+# Next, we create a vector with the corresponding probabilities
+# for each color:
+
+problem.3.probability.vector <- c(0.6, 0.2, 0.15, 0.05)
+
+# To obtain the expected profit, we use vectorized operations to multiply
+# the profit for each color by its corresponding probability, and then
+# add up all the values:
+
+problem.3.expected.profit <- sum( problem.3.profit.vector * problem.3.probability.vector )
+
+# Finally, we report the expected profit:
+
+cat( "The expected profit is:", problem.3.expected.profit, "\n" )
+```
+
+
+
+
+**Part b)**
+
+There are a couple of different ways that we can construct the simulation. One approach is to directly model the sample space of colored balls, and then apply the random variable function to this:
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications) {
+  
+  # Here, we directly model sampling from an urn with colored balls
+  
+  observed.ball <-
+    sample(
+      c( "red", "white", "blue", "purple" ),
+      1,
+      replace = TRUE,
+      prob = problem.3.probability.vector
+  )
+  
+  # Now we calculate the profit based on the observed outcome of the experiment.
+  
+  if( observed.ball == "red" ) {
+    result.vector[ replication.index ] <- -1
+  } else if( observed.ball == "white" ) {
+    result.vector[ replication.index ] <- 1
+  } else if( observed.ball == "blue" ) {
+    result.vector[ replication.index ] <- 4
+  } else {
+    result.vector[ replication.index ] <- 9
+  }
+}
+
+cat( "The approximate estimate of the mean profit is:", mean( result.vector ), "\n" )
+```
+The simulation approximation for the expected profit should be close to 0.65.
+
+
+Another way to do this is to work directly with the profit random vector.
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications) {
+  
+  # Here, we directly model sampling from an urn with colored balls
+  
+  profit <-
+    sample(
+      problem.3.profit.vector,
+      1,
+      replace = TRUE,
+      problem.3.probability.vector)
+  
+  result.vector[ replication.index ] <- profit
+}
+
+cat( "The approximate estimate of the mean profit is:", mean( result.vector ), "\n" )
+```
+The simulation approximation for the expected profit should be close to 0.65.
+
+
+
+
+
+
+
+# Problem 4
+
+### Problem Statement
+
+The Chevalier de Mere has a new dice game. In this game, the player pays an initial wager of \$2 then rolls two dice 20 times, and wins a payout of *P* if both dice come up as 1 at least once.
+
+**Problem** Calculate the value of the payout *P* that makes this game fair. Save your answer in a variable named `fair.value.payout`.
+
+**Hint:** First, calculate the probability of winning the game, then use the formula from lecture.
+
+### Problem Solution
+
+First, we need to calculate the probability of winning the game:
+```{r}
+winning.probability <- 1 - (35/36)^20
+winning.probability
+```
+
+Now we can use our formula from lecture to determine what the winning profit has to be in order for the game to be fair:
+```{r}
+fair.value.payout <- 2 / winning.probability
+fair.value.payout
+```
+
+
+
+# Problem 5
+
+### Problem Statement
+
+Construct a simulation to validate your answer in Problem 4. That is, show that if the players play the game using the winning payout that you calculated and stored in the variable `fair.value.payout', then the expected profit will be 0.
+
+### Problem Solution
+
+```{r}
+# We specify the number of replications:
+
+number.replications <- 100000
+
+# Also, we create storage for our simulation replications:
+
+result.vector <- numeric( number.replications )
+
+# Now we can run our main simulation for loop
+
+for( replication.index in 1:number.replications ) {
+  
+  # We're going to simulate rolling each die 20 times
+  die.1.vector <- sample(1:6, 20, replace = TRUE )
+  die.2.vector <- sample(1:6, 20, replace = TRUE )
+  
+  # Now we use some vectorized code. We first compare each die vector to 1; this will
+  # return a logical vector where each element is TRUE if and only if the corresponding
+  # element of the die vector is equal to 1. We then combine these two vectors using the
+  # & operator; this will create a logical vector where each element is TRUE if and only 
+  # the corresponding element in die.1.vector is equal to 1, and also the corresponding
+  # element in die.2.vector is also equal to 1. Thus, when we run this code, the test for
+  # the if() statement evaluates to TRUE if and only if the player wins the game.
+  
+  if( any( (die.1.vector == 1) & (die.2.vector == 1) ) ) {
+    
+    # In this block of code, we calculate the profit for winning the game. That
+    # is just the fair value of the payout that you calculated in Problem 4,
+    # minus the initial wager:
+    
+    result.vector[ replication.index ] <- fair.value.payout - 2
+    
+  } else {
+    
+    # In this block of code, we calculate the profit for losing the game. That
+    # is just minus the initial wager, because there is no payout for losing 
+    # a game:
+    
+    result.vector[ replication.index ] <- -2
+  }
+}
+
+# Now when we calculate the mean of the profit.vector it should be close to 0
+
+mean( result.vector )
+```
+
+
+
+
+
+
+
+# Problem 6
+
+### Problem Statement
+
+**Part a)** The Chevalier de Mere is holding a party with 30 guests, and he devises a fun new party game to play with his friend Pierre de Fermat. Each of the 30 guests announces his or her birthday, and if any two guests have the same birthday, then Fermat has to pay the Chevalier 1000 euros. How much should the Chevalier pay Fermat as an initial wager for the game to be fair? Store your answer in the variable `fair.value.wager`.
+
+**Part b)** Develop a simulation that demonstrates that your calculation in Part a) was correct. That is, show that if the Chevalier does payout the value that you saved in the variable `fair.value.wager` each time he loses the game, then the expected value of his winnings is 0.
+
+
+**Hint** Once again, calculate the winning probability of the game, and then use the formula in lecture.
+
+
+### Problem Solution
+
+ 
+**Part a)** The Chevalier de Mere is holding a party with 30 guests, and he devises a fun new party game to play with his friend Pierre de Fermat. Each of the 30 guests announces his or her birthday, and if any two guests have the same birthday, then Fermat has to pay the Chevalier 1000 euros. How much should the Chevalier pay Fermat as an initial wager for the game to be fair? Store your answer in the variable `fair.value.wager`.
+
+
+First, let's calculate the exact probability that the Chevalier will win the game:
+```{r}
+winning.probability <- 1 - prod( seq( from = 1, by = -1/365, length.out = 30 ) )
+winning.probability
+```
+You should convince yourself that this makes sense: we know that only 23 guests are required to achieve a 50\% probability of a match, so now that we have a room with 30 guests the probability of a birthday match will be somewhat greater than 50\%.
+
+So the Chevalier will win his bet 71% of the time. Since the payout is $P = 1000$, the formula from lecture gives the fair wager as:
+```{r}
+fair.value.wager <- 1000 * winning.probability
+fair.value.wager
+```
+So the fair wager for the Chevalier is 706 euros.
+
+
+**Part b)** Develop a simulation that demonstrates that your calculation in Problem 5 was correct. That is, show that if the Chevalier does payout the value that you saved in the variable `losing.payout` each time he loses the game, then the expected value of his winnings is 0.
+
+```{r}
+number.replications <- 10000
+
+profit.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications) {
+  
+  birthday.sample <- sample(1:365, 30, replace = TRUE)
+  
+  if( any( duplicated(birthday.sample) ) ) {
+    profit.vector[ replication.index ] <- 1000 - fair.value.wager
+  } else {
+    profit.vector[ replication.index ] <- -fair.value.wager
+  }
+}
+
+mean( profit.vector )
+```
+
+
+
+
+
+# Problem 7
+
+### Problem Statement
+
+Based on a careful analysis, Blaise Pascal has decided that the stock of WiDgT will have 4 possible prices one month from now:
+
+* The stock will be \$110 with probability 0.10
+
+* The stock will be \$100 with probability 0.15
+
+* The stock will be \$90 with probability 0.30
+
+* The stock will be \$80 with probability 0.30
+
+* The stock will be \$70 with probability 0.15
+
+**Part a)**
+
+Assuming that Pascal's probability model is true, what would be a fair price for the stock?
+
+
+
+**Part b)**
+
+Suppose the stock is currently selling for \$84. Assuming that Pascal's model is correct, calculate his expected profit in one month if he purchases one share of stock today.
+
+
+
+**Part c)**
+
+Assuming that Pascal's probability model is true, what is the probability that if he purchases one share of the stock at \$84 today he will lose money one month from now?
+
+### Problem Solution
+
+
+**Part a)**
+
+Assuming that Pascal's probability model is true, what would be a fair price for the stock?
+
+**Answer**
+
+```{r}
+stock.price.vector <- c(110, 100, 90, 80, 70)
+
+stock.probability.vector <- c(0.10, 0.15, 0.30, 0.30, 0.15)
+
+# Now we use our standard idiom for calculating the expected value for
+# a finite random variable.
+
+expected.stock.price <- sum( stock.price.vector * stock.probability.vector )
+
+cat( "The expected stock price is:", expected.stock.price, "\n" )
+```
+
+
+**Part b)**
+
+Suppose the stock is currently selling for \$84. Assuming that Pascal's model is correct, calculate his expected profit in one month if he purchases one share of stock today.
+
+```{r}
+# Here's a nice way to calculate the profit vector. We start with the stock.price.vector,
+# and then use vectorized subtraction to subtract the current price from each entry.
+
+profit.vector <- stock.price.vector - 84
+
+sum( profit.vector * stock.probability.vector )
+```
+
+
+
+**Part c)**
+
+Assuming that Pascal's probability model is true, what is the probability that if he purchases one share of the stock at \$84 today he will lose money one month from now?
+
+```{r}
+0.30 + 0.15
+```
+
+
+
+
+
+
+
+
+
+
+
+# Problem 8
+
+### Problem Statement
+
+Construct a simulation that will verify that if Pascal purchases the stock today for \$84, his expected profit will be the value that you calculated in Part b) in Problem 7.
+
+### Problem Solution
+
+We can define the stock prices and stock probabilities just like in Problem 7:
+```{r}
+stock.price.vector <- c(110, 100, 90, 80, 70)
+
+stock.probability.vector <- c(0.10, 0.15, 0.30, 0.30, 0.15)
+```
+
+Now we can build our simulation:
+```{r}
+number.replications <- 10000
+
+profit.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+  
+  final.stock.price <- sample( stock.price.vector,
+                               1,
+                               replace = TRUE, 
+                               prob = stock.probability.vector )
+  
+  final.profit <- final.stock.price - 84
+  
+  profit.vector[ replication.index ] <- final.profit
+}
+
+mean( profit.vector )
+
+
+
+```
+
+Your final answer should be very close to 3.5.
+
+
+
+
+
+
+
+

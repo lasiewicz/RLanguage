@@ -1,0 +1,497 @@
+---
+title: "Lecture 4: Roulette"
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# More R Stuff
+
+We just have a little bit of new R code to learn about this week.
+
+
+### The %in% Operator
+
+Suppose we have a particular value and a vector, and we wish to determine if the particular value is contained in the vector i.e. at least one element of the vector has this particular value. We've already seen one way to do this, in which we perform a vectorized comparison and then use the `any()` function. Another way to do this with the %in% operator, which takes a value and a vector and returns `TRUE` if the value is contained in the vector, and `FALSE` otherwise. For instance, suppose the variable `a` has the value 4, and we wish to test if this value is contained in the range 1 through 10. Then we can write:
+```{r}
+# First, set the value of the variable a to 4:
+
+a <- 4
+
+# Now test to see if this value is contained in the range 1 through 10:
+
+a %in% 1:10
+```
+Because the value 4 is indeed contained in the range 1 through 10, the %in% returns the value `TRUE`. On the other hand, if the particular value is not contained in the vector, then the %in% operator will return `FALSE`:
+```{r}
+a %in% 10:20
+```
+
+
+
+
+
+
+### The if-then-else construct
+
+Last week we saw the `if()` function, that takes a logical value and then evaluates a block of code if the logical value is TRUE. What happens if the logical value evaluates to FALSE? In this case, we can use the `else` keyword to indicate a block of code to be evaluated. For instance:
+```{r}
+a <- 1
+
+if( a > 3 ) {
+  cat( "The variable a is greater than 3" )
+} else {
+  cat( "The variable a is less than or equal to 3" )
+}
+```
+With this code, try changing the value of `a`, and see how the output message changes. Make sure you try all three cases: try a value of `a` which is strictly greater than 3, another value of `a` that is strictly less than 3, and finally the case where `a` is exactly 3.
+
+We can also create chained `if` statements, by placing another `if` after the `else`:
+```{r}
+a <- 3
+
+if( a > 3 ) {
+  cat( "The variable a is greater than 3" )
+} else if (a < 3) {
+  cat( "The variable a is less than  3" )
+} else {
+  cat( "The variable a is equal to 3" )
+}
+```
+
+
+### The `var()` function
+
+So far, when we finished our simulations, we use the `mean()` function to estimate a mean or a proportion. Now that we've seen the variance, we'll need a function that can take a numeric vector and calculate an estimate of the true variance. In R, that function is `var()`, and this function takes a vector of numeric values and calculates the variance:
+```{r}
+var( c(4, 6, 8, 13, 1) )
+```
+
+
+### Incrementing the value of a variable
+
+Often, we'll want to add some quantity to a variable. For example, suppose the variable `a` has the value 5:
+```{r}
+a <- 5
+```
+Now we can increment the value stored in `a` by 1 using this code:
+```{r}
+a <- a + 1
+```
+Let's unpack this. This is an assignment statement, so R evaluates the right-hand side first, then assigns this value to the left-hand side. In the first step, when R evaluates the right-hand step, `a` has the value 5, so the expression `a + 1` evaluates to 5 + 1 = 6. Then, in the second step, the value of the right-hand side is assigned to the left-hand side, which is the variable `a`. So the end result is that `a` now has the value 6 at the end of this code:
+```{r}
+a
+```
+We aren't limited to incrementing by 1; we can increment or decrement a variable by any amount. For instance, suppose the variable `payout` starts with the value 0:
+```{r}
+payout <- 0
+```
+Now we can increment `payout` by the value 9:
+```{r}
+payout <- payout + 9
+payout
+```
+
+
+
+
+# A Computational Issue
+
+At the beginning of class, we reviewed the Birthday problem, and saw that expressions for the solution of this problem that were mathematically equivalent but were computationally very different. The first expression was of the form:
+$$
+\underbrace{\left ( \frac{365}{365} \right ) \times \left ( \frac{364}{365} \right ) \times \ldots \times \left ( \frac{365 - N + 1}{365} \right )}_{\hbox{$N$ terms}}
+$$
+This is the expression that we saw in Lecture 2, and we can implement it in R using the `seq()` function:
+```{r}
+prod( seq( from = 1, by = -1/365, length.out = 23) )
+```
+The other expression was:
+$$
+	\underbrace{ \frac{ 365 \times 364 \times \ldots \times (365 - N + 1)}{365 \times 365 \times \ldots \times 365}}_{\hbox{$N$ terms}}
+$$
+We need to write some different R code for this expression.
+
+First, for the numerator, we can use the `seq()` function:
+```{r error = TRUE}
+prod( seq( from = 365, by = -1, length.out = 23) )
+```
+The "e+58" at the end of the output means 10 raised to the 58th power, so the whole number is really 4.22 times 10 raised to the 58th power. That's a very big number. The denominator is even bigger, but at least it's easier to type:
+```{r error = TRUE}
+365^23
+```
+Also, a very big number! So the entire expression is:
+```{r error = TRUE}
+prod( seq( from = 365, by = -1, length.out = 23) ) / 365^23
+```
+You'll notice that this value is *exactly* the same as what we calculated using the first expression. However, if we try to use the second approach on other problems with larger numbers, at some point R will not be able to handle the resulting values, and will issue an error.
+	
+
+
+
+# Variance of a finite random variable
+
+
+First, let's define a vector with the realized values of the random variable:
+```{r}
+x.support.vector <- c(0, 1, 5, 20)
+
+x.probability.vector <- c(0.55, 0.3, 0.1, 0.05)
+
+```
+
+Now we can calculate the expected value:
+```{r}
+x.expected.value <- sum( x.support.vector * x.probability.vector )
+x.expected.value
+```
+We calculated the value 1.8 in the previous lecture.
+
+Now we can calculate the squared deviations from the mean:
+```{r}
+(x.support.vector - x.expected.value)^2
+```
+We calculated these values in lecture, but it would great if you got a calculator and checked all of these by hand.
+
+Finally, to calculate the expected value of the squared deviations from the mean, we have to weight each squared deviation from the mean by its associated probability, and then add all these terms up. First, the weighted values are:
+```{r}
+(x.support.vector - x.expected.value)^2 * x.probability.vector
+```
+
+Finally, we add up all these terms to obtain the variance:
+```{r}
+sum( (x.support.vector - x.expected.value)^2 * x.probability.vector )
+```
+And 19.56 is exactly the value that we calculated in lecture.
+
+
+Let's try the alternative formula for calculating the variance. First, we calculate the *second moment*, which is the expected value of the square of $X$:
+```{r}
+x.squared.expected.value <- sum( x.support.vector^2 * x.probability.vector )
+x.squared.expected.value
+```
+
+Now we can use the alternative value:
+```{r}
+x.squared.expected.value - (x.expected.value^2)
+```
+
+
+
+
+# Bernoulli and Generalized Bernoulli Random Variables
+
+
+### Bernoulli random variables
+
+Let's consider a baseball batter who bats .300 i.e. who gets a hit 30\% of the time. In lecture we saw that if we define a Bernoulli random variable $X$ that is 1 when the batter gers a hit and 0 when the batter gets an out then the expected value of $X$ is 0.3 and the variance is 0.21. Let's simulate this:
+```{r}
+number.replications <- 10000
+
+result.vector <- sample( c(1,0), 
+                         number.replications, 
+                         replace = TRUE, 
+                         prob = c(0.3, 0.7) )
+
+cat( "The approximate expected value of the Bernoulli random variable is:", mean(result.vector), "\n" )
+cat( "The approximate variance of the Bernoulli random variable is:", 
+       round(var( result.vector),5), "\n" )
+```
+
+The approximate estimate of the expectation should be close to 0.3, while the approximate estimate of the variance should be close to 0.21. 
+
+
+### Generalized Bernoulli random variables
+
+Now let's consider the generalized Bernoulli random variable, where the batter receives \$70 for a hit and $25 for an out. Using the standard approach, the expected value of this generalized Bernoulli random variable is:
+```{r}
+first.moment <- (70 * 0.3) + (25 * 0.7)
+first.moment
+```
+ALso using the standard approach, the second moment is:
+```{r}
+second.moment <- (70^2 * 0.3) + (25^2 * 0.7)
+second.moment
+```
+Then the variance is:
+```{r}
+second.moment - first.moment^2
+```
+
+We can instead use the algebraic formulas derived in lecture. The expectation of this generalized Bernoulli random variable is:
+```{r}
+(70 - 25) * 0.3 + 25
+```
+
+The variance of this generalized Bernoulli random variable is:
+```{r}
+(70-25)^2 * 0.3 * (1-0.3)
+```
+These are exactly the values we calculate using the standard approach.
+
+
+
+Now let's construct a simulation for this random variable:
+```{r}
+number.replications <- 10000
+
+result.vector <- sample( c(70,25), 
+                         number.replications, 
+                         replace = TRUE, 
+                         prob = c(0.3, 0.7) )
+
+cat( "The approximate expected value of the generalized Bernoulli random variable is:", mean(result.vector), "\n" )
+cat( "The approximate variance of the generalized Bernoulli random variable is:", 
+       round(var( result.vector),5), "\n" )
+```
+
+The approximate value of the expectation should be close to 38.5, while the approximate value of the variance should be close to 425.25.
+
+
+
+
+
+
+
+
+# Roulette
+
+### The straight-up bet
+
+First, let's calculate the expected profit from a \$1 straight-up bet. That means that we bet $1 on a particular number, and if it comes up we win \$36 back, resulting in a profit of \$35, while if it does not we lose our bet, resulting in a profit of -\$1. First, let's perform an exact calculation for the expected value of the profit:
+```{r}
+straight.up.expected.profit <- 35 * 1/38 + (-1) * 37/38
+straight.up.expected.profit
+```
+
+So, in the long run, for every dollar that we bet, we can expect to lose a little more than 5 cents.
+
+Now let's calculate the variance of the profit for a straight-up bet. We've already calculated the expected value of the profit, so now we need to calculate the second moment i.e. the expected value of the squared profit:
+```{r}
+straight.up.expected.squared.profit <- 35^2 * 1/38 + (-1)^2 * 37/38
+straight.up.expected.squared.profit
+```
+
+Now we can calculate the variance:
+```{r}
+straight.up.expected.squared.profit - (straight.up.expected.profit^2)
+```
+
+The profit from a straight up bet is an example of a generalized Bernoulli random variable: one outcome is 35, with probability 1/38, while the other outcome is -1, which occurs with probability 37/38. We can use our algebraic formula for the expected value:
+```{r}
+(35 - (-1)) * (1/38) + (-1)
+```
+That's exactly the value that we calculated previously. Now let's try this out the algebraic formula for the variance of the generalized Bernoulli random variable:
+```{r}
+(35 - (-1))^2 * (1/38) * (37/38)
+```
+
+
+
+
+Now let's build a simulation to study the profit of a straight up bet. For concreteness, let's assume that the player places a \$1 wager on the number 22:
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    ## First let's spin the roulette wheel:
+    
+    spin.number <- sample(1:38, 1, replace = TRUE )
+    
+    ## Now we'll test the spin.number to see if it's
+    ## equal to 22:
+    
+    if( spin.number == 22 ) {
+        
+        ## Here the spin number is equal to 22, so
+        ## the player wins, and the profit 
+        ## for this game is $35:
+        
+        result.vector[ replication.index ] <- 35
+        
+    } else {
+        
+        ## Here the spin.number is not 22, so
+        ## the player loses, and the profit
+        ## for this game is -$1:
+        
+        result.vector[ replication.index ] <- -1
+        
+    }
+}
+
+## Now that we're done with our simulation, we can print out
+## the mean and variance of our simulation results:
+
+cat( "The approximate expected value of the profit is:",
+     mean( result.vector), "\n" )
+
+cat( "The approximate variance of the profit is:", 
+       round(var( result.vector),5), "\n" )
+```
+The approximate expectation of the profit should be close to -0.053, while the approximate variance of the profit should be close to 33.21.
+
+
+### The Red/Black bet
+
+In lecture, we looked at the case of a \$1 wager on Red. Let's calculate the expected value of the profit for this bet:
+```{r}
+expected.red.profit <- 1 * 18/38 + (-1) * 20/38
+expected.red.profit
+```
+Now for the second moment:
+```{r}
+expected.squared.red.profit <- 1^2 * 18/38 + (-1)^2 * 20/38
+expected.squared.red.profit
+```
+
+The variance of the profit for a wager on red is:
+```{r}
+expected.squared.red.profit - (expected.red.profit^2)
+```
+
+
+Let's do a simulation. This time, we'll use the %in% operator. First, let's define a vector that has all the values that are red:
+```{r}
+red.vector <- c(1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36)
+```
+Now we can run our simulation:
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    ## First let's spin the roulette wheel:
+    
+    spin.number <- sample(1:38, 1, replace = TRUE )
+  
+    ## Now we'll test the spin.number to see if it's
+    ## a red number:
+
+    if( spin.number %in% red.vector ) {
+
+        ## Here the spin number is red, so
+        ## the player wins, and the profit 
+        ## for this game is $1:
+        
+        result.vector[ replication.index ] <- 1
+        
+    } else {
+
+        ## Here the spin.number is not red, so
+        ## the player loses, and the profit
+        ## for this game is -$1:
+        
+        result.vector[ replication.index ] <- -1
+    }
+}
+
+## Now that we're done with our simulation, we can print out
+## the mean and variance of our simulation results:
+
+cat( "The approximate expected value of the profit is:",
+     mean(result.vector), "\n" )
+cat( "The approximate variance of the profit is:", 
+     round(var( result.vector),5), "\n" )
+```
+The approximate expectation of the profit should be close to -0.053, while the approximate variance of the profit should be close to 0.997.
+
+
+
+
+### The combined bet
+
+The textbook discusses combined bets, where a player places multiple bets. Here we need to consider multiple cases. For instance, consider the example where a player wagers \$2 on Black, and \$3 on the Second Dozen. There are four cases:
+
+* First, the number can be 14, 16, 18, 19, 21, or 23, in which case both bets pay off. The payout for the Black bet will be $2 \times \$2 = 4$, while the payout for the Second Dozen bet will be $3 \times \$3 = 9$, for a total payout of \$13. This will occur with probability 6/38.
+
+* Second, the number can be 1, 3, 5, 7, 9, 12, 25, 27, 30, 32, 34, or 36, in which case the Black bet wins, but the Second Dozen bet loses. Then the payout is $2 \times \$2 = \$4$ for the winning Black bet but $0 \times \$3 = \$0$ for the losing bet on the Second Dozen, for a net payout of $\$4 + \$0 = \$4$. This will occur with probability 12/38.
+
+* Third, the number can be 13, 15, 17, 20, 22, or 24, in which case the wager on Black loses, but the bet on the Second Dozen wins. Then the payout is $2 \times \$0 = \$0$ for the losing Black bet but $3 \times \$3 = \$9$ for the losing bet on the second dozen, for a net payout of $\$0 + \$9 = \$9$. This will occur with probability 6/38.
+
+* Finally, any other number means that both bets lose, so the payout is just \$0. This will occur with probability 14/38.
+
+This is not a Bernoulli random variable, nor a generalized Bernoulli random variable, because the profit random variable has more than two values. So we have to use the standard approach. Here we can exploit the vectorized operations of R to make the calculations easy. First, the expected value is:
+```{r}
+expected.payout <- sum( c(13, 4, 9, 0) * c(6/38, 12/38, 6/38, 14/38) )
+expected.payout
+```
+
+Now let's construct a simulation to verify this calculation:
+```{r}
+
+second.dozen.vector <- 13:24
+
+black.vector <- c(1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36)
+
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, let's spin the roulette wheel:
+    
+    roulette.outcome <- sample(1:38, 1, replace = TRUE )
+    
+    # We'll initialize the payout to 0, and then
+    # increment it depending on whether or not the
+    # second dozen or black bets paid off:
+    
+    payout <- 0
+    
+    ## First we'll check to see if the Second Dozen
+    ## bet won:
+    
+    if( roulette.outcome %in% second.dozen.vector ) {
+        
+        ## Here the Second Dozen bet won, so
+        ## we increment the payout value
+        ## by 3 * $3 = 9:
+        
+        payout <- payout + 9
+        
+    }
+    
+    if( roulette.outcome %in% black.vector ) {
+        
+        ## Here the Black bet won, so
+        ## increment the payout value
+        ## by 2 * $2 = $4:
+        
+        payout <- payout + 4
+    }
+    
+    ## Now we store the total payout
+    ## in result.vector:
+    
+    result.vector[ replication.index ] <- payout
+}
+
+cat( "The estimated expected payout is:", mean( result.vector ), "\n" )
+```
+Your simulation result should be close to 4.74.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

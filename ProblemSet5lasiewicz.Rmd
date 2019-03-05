@@ -1,0 +1,517 @@
+---
+title: "Problem Set 5"
+subtitle: 'William J Lasiewicz'
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+
+# Instructions
+
+**Due:** Wednesday, March 6, 2019
+
+#Instructions
+
+First, save this notebook with a title consisting of "ProblemSet5" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet5Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+
+
+
+
+# Problem 1
+
+### Problem Statement
+
+Assume we have an urn with 9 red balls and 13 white balls, and we draw a sample of 7 balls from this urn. We would like to calculate the probability of observing exactly 4 red balls in this sample of size 7.
+
+**Part (a)**
+
+Calculate the probability of observing exactly 4 red balls in the sample of size 7 using only the R function `choose()`. (You should use the formula for the hypergeometric distribution on slide 104.)
+
+**Part (b)**
+
+Calculate the probability of observing exactly 4 red balls in the sample of size 7 using the built-in R function `dhyper()`. (See slide 112 for the information about the `dhyper()` function.)
+
+
+**Part (c)**
+
+Construct a simulation that shows that your calculations in Parts (a) and (b) are correct.
+
+
+
+
+
+### Problem Solution
+
+**Part (a)**
+
+
+
+```{r}
+#P(X=x)=((m\x)*(n\k-x))\((m+n)\k)
+#m=number of red balls in urn
+#n=number of white balls in urn
+#k=total sample size we draw
+#x=number of red balls in sample
+m<-9
+n<-13
+k<-7
+x<-4
+
+choose(9,4) * choose( 13,3) / choose( 22,7)
+```
+
+
+
+**Part (b)**
+
+```{r}
+#dhyper(x,m,n,k)
+dhyper( 4, 9, 13, 7)
+```
+
+
+**Part (c)**
+
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+urn.vector <- c( "red", "red", "red", "red", "red", "red", "red", "red", "red","white", "white", "white", "white","white", "white", "white", "white","white", "white", "white", "white", "white")
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( urn.vector, 7, replace = FALSE )
+    
+    red.ball.count <- sum( my.sample == "red" )
+    
+    if(red.ball.count == 4) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+```
+
+
+
+\newpage
+# Problem 2
+
+### Problem Statement
+
+The directors of WiDgT have decided to change their employee ID system: each employee IDs must still consist of a sequence of 5 digits, but now all the digits must be different. Thus, these are examples of legal IDs:
+
+* 48713
+
+* 90763
+
+* 85124
+
+However, these are examples of non-legal IDs, because they all have repeated digits:
+
+* 55683
+
+* 17941
+
+* 60820
+
+**Part (a)**
+
+How many legal IDs are there? Use R to perform the arithmetic to calculate this value.
+
+
+**Part (b)**
+
+Each employee is randomly assigned a legal ID, independently of all other employees, so it is possible for two employees to be assigned the same ID. WiDgT has now expanded to 240 employees. What is the probability that at least two employees will be assigned the same ID?
+
+**Part (c)**
+
+Construct a simulation to verify your calculation in Part (b).
+
+
+
+
+### Problem Solution
+
+**Part (a)**
+
+```{r}
+num<-10*9*8*7*6
+num
+
+```
+**Part (b)**
+30240 cominitation
+1 -probablity none out of 240 are the same
+```{r}
+#probablity none out of 240 are the same
+p<-1-(30239/30240)^240
+p
+
+```
+
+
+
+**Part (c)**
+```{r}
+number.replications <- 10000
+
+# We'll need a vector to store the results of our simulations:
+
+result.vector <- logical( number.replications )
+
+for(replication.index in 1:number.replications) {
+
+  
+  employee.sample <- sample(1:30240, 240, replace = TRUE)
+  
+
+  
+  if( any( duplicated(employee.sample) ) ) {
+    result.vector[ replication.index ] = TRUE
+  }
+}
+
+cat( "The estimated probability of a match is:", mean( result.vector ) )
+```
+
+\newpage
+# Problem 3
+
+### Problem Statement
+
+The Chevalier de Mere has invented a new game. An urn contains 25 balls, with 5 of them colored red and the rest colored white. The player then selects 5 balls without replacement from the urn and wins \$10 if at least 2 of them are red.
+
+**Part (a)**
+
+Calculate the probability that the player will win the game.
+
+
+**Part (b)**
+
+What is the fair value of the game?
+
+**Part (c)**
+
+Construct a simulation to verify your calculations in Parts (a) and (b).
+
+
+### Problem Solution
+
+**Part (a)**
+
+m=5
+n=20
+k=5
+x=2
+phyper(x, m, n, k)
+phyper(3, 6, 9, 5)
+```{r}
+#probablity none out of 240 are the same
+p<-phyper(2, 5, 20, 5)
+p
+
+
+```
+
+
+
+**Part (b)**
+10$*.9623377
+=$9.62
+
+
+
+**Part (c)**
+
+
+
+
+
+
+
+\newpage
+# Problem 4
+
+### Problem Statement
+
+**Part (a)**
+
+Marie Antoinette is very excited! She has 100 boxes of Healthy Kale and Tofu breakfast cereal, and she knows that 5 of them contain the new Pierre de Fermat action figure! How many boxes of cereal must she open so that the probability that she finds at least one action figure is greater than 0.7?
+
+**Part (b)**
+
+Construct a simulation to verify your answer in Part (a).
+
+
+
+### Problem Solution
+
+**Part (a)**
+
+//to way to approch this , algebraically or iteratively.  iteratively allows us to use the build in R function.
+            // we will use the following.
+            m < -5
+            n < -95
+            k < -x
+            x < -1
+           phyper(1, 5, 95, x)
+           probablity of at least 1 is 1-probablity of none
+           dhyper(1, 5, 95, x)
+```{r}
+number.replications<-100
+for(i in 1:number.replications) {
+  p<-dhyper(0, 5, 95, i)
+  #cat (i, "  ",p,"\n")
+  if ((1-p)>.7){
+    cat( "She must open ", i, " boxes to get probablity of " ,1-p)
+    break
+  }
+  
+}
+```
+
+**Part (b)**
+
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+urn.vector<-seq( 1, 100)
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( urn.vector, 21, replace = FALSE )
+    
+    action.figure.count <- sum( my.sample >95 )
+    #assume numbers 96,97,98,99,100 containg action.figure
+    if(action.figure.count >0) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector)
+# this gave a result of 0.7036 simular to above
+
+```
+
+\newpage
+# Problem 5
+
+### Problem Statement
+
+In a 6-spot Keno ticket, the player selects 6 numbers. The payout for this wager in the Massachusetts Lottery Keno game are:
+
+|Match|Payout|
+|:---:|-----:|
+|6|1600|
+|5|50|
+|4|7|
+|3|1|
+
+**Part (a)**  Calculate the expected profit for a \$1 wager on a 6 spot Keno ticket.
+
+           
+
+
+**Part (b)** Construct a simulation to verify your calculation in Part (a).
+
+
+
+
+### Problem Solution
+
+**Part (a)**
+
+ m < -6
+            n < -74
+            k < -20
+            x < -(3 though 6)
+
+           hyper(x, m, n, k)
+```{r}          
+p6<-dhyper(6, 6, 74, 20)
+cat(p6,"\n")
+p5<-dhyper(5, 6, 74, 20)
+cat(p5,"\n")
+p4<-dhyper(4, 6, 74, 20)
+cat(p4,"\n")
+p3<-dhyper(3, 6, 74, 20)
+cat(p3,"\n")
+Expected.value=(p6*1600)+(p5*50)+(p4*7)+(p3*1)
+cat(Expected.value)
+cat("expected profit = " ,Expected.value-1,"cents")
+```
+
+**Part (b)**
+
+```{r}
+number.replications <- 100000 # bigger value as impobable to match 6
+
+result.vector <- numeric( number.replications )
+
+urn.vector<-seq( 1, 80)
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( urn.vector, 6, replace = FALSE )
+   # cat(my.sample ,"\n")
+       match.numbercount <- sum( my.sample >74 )
+    #cat (match.numbercount,"\n")
+    #use arbitary numbers 74 - 80 as numbers
+    if(match.numbercount ==6) {
+      result.vector[ replication.index ] =1500
+    }
+     if(match.numbercount ==6) {
+      result.vector[ replication.index ] =150
+     }
+     if(match.numbercount ==4) {
+      result.vector[ replication.index ] = 17
+     }
+     if(match.numbercount ==3) {
+      result.vector[ replication.index ] = 1
+     }
+     if(match.numbercount <3) {
+      result.vector[ replication.index ] =0
+     }
+    #cat ("result.vector[ replication.index ] ",result.vector[ replication.index ],"\n")
+    
+}
+
+mean( result.vector)
+# This doesn't really pan out as you never hit 6
+
+```
+
+
+
+\newpage
+# Problem 6
+
+### Problem Statement
+
+**Part (a)**
+
+The Commonwealth of Massachusetts has decided to change the winning values for Keno so that now the expected payout is 65 cents for every dollar wagered. In order to do this, the maximum payout for a 6 spot Keno ticket will be reduced, so that the table of winning amounts is:
+
+|Match|Payout|
+|:---:|-----:|
+|6| ???|
+|5|50|
+|4|7|
+|3|1|
+
+Find the largest value for the amount won for matching all 6 numbers on the ticket so that the expected payout is less than $0.65 for a $1.00 wager. Only consider multiples of 100 for this amount such as 1600, 1500, and so on.
+
+
+**Part (b)**
+
+Construct a simulation that will verify your calculation in Part (a) i.e. if you use the new winning payout that you calculated for matching all 6 numbers on the ticket, show that the expected payout for a \$1 wager is less than \$0.65.
+
+
+
+### Problem Solution
+
+**Part (a)**
+
+
+
+**Part (b)**
+
+
+
+
+
+\newpage
+# Problem 7
+
+### Problem Statement
+
+The Chevalier de Mere has devised a new game, called "Anti-Keno", which he will offer at his casino. In this game, the player makes an initial wager of \$1 and selects 12 numbers, and as usual a sample of size 20 is drawn from the numbers 1 through 80 without replacement. In "Anti-Keno", the casino pays the player a payout of \$40 if none of the numbers that he or she selected are in the sample, and \$0 otherwise.
+
+**Part (a)**
+
+What is the expected profit for the casino in this game?
+
+**Part (b)**
+
+Construct a simulation to verify the calculation that you did in Part (a).
+
+
+
+
+
+### Problem Solution
+
+**Part (a)**
+
+
+
+
+
+**Part (b)**
+
+
+
+
+
+\newpage
+# Problem 8
+
+This problem has nothing to do with anything that we studied in lecture this week. Instead, it's another example of a problem that would be hard for you to solve with our current set of mathematical tools, but can be analyzed using a simulation.
+
+### Problem Statement
+
+Champion golfer Feline Forrest and his arch-rival Dill Pickelson are playing a round of golf together. In golf, a player's score is an integer (i.e.\ a whole number) and the player with the *lowest* score wins. On this golf course, Feline's scores range from 65 through 75, and all values are equally likely.  Dill's scores range from 66 through 76, with all scores equally likely. Thus, Feline has a one-stroke advantage over Dill.
+
+Your challenge in this problem is to answer three questions:
+
+* What is the probability that Feline will win the round of golf?
+
+* What is the probability that Dill will win the round of golf?
+
+* What is the probability that the two will tie i.e.\ have the same score?
+
+
+**Big hint:** Because this is really a problem about building a simulation, I'll help you along by telling you the exact answers:
+
+* Feline win win the round with probability 66/121, which is 0.54545.
+
+* Dill will win the round with probability 45/121, which is 0.37190.
+
+* The two players will tie with probability 10/121, which is 0.08264
+
+
+
+
+### Problem Solution
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

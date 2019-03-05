@@ -1,0 +1,472 @@
+---
+title: "Problem Set 3 Solutions"
+subtitle: 'William J Lasiewicz'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+
+#Instructions
+
+**Due:** Wednesday, February 20, 2019
+
+
+First, save this notebook with a title consisting of "ProblemSet3" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet3Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+# Problem 1
+
+### Problem Statement
+
+In lecture, we saw that if there are 23 people in a room, there is a 50\% chance that at least 2 of them will have the same birthday. Now we would like to determine how many people have to be in the room in order that there is a 90\% probability that at least 2 of them will have the same birthday.
+
+**Part a)**
+
+
+Using the exact method, calculate the smallest number of people in the room so that the probability of at least two people having the same birthday is 90\%. You'll have to solve this by trial-and-error: make a guess for the number, see if the resulting probability is too high or too low, adjust your guess, try again . . .
+
+**Part b)**
+
+Using a simulation approach, calculate an approximate value for the smallest number of people in the room so that the probability of at least two people having the same birthday is 90\%.
+
+
+### Problem Solution
+
+**Part a)**
+
+```{r}
+1 - prod( seq( from = 1, by = -1/365, length.out = 41
+               ) )
+```
+this will give you  0.9031516 for 41 which is the answer.  I tried 40 and it was less than 90.
+
+
+
+**Part b)**
+
+```{r}
+
+# As before, let's first set the number of replications:
+
+number.replications <- 10000
+
+# We'll need a vector to store the results of our simulations:
+
+result.vector <- logical( number.replications )
+
+
+# Now we're going to run this experiment repeatedly:
+
+for(replication.index in 1:number.replications) {
+  
+  # For each time through the for loop, we generate a new random sample:
+  #we use 41 as the given answer above
+  
+  birthday.sample <- sample(1:365, 41, replace = TRUE)
+  
+  # Now let's test to see if the random sample has any duplicate elements. If
+  # if does, then set the corresponding value of result.vector equal to TRUE.
+  # Otherwise, do nothing, because by default when we created result.vector it
+  # will be populated with FALSE values
+  
+  if( any( duplicated(birthday.sample) ) ) {
+    result.vector[ replication.index ] = TRUE
+  }
+}
+
+# As before, we calculate the proportion of TRUE elements by using
+# the mean() function:
+
+cat( "The estimated probability of a match is:", mean( result.vector ) )
+```
+
+
+
+
+
+# Problem 2
+
+### Problem Statement
+
+WiDgT is a dynamic new disruptive startup dedicated to producing the finest hand-crafted artisinal widgets using only all-organic, gluten-free, fair trade ingredients. The company has 200 employees, and would like to randomly assign each employee a five-digit identification number, where each employee is equally likely to be assigned any particular five-digit sequence. 
+
+
+**Part a)**
+
+Using the mathematical methods we saw in lecture, calculate the exact probability that at least two employees will be assigned the same identification number.
+
+
+**Part b)**
+
+Construct a simulation to show that you calculated the correct value in Part a).
+
+
+
+
+### Problem Solution
+
+**Part a)**
+```{r}
+# this is the birthday problem with 99999 +1  (00000)=100,000
+# and we look at 200 people rather than the number in the classroom
+1 - prod( seq( from = 1, by = -1/100000, length.out = 200
+               ) )
+# The result is 0.1805587 ,  so the probablity of at least 2 employees having the same birthday is 0.1805587
+```
+
+
+
+**Part b)**
+
+```{r}
+
+# As before, let's first set the number of replications:
+
+number.replications <- 10000
+
+# We'll need a vector to store the results of our simulations:
+
+result.vector <- logical( number.replications )
+
+
+# Now we're going to run this experiment repeatedly:
+
+for(replication.index in 1:number.replications) {
+  
+  # For each time through the for loop, we generate a new random sample:
+  #we use 200 and 100000 
+  
+  birthday.sample <- sample(1:100000, 200, replace = TRUE)
+  
+  # Now let's test to see if the random sample has any duplicate elements. If
+  # if does, then set the corresponding value of result.vector equal to TRUE.
+  # Otherwise, do nothing, because by default when we created result.vector it
+  # will be populated with FALSE values
+  
+  if( any( duplicated(birthday.sample) ) ) {
+    result.vector[ replication.index ] = TRUE
+  }
+}
+
+# As before, we calculate the proportion of TRUE elements by using
+# the mean() function:
+
+cat( "The estimated probability of a match is:", mean( result.vector ) )
+```
+
+
+
+
+# Problem 3
+
+### Problem Statement
+
+A large urn contains 100 balls of four colors: 60 are red, 20 are white, 15 are blue, and 5 are purple. The balls are completely mixed up, and the player draws one ball at random.
+
+* If the ball is red, then the player receives nothing.
+
+* If the ball is white, then the player receives a payout of $2.
+
+* If the ball is blue, then the player receives a payout of $5.
+
+* If the ball is purple, then the player receives a payout of $10.
+
+The player pays $1 for each play of the game.
+
+**Part a)** Calculate the exact values of the expected value of the profit.
+
+**Part b)** Construct a simulation to verify that your answer in Part a) was correct.
+
+
+### Problem Solution
+
+**Part a)**
+#The expected value is (.6*0)+(.20*5)+(.15*10))-1
+
+```{r}
+
+
+((.6*0)+(.20*2)+(.15*5)+(.05*10))-1
+# The expected value  is .65
+
+```
+
+
+**Part b)**
+```{r}
+number.replications <- 10000
+
+
+profit.vector <- numeric( number.replications )
+
+
+
+for( replication.index in 1:number.replications ) {
+  
+  # Now when we sample from the payout random variable, we can immediately assign
+  # it to the payout.vector:
+  
+  sel.payout <- 
+    sample( c(0, 2, 5,10),
+            1, 
+            replace = TRUE,
+            prob = c(.6, .2, .15,.05) )
+  profit.vector[replication.index]<- sel.payout-1
+}
+
+cat( "The approximate estimated expected payout is:", mean( profit.vector) )
+```
+
+
+
+
+
+
+
+
+# Problem 4
+
+### Problem Statement
+
+The Chevalier de Mere has a new dice game. In this game, the player pays an initial wager of \$2 then rolls two dice 20 times, and wins a payout of *P* if both dice come up as 1 at least once.
+
+**Problem** Calculate the value of the payout *P* that makes this game fair. Save your answer in a variable named `fair.value.payout`.
+
+**Hint:** First, calculate the probability of winning the game, then use the formula from lecture.
+
+### Problem Solution
+probablity of winning the game
+probably of snake eyes =1/36
+probablity of loosing a single game 35/36
+
+probablityofwinning<-1-((35/36)^20)
+```{r}
+probablityofwinning<-1-((35/36)^20)
+probablityoflosing<-1-probablityofwinning
+cat( "probablity of winning:", probablityofwinning ,"\n") 
+
+
+fair.value.payout<-2/0.4307397
+cat( "fair value:", fair.value.payout) 
+```
+
+
+
+
+# Problem 5
+
+### Problem Statement
+
+Construct a simulation to validate your answer in Problem 4. That is, show that if the players play the game using the winning payout that you calculated and stored in the variable `fair.value.payout', then the expected profit will be 0.
+
+### Problem Solution
+ mean (result.vector ))
+
+```{r}
+number.replications <- 10000
+buyin<-2
+fair.value.payout<-2/0.4307397
+probablityofwinning<-1-((35/36)^20)
+probablityoflosing<-1-probablityofwinning
+cat( "probablity of winning:", probablityofwinning ,"\n")
+cat( "probablity of losing:", probablityoflosing ,"\n")
+payout.vector <- numeric( number.replications )
+
+# Here we're going to build a virtual urn, with 5 character strings to represent
+# the 5 white balls, 4 character strings to represent the 4 red balls, and
+# 3 character strings to represent the 3 yellow balls:
+
+for( replication.index in 1:number.replications ) {
+  
+  # Now when we sample from the payout random variable, we can immediately assign
+  # it to the payout.vector:
+  
+  payout.vector[ replication.index ] <- 
+    sample( c(0, fair.value.payout),
+            1, 
+            replace = TRUE,
+            prob = c(probablityoflosing,probablityofwinning) )
+}
+
+cat( "The approximate estimated expected payout is:", mean( payout.vector - buyin) )
+```
+
+
+
+
+# Problem 6
+
+### Problem Statement
+
+**Part a)** The Chevalier de Mere is holding a party with 30 guests, and he devises a fun new party game to play with his friend Pierre de Fermat. Each of the 30 guests announces his or her birthday, and if any two guests have the same birthday, then Fermat has to pay the Chevalier 1000 euros. How much should the Chevalier pay Fermat as an initial wager for the game to be fair? Store your answer in the variable `fair.value.wager`.
+
+**Part b)** Develop a simulation that demonstrates that your calculation in Problem 5 was correct. That is, show that if the Chevalier does payout the value that you saved in the variable `losing.payout` each time he loses the game, then the expected value of his winnings is 0.
+
+
+**Hint** Once again, calculate the winning probability of the game, and then use the formula in lecture.
+
+
+### Problem Solution
+
+ 
+**Part a)** 
+```{r}
+#first lets calculate the probablity
+#Note from the book we use the same variable for Payout and Profile and then a small case for probablity,  I guess we just need to use p for everything,  because well we don't want to make it readable.
+1 - prod( seq( from = 1, by = -1/365, length.out = 30
+               ) )
+
+#E(X)-w=0
+ # 0.7063162x - 1000 =0
+
+fair.value.wager=0.7063162 *1000
+cat(fair.value.wager)
+
+```
+
+**Part b)** 
+
+```{r}
+fair.value.wager=0.7063162 *1000
+#cat(fair.value.wager)
+# As before, let's first set the number of replications:
+
+number.replications <- 10000
+
+# We'll need a vector to store the results of our simulations:
+
+payout.vector <- logical( number.replications )
+
+
+# Now we're going to run this experiment repeatedly:
+
+for(replication.index in 1:number.replications) {
+  
+  # For each time through the for loop, we generate a new random sample:
+  #we use 41 as the given answer above
+  
+  birthday.sample <- sample(1:365, 30, replace = TRUE)
+  
+  # Now let's test to see if the random sample has any duplicate elements. If
+  # if does, then set the corresponding value of result.vector equal to TRUE.
+  # Otherwise, do nothing, because by default when we created result.vector it
+  # will be populated with FALSE values
+  
+  if( any( duplicated(birthday.sample) ) ) {
+    payout.vector[ replication.index ] <- (1000-fair.value.wager)
+  }
+  else
+  {
+     payout.vector[ replication.index ] <- -fair.value.wager
+  }
+}
+
+# As before, we calculate the proportion of TRUE elements by using
+# the mean() function:
+
+cat( "The average payout is:", mean( payout.vector ) )
+```
+
+# Problem 7
+
+### Problem Statement
+
+Based on a careful analysis, Blaise Pascal has decided that the stock of WiDgT will have 4 possible prices one month from now:
+
+* The stock will be \$110 with probability 0.10
+
+* The stock will be \$100 with probability 0.15
+
+* The stock will be \$90 with probability 0.30
+
+* The stock will be \$80 with probability 0.30
+
+* The stock will be \$70 with probability 0.15
+
+**Part a)**
+
+Assuming that Pascal's probability model is true, what would be a fair price for the stock?
+
+
+**Part b)**
+
+Suppose the stock is currently selling for \$84. Assuming that Pascal's model is correct, calculate his expected profit in one month if he purchases one share of stock today.
+
+
+
+**Part c)**
+
+Assuming that Pascal's probability model is true, what is the probability that if he purchases one share of the stock at \$84 today he will lose money one month from now?
+
+### Problem Solution
+
+
+**Part a)**
+
+```{r}
+(110*.1)+(100*.15)+(90*.30)+(80*.30)+(70*.15)
+```
+
+
+**Part b)**
+#profit = expected value - cost
+=$ 3.5
+or 87.5-84.00
+```{r}
+87.5-84.00
+```
+
+
+
+**Part c)**
+he will lose money at 70 or 80 stock price.
+80 is .3 and 70 is .15
+.3+.15=.45
+```{r}
+.3+.15
+```
+The probablity he will lose money is .45
+
+
+
+
+
+
+
+
+
+
+# Problem 8
+
+### Problem Statement
+
+Construct a simulation that will verify that if Pascal purchases the stock today for \$84, his expected profit will be the value that you calculated in Part b) in Problem 7.
+
+### Problem Solution
+
+```{r}
+number.replications <- 1000
+start.price<-84
+profit.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+  
+  selected.price <- sample( c(110, 100, 90,80,70),
+                           1, 
+                           replace = TRUE,
+                           prob = c(.1, .15, .3,.3,.15) )
+  profit.vector[ replication.index ] <- selected.price - start.price
+}
+
+cat( "The approximate estimated expected payout is:", mean( profit.vector) )
+
+```
+
+
+

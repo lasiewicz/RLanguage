@@ -1,0 +1,138 @@
+---
+title: "Problem Set 1"
+subtitle: 'William Lasiewicz'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Instructions
+
+**Due:** Wednesday, February 6, 2019
+
+#Instructions
+
+First, save this notebook with a title consisting of "ProblemSet1" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet1Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+
+
+
+
+# Problem 1
+
+### Problem Statement
+
+Save this file using the naming convention as described in the instructions above.
+
+
+
+
+
+# Problem 2
+
+### Problem Statement
+
+Change the subtitle of this document so that it has your name.
+
+
+
+
+
+
+
+# Problem 3
+
+### Problem Statement
+
+In the space below, create a level 3 header that says "Problem Solution".
+
+### Problem Solution
+
+
+
+
+
+
+
+# Problem 4
+
+### Problem Statement
+
+As in Problem 3, create a level 3 header titled "Problem Solution", and then write a short piece of text that contains three bullet points listing things that you like.
+
+### Problem Solution
+* Rammstein
+
+* Pizza
+
+* Coffee
+
+
+
+# Problem 5
+
+### Problem Statement
+
+As in Problem 3, create a level 3 header titled "Problem Solution". Then create a code chunk, and in the code chunk type the R code `2 + 2`. After the code chunk, write some text that summarizes the result of this R computation; your summary should start with the word "Summary:" in bold.
+
+### Problem Solution
+
+```{r}
+2 + 2
+```
+**Summary** 4
+
+
+
+# Problem 6
+
+### Problem Statement
+
+Now let's write our first non-trivial R code. As before, create a level 3 header titled "Problem Solution", and a code chunk after that. Then type the R code `1:10` inside the code chunk; this will create a "vector" containing the numbers 1 through 10. Finally, write some text after the code chunk summarizing what you did.
+
+### Problem Solution
+
+```{r}
+1:10
+```
+This created the numbers like this [1]  1  2  3  4  5  6  7  8  9 10
+
+
+
+
+
+
+# Problem 7
+
+### Problem Statement
+
+Knit this R notebook to a PDF document.
+
+
+
+
+
+
+
+
+
+# Problem 8
+
+### Problem Statement
+
+Upload this notebook along with the knitted PDF version to Assignment 1 in Canvas.
+
+
+
+
+
+
+
+
+
