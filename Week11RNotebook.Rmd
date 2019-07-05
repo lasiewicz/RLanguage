@@ -1,0 +1,326 @@
+---
+title: "Week 11 R Notebook"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+# The Stripchart
+
+The *stripchart* is another way to visualize data. It provides a nice complement to the histogram, and both provide different advantages and disadvantages. Not many texts describe stripcharts, and I only discovered them relatively recently, but I have become enthusiastic about them and hope to convince you that they are a powerful addition to your R toolchest.
+
+Just like a histogram, a stripchart displays a one-dimensional set of data, but it uses a very different approach: a stripchart plots each element of the dataset as a point, where the $x$ coordinate of the point is the value of that element. Let's take a look at a really simple example:
+```{r}
+really.simple.stripchart.example <- c(4, 6, 9, 13, 18)
+```
+Now we can make a stripchart of this, using the built-in R command `stripchart()`:
+```{r}
+stripchart( really.simple.stripchart.example )
+```
+
+Amazing!
+
+Of course, we can fancify our chart by adding some options:
+
+* We still have options like `main`, `xlab`, and `xlim`, that control the main title, $x$-axis lable, and $y$-axis label, respectively.
+
+* We can control the style of the point by the `pch` option.
+
+* We can control the size of the point by the `cex` option.
+
+* We can control the color of the point by the `col` option.
+
+
+Let's try these out:
+```{r}
+stripchart( really.simple.stripchart.example,
+            main = "A Really Simple Example of a Stripchart",
+            xlab = "Values",
+            pch = 19,
+            cex = 1.4,
+            col = "cyan4")
+```
+
+The `pch` option can take values from 1 to 25, and these will give different shapes. Values 21 to 25 will give shapes that you can fill in with a different color using the `bgcol` option:
+Let's try these out:
+```{r}
+stripchart( really.simple.stripchart.example,
+            main = "A Really Simple Example of a Stripchart",
+            xlab = "Values",
+            pch = 22,
+            cex = 1.4,
+            bg = "yellow")
+```
+
+The `stripchart` function also has an option called `jitter`, and it's really this option makes stripchartssouseful. "Jitter" just means random noise, so when you call the `jitter` function it adds a random value to the *vertical* coordinate of the point. The $x$ coordinate remains unchanged, because that is what is indicating the actual value of the data, but the $y$ coordinate displays no information at all, so it doesn't matter if we add some jitter to it.
+```{r}
+stripchart( really.simple.stripchart.example,
+            main = "A Really Simple Example of a Stripchart",
+            xlab = "Values",
+            method = "jitter",
+            jitter = 0.4,
+            ylim = c(0, 2),
+            pch = 19,
+            cex = 1.4,
+            col = "cyan4")
+```
+
+The jitter process is completely random, and each time that you run it you'll get a different graph. Incidentally, I find that it is best to manually set the range of the $y$ axis using the `ylim` option, and then adjust the `jitter` value to taste.
+
+So far, I'm sure you're underwhelmed -- despite my enthusiasm, these charts have not been particularly. Where stripcharts become valuable is when we have somewhere between 100 to 500 data points, because then the charts can display very interesting patterns. To see this, let's simulate a sample of 200 points from an exponential distribution with rate parameter $r = 0.4$:
+```{r}
+stripchart.exponential.sample <- rexp(200, rate = 0.4)
+```
+
+We know that we can graph this using a histogram, and we can also superimpose the density curve for the exponential distribution:
+```{r}
+hist( stripchart.exponential.sample,
+      main = "Exponential data histogram",
+      xlab = "Values",
+      ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "aquamarine2" )
+
+curve( dexp(x, rate = 0.4), lwd = 2, add = TRUE)
+```
+
+Now let's see what the stripchart looks like:
+```{r}
+stripchart( stripchart.exponential.sample,
+            main = "Stripchart for exponential data",
+            pch = 19,
+            cex = 1,
+            xlab = "Values",
+            ylim = c(0,2),
+            method = "jitter",
+            jitter = 0.8,
+            col = "dodgerblue3")
+```
+
+Cool! Now we can really see the distribution of the exponential data. Notice that the jitter makes it easier to visualize the probability distribution, especially for a continuous distribution -- the whole concept of the "density" of the distribution now becomes much more obvious.
+
+What would happen if we didn't use jitter? Then there would be no vertical dispersion, and everything would be graphed along a single horizontal line:
+```{r}
+stripchart( stripchart.exponential.sample,
+            main = "Stripchart for exponential data",
+            pch = 19,
+            cex = 1,
+            xlab = "Values",
+            ylim = c(0,2),
+            col = "dodgerblue3")
+```
+
+This isn't as visually appealing a chart as before. There's nothing technically wrong with it, and you can still get some sense of the density of the distribution in that the points on the left seem to more densely packed than the points on the right, but you don't have the immediate intuition that occurs when the points are vertically dispersed using jitter.
+
+I said that stripcharts work best when you have between 100 and 500 points, and that's just a rough guideline. If you have a lot of points, then the eventually the points will just congeal into a solid mass like this:
+```{r}
+stripchart( rexp(10000, 0.4),
+            main = "Too much data!",
+            pch = 19,
+            cex = 1,
+            xlab = "Values",
+            method = "jitter",
+            jitter = 0.8,
+            ylim = c(0,2),
+            col = "dodgerblue3")
+```
+
+There's nothing wrong with this graph, and in fact you could even argue that such a large sample size enables us to see the gradations in the density on the right-hand side. This is true, and it is indeed useful that way, but the issue is that we now have so much data that we can't really perceive anything about the density on the left-hand side, other than that it's much higher relative to the right-hand side.
+
+Incidentally, sometimes when we have a large amount of data it can be helpful to reduce the size of the individual dots by using the `cex` option. Notice that the graph above becomes a little more legible if we make the points smaller:
+```{r}
+stripchart( rexp(10000, 0.4),
+            main = "Too much data!",
+            pch = 19,
+            cex = 0.5,
+            xlab = "Values",
+            method = "jitter",
+            jitter = 0.8,
+            ylim = c(0,2),
+            col = "dodgerblue3")
+```
+
+Stripcharts can really help to illustrate the difference between discrete and continuous random variables. Let's consider a binomial distribution with $n = 10$ trials and a probability of success $p = 0.7$. This is a discrete distribution that can only take on 11 values: 0, 1, 2, ..., 10. Let's get a random sample of $n = 250$ points, and then make a histogram:
+```{r}
+stripchart.binomial.sample <- rbinom(250, 10, 0.7)
+
+hist( stripchart.binomial.sample,
+      main = "Histogram of binomial data",
+      xlab = "Value",
+      prob = TRUE,
+      breaks = (-0.5):(10.5),
+      col = "darkorchid1")
+```
+
+
+Now let's make a stripchart of this data. Since the binomial random variable only takes on values 0, 1, 2, ..., 10, the stripchart will consist of discrete stacks of points at these $x$ values, and nothing in between:
+```{r}
+stripchart( stripchart.binomial.sample,
+            main = "Discrete random variable stripchart",
+            pch = 19,
+            cex = 1,
+            xlab = "Values",
+            method = "jitter",
+            jitter = 0.8,
+            ylim = c(0,2),
+            col = "darkorchid1")
+```
+
+
+
+
+
+# Segments and Text
+
+The `segments()` function is easy to understand: it just draws a line segment. You have to give the function four values:
+
+* The $x$-coordinate of the initial endpoint of the line segment.
+
+* The $y$-coordinate of the initial endpoint of the line segment.
+
+* The $x$-coordinate of the terminating endpoint of the line segment.
+
+* The $y$-coordinate of the terminating endpoint of the line segment.
+
+Once you've specified the initial and terminating endpoints of the line segment, you can then make various adjustments using options:
+
+* The option `lwd` controls the width of the line; I often find that setting to the values 2 or 3 gives nice results.
+
+* The option `lty` controls the type of line; you can get nice dashed lines by using the values 2 or 3 for this option.
+
+* As usual, the `col` option controls the color of the line.
+
+Let's do a more sophisticated data visualization. I would like to display an exponential distribution with a rate parameter of $r = 0.3$ using a stripchart, and then calculate the cumulative probability that such a distribution will be less than or equal to the particular value $x = 5$. First, let's generate some random data from the distribution:
+```{r}
+random.exponential.sample.2 <- rexp(500, rate = 0.3)
+```
+
+Now we can use the `pexp()` function to calculate the exact cumulative probability that this distribution is less than or equal to the particular value $x = 5$:
+```{r}
+pexp(5, rate = 0.3)
+```
+Let's check that using our simulated data:
+```{r}
+mean( random.exponential.sample.2 <= 5 )
+```
+
+This isn't perfect, but remember that our sample only had 500 points in it, so the simulated value will not be a very close approximation to the correct value
+
+
+Now we'll make a stripchart of the exponential data, and include a line segment showing where the particular value $x = 5$ cuts off the data:
+```{r}
+stripchart( random.exponential.sample.2,
+            main = "Data visualization of cumulative probability at x = 5",
+            xlab = "Values",
+            method = "jitter",
+            ylim = c(0,2.5),
+            jitter = 0.7,
+            pch = 19,
+            cex = 1,
+            col = "darkslategray4")
+
+segments( 5, 0.3, 5, 2.0, lwd = 3, lty = 1, col = "navy")
+```
+
+It can be nice to label the line, and for this we can use the `text()` function. This function takes an $x$ coordinate, a $y$ coordinate, and a character string, and displays the character string at the specified coordinates. Let's redo our previous graph, but this time add on a label for the line segment:
+```{r}
+stripchart( random.exponential.sample.2,
+            main = "Data visualization of cumulative probability at x = 5",
+            xlab = "Values",
+            method = "jitter",
+            ylim = c(0,2.5),
+            jitter = 0.7,
+            pch = 19,
+            cex = 1,
+            col = "darkslategray4")
+
+segments( 5, 0.3, 5, 2.0, lwd = 3, lty = 1, col = "navy")
+
+text( 5, 2.2, "x = 5", cex = 1.2, col = "navy")
+```
+
+# Exporting your graphics
+
+You can export your graphics very easily.
+
+To export your graph as a `png` file, use the `png()` function, and specify the name of the output file as well as the height and width of the graphic image in pixels. Make sure that you specify the proper file extension: if you want to make a PNG file, then the filename must end in ".png". Finally, when you're all done, make sure that you properly close the graphics rendering system by calling the function `dev.off()`. Note that even though this function doesn't require any input arguments you must still have the two parentheses to indicate to R that this is a function and not a variable.
+```{r}
+png( "Cool graphics.png", height = 480, width = 640)
+
+stripchart( random.exponential.sample.2,
+            main = "Data visualization of cumulative probability at x = 5",
+            xlab = "Values",
+            method = "jitter",
+            ylim = c(0,2.5),
+            jitter = 0.7,
+            pch = 19,
+            cex = 1,
+            col = "darkslategray4")
+
+segments( 5, 0.3, 5, 2.0,
+          lwd = 3, lty = 1, col = "navy")
+
+text( 5, 2.2, "x = 5", cex = 1.5, col = "navy")
+
+# Don't forget to close the graphics device, and remember to use
+# the parentheses!
+
+dev.off()
+```
+When you do this, you won't see a nice graph in your notebook, but instead will just this message about a "null device". But if you go to the folder that holds the R notebook you should now see a nice little PNG file with the graph.
+
+
+To render your graph to a PDF, you once again give the name of the output graphics file with the filename extension ".pdf", and then specify the height and width of the file in inches:
+```{r}
+pdf( "Cool graphics.pdf", height = 7.5, width = 11)
+
+stripchart( random.exponential.sample.2,
+            main = "Data visualization of cumulative probability at x = 5",
+            xlab = "Values",
+            method = "jitter",
+            ylim = c(0,2.5),
+            jitter = 0.7,
+            pch = 19,
+            cex = 1,
+            col = "darkslategray4")
+
+segments( 5, 0.3, 5, 2.0,
+          lwd = 3, lty = 1, col = "navy")
+
+text( 5, 2.2, "x = 5", cex = 1.5, col = "navy")
+
+dev.off()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

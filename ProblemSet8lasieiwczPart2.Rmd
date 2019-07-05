@@ -1,0 +1,519 @@
+---
+title: "Problem Set 8"
+subtitle: "STAT E-80: Basic Probability Using R"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Instructions
+
+**Due:** Wednesday, April 10, 2019
+
+#Instructions
+
+First, save this notebook with a title consisting of "ProblemSet8" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet8Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+
+
+
+\newpage
+# Problem 5
+
+###Part (a)
+
+Marie Antoinette is playing roulette in a European casino, and for each spin she bets on the first column. Calculate the probability that a single bet on the first column will win, and store this value in a variable called `first.column.win.probability`.
+
+**Answer**
+
+
+```{r}
+first.column.win.probability <- 12/37
+
+```
+
+
+
+###Part (b)
+
+Marie decides to play roulette until she wins a game. What is the exact probability that Marie will lose 5 games before she wins?
+
+**Answer**
+
+
+
+```{r}
+answer<-dgeom(5, first.column.win.probability)
+cat(answer)
+
+
+```
+
+
+
+###Part (c)
+
+What is the probability that she will lose at least 3 games before her first win?
+
+**Answer**
+```{r}
+
+answer<-pgeom(2, first.column.win.probability,lower.tail=FALSE)
+cat(answer)
+```
+
+
+
+
+
+
+###Part (d)
+
+What is the expected value and the variance of the number of losses that Marie will have before her first win?
+
+**Answer**
+Thus, the expected number of losses before the first win is:
+```{r}
+expectednumberoflossesbeforfirstwin<-(1 - first.dozen.win.probability) / first.dozen.win.probability
+cat (expectednumberoflossesbeforfirstwin)
+cat("\n")
+varianceofnumberlossesbeforfirstwin<-(1 - first.dozen.win.probability) / first.dozen.win.probability^2
+cat (varianceofnumberlossesbeforfirstwin)
+```
+
+
+
+
+###Part (e)
+
+Construct a simulation that will verify your answers to parts (b), (c), and (d):
+
+```{r}
+# Since this is a geometric random variable,
+# we'll start by specifying the probability of success:
+first.column.win.probability <- 12/37
+probability.success <- first.column.win.probability
+
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, we set up the variable that keeps track of
+    # the whether or not a success has occurred:
+    
+    failure.status <- "Failure"
+    
+    # Now we have an accumulator random variable
+    # that will keep track of the number of failures
+    # before the first success:
+    
+    number.failures <- 0
+    
+    # Now we enter the while loop
+    
+    while( failure.status == "Failure" ) {
+        
+        # First, let's run a trial, which will either be
+        # a success or a failure:
+        
+        failure.status <- sample( c("Success", "Failure"), 1,
+                               prob = c(probability.success, 1 - probability.success) )
+        
+        # Now let's check to see if the trial is a failure
+        # If the trial is a Failure, then update the 
+        # accumulator variable that is counting the number
+        # of failures.
+        
+        if( failure.status == "Failure" ) {
+            number.failures <- number.failures + 1
+        }
+        
+    }
+    
+    result.vector[ replication.index ] <- number.failures
+    
+}
+fiveloses<-mean( result.vector == 5 )
+atleastthree<-mean( result.vector <= 3 )
+cat("(P (X=5)=",fiveloses, "\n")
+cat("(P (X<=5)=",atleastthree, "\n")
+varance<-var( result.vector )
+ cat ("varance=",varance, "\n")
+expectedvalue<-mean( result.vector )
+cat("expectedvalue ",expectedvalue)
+    
+```
+
+
+
+
+###Part (f)
+
+Make a histogram of the `result.vector` from your simulation. Make sure you provide a main title, label the x axis, and use the `prob = TRUE` option. Also, choose a cool color from the R Colors document.
+
+**Answer**
+
+
+```{r}
+hist( result.vector,
+      main = "Histogram of rouletee result sim",
+      col = "darkturquoise",prob = TRUE,xlab = "losses before she wins" )
+```
+
+
+
+
+\newpage
+# Problem 6
+
+### Problem Statement
+
+Every day the philosopher Z'a'phma purchases an 8-spot Keno ticket at his local convenience store.
+
+###Part (a)
+
+What is the probability that a single ticket will have some sort of positive payout? (Remember that an 8-spot Keno ticket will payout if there are 4 or more matches.) Calculate this value, and store it in a variable named `winning.keno.probability`.
+
+**Answer**
+
+
+
+```{r}
+p8<-dhyper(8, 8, 72, 20)
+p7<-dhyper(7, 8, 73, 20)
+p6<-dhyper(6, 8, 74, 20)
+p5<-dhyper(5, 8, 75, 20)
+p4<-dhyper(4, 8, 76, 20)
+winning.keno.probability<-p8+p7+p6+p5+p4
+cat(winning.keno.probability)
+
+```
+
+
+
+###Part (b)
+
+What is the probability that Z'a'phma will not have a winning Keno ticket over a whole week? You can calculate this probability using the tools that we learned in the second lecture. (Hint: in order for Z'a'phma to not have a winning Keno ticket during the whole week, he has to lose every day, and all the days are independent.)
+
+**Answer**
+```{r}
+p8<-dhyper(8, 8, 72, 20)
+p7<-dhyper(7, 8, 73, 20)
+p6<-dhyper(6, 8, 74, 20)
+p5<-dhyper(5, 8, 75, 20)
+p4<-dhyper(4, 8, 76, 20)
+winning.keno.probability<-p8+p7+p6+p5+p4
+(1-winning.keno.probability)^7
+
+```
+
+
+
+### Part (c)
+
+Now we'll think about this in terms of the geometric distribution. Suppose Z'a'phma decides to start playing Keno on a Sunday, and each day he buys one ticket. Let $X$ denote the number of losing tickets that Z'a'phma has before he gets a winning ticket. Then $X$ is a geometric random variable, where the probability of success is the value that you calculated in part (a). The probability that Z'a'phma doesn't get a winning ticket during the week is just $\Pr(X \geq 7)$. Calculate this value, either by using the algebraic formula, or by using the `pgeom()` function with the `lower.tail = FALSE` option.
+
+Hint: be very careful about the inequality sign. The survival function is $\Pr(X > k)$, so the inequality is strict (i.e. it doesn't include the case $X = k$). If Z'a'phma loses for all 7 days of the week, what is the appropriate value of $k$?
+
+**Answer**
+```{r}
+p8<-dhyper(8, 8, 72, 20)
+p7<-dhyper(7, 8, 73, 20)
+p6<-dhyper(6, 8, 74, 20)
+p5<-dhyper(5, 8, 75, 20)
+p4<-dhyper(4, 8, 76, 20)
+winning.keno.probability<-p8+p7+p6+p5+p4
+answer<-pgeom(6, winning.keno.probability,lower.tail=FALSE)
+
+cat(answer)
+
+```
+
+
+
+
+
+###Part (d)
+
+What is the expected number of days that Z'a'phma has to play in order to get his first winning ticket?
+
+**Answer**
+
+```{r}
+p8<-dhyper(8, 8, 72, 20)
+p7<-dhyper(7, 8, 73, 20)
+p6<-dhyper(6, 8, 74, 20)
+p5<-dhyper(5, 8, 75, 20)
+p4<-dhyper(4, 8, 76, 20)
+winning.keno.probability<-p8+p7+p6+p5+p4
+expect.value<-(1-winning.keno.probability)/winning.keno.probability
+cat(expect.value)
+```
+
+
+
+
+###Part (e)
+
+Construct a simulation to confirm your answers in parts (b), (c), and (d). Try to model the process as closely as you can: use the `sample()` function without replacement to model purchasing an 8-spot Keno ticket, then use a `while()` loop to model the process of playing until a win occurs. You can store the number of losing Keno tickets in the `result.vector`, and that when you've finished the main simulation loop you can find the proportion of simulations where Z`a`phma had 7 or more losses before the first win. Also, you can calcualate the mean number of losing tickets.
+
+**Answer**
+```{r}
+# too many keno question, so lets make a function
+urn.vector<-seq( 1, 80)
+
+
+
+
+probability.success <- winning.keno.probability
+
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, we set up the variable that keeps track of
+    # the whether or not a success has occurred:
+    
+    failure.status <- "Failure"
+    
+    # Now we have an accumulator random variable
+    # that will keep track of the number of failures
+    # before the first success:
+    
+    number.failures <- 0
+    
+    # Now we enter the while loop
+    
+    while( failure.status == "Failure" ) {
+        
+        keno.sample <- sample( urn.vector, 20, replace = FALSE )
+        match.numbercount <- sum( keno.sample >72 )
+        if (match.numbercount>3){
+          failure.status=FALSE
+        }
+        else
+        {
+          failure.status=TRUE
+        }
+        failure.status <- sample( c("Success", "Failure"), 1,
+                               prob = c(probability.success, 1 - probability.success) )
+  
+        
+        if( failure.status == "Failure" ) {
+            number.failures <- number.failures + 1
+        }
+        
+    }
+    
+    result.vector[ replication.index ] <- number.failures
+    
+}
+sevenloses<-mean( result.vector == 7 )
+atleastseven<-mean( result.vector <= 7 )
+cat("(P (X=7)=",sevenloses, "\n")
+cat("(P (X<=7)=",atleastseven, "\n")
+expectedvalue<-mean( result.vector)
+cat("expectedvalue ",expectedvalue, "\n")
+cat("mean number of loosing tickets ",expectedvalue)
+
+    
+```
+
+
+
+
+
+### Part (f)
+
+Create a histogram of your result vector. Remember to label the $x$ axis, give the graph a main title, and use the `prob = TRUE` option. Looking at the graph, do you think that it is possible for Z'a'phma to have to play for 3 weeks before he gets a winning ticket?
+
+
+```{r}
+#anything is possible,  if Z'a'phma has to complete this homework with 8 problems all with parts,  a b c d e and f,  #he won't have time to buy keno tickets,  so in that case the the probablity is 100% of Z'a'phma going 3 weeks and #not winning a ticket.
+
+answer<-pgeom(20, winning.keno.probability,lower.tail=FALSE)
+cat(answer)
+hist( result.vector,
+      main = "Z'a'phma keno fun",
+      col = "darkturquoise",prob = TRUE,xlab = "losses before they win" )
+
+```
+
+
+
+
+
+\newpage
+# Problem 7
+
+In the classic Birthday Problem, we asked how many people need to be in a room so that there was a 50\% probability that at least 2 of them have the same probability. One of the subtle points of this question is that we don't select any particular birthday in advance. Instead, we simply assemble the group and see if there is any match, and any day out of the 365 days in a year is just as good as any other.
+
+What if we *did* pre-select a particular day, say November 2, and then asked people if their birthdays matched that day? This is a very different experiment, because in this case it doesn't matter if 2 people in the room both have a birthday on, say, April 28. Instead, the only birthday that we are interested in is November 2. What is the number of people required so that the probability that at least one person has the pre-specified birthday is 50%? Think about this for a few moments before we investigate this -- what is your intuition about this number?
+
+To solve this problem, notice that the number of people required to obtain a match with a pre-specified birthday is in fact a geometric distribution: if we assume that birthdays are uniformly distributed, then the probability of a success is 1/365. So our question becomes: for a geometric random variable with probability of success $p = 1/365$, how large does $k$ have to be so that $\Pr(X <= k)$ is at least 0.5?
+
+###Part (a)
+
+Recall that we can express the cumulative probability function for a geometric distribution as:
+$$
+\Pr(X \leq k)\ =\ 1 - (1-p)^{k+1}
+$$
+Thus, we want to solve the inequality:
+$$
+1 - (1-p)^{k+1}\ \geq\ 0.5
+$$
+Find the smallest value of $k$ such that this equality is true, given that $p = 1/365)$. You can either solve this exactly, using algebra, or just perform a trial-and-error search.
+
+**Answer**
+
+
+```{r}
+number.replications <- 10000
+p<-(1/365)
+for(k in 1:number.replications) {
+  
+  answer <- 1-(1-p)^(k+1)
+  #cat (answer)
+                
+  #
+  if (answer >= .5){
+    cat(answer ,"\n")
+    break
+  }
+}
+cat ("k has to be at least" ,k-1, " " )
+
+```
+
+
+###Part (b)
+
+Confirm your solution in part (a) by using the `pgeom()` function to show that your choice of $k$ really does lead to a cumulative probability that is greater than 0.5.
+
+**Answer**
+
+pgeom()
+```{r}
+p<-(1/365)
+answer<-pgeom(251, p,lower.tail = FALSE)
+cat (answer)
+
+```
+
+
+
+
+###Part (c)
+
+Construct a simulation to verify your calculation. You should explicitly model the process of sampling from a uniform distribution of 365 birthdays, and keep of track of how many times you don't get a match before you get the first match. 
+
+Hint: This simulation might take a little while to run: each individual simulation replication can take a long time to run, because it can be time-consuming to model the geometric distribution for such a rare event. So at first you should use just a few replications, say 10 or 20, just to make sure that your code is working properly, and only once you've tested it should you try to run a large number of replications.
+
+
+**Answer**
+
+
+```{r}
+# Since this is a geometric random variable,
+# we'll start by specifying the probability of success:
+
+
+number.replications <- 1000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, we set up the variable that keeps track of
+    # the whether or not a success has occurred:
+    
+    failure.status <- "Failure"
+    
+    # Now we have an accumulator random variable
+    # that will keep track of the number of failures
+    # before the first success:
+    
+    number.failures <- 0
+    
+    # Now we enter the while loop
+    
+    while( failure.status == "Failure" ) {
+        
+        # First, let's run a trial, which will either be
+        # a success or a failure:
+        birthday.sample <- sample(1:365, 1)
+   
+  
+        if (birthday.sample==360)
+          {
+                 failure.status="Success"  
+        }   
+        else
+        {
+          failure.status="Failure"
+        }
+  
+        
+        if( failure.status == "Failure" ) {
+            number.failures <- number.failures + 1
+        }
+        
+    }
+    
+    result.vector[ replication.index ] <- number.failures
+    
+}
+
+result<-mean( result.vector  )
+cat (result)
+
+```
+
+
+
+###Part (d)
+
+Make a histogram of the `result.vector` from your simulation. Make sure you provide a main title, label the x axis, and use the `prob = TRUE` option. Also, choose a cool color from the R Colors document.
+
+**Answer**
+
+
+```{r}
+hist( result.vector,
+      main = "Histogram Birthday result sim",
+      col = "darkturquoise",prob = TRUE,xlab = "number of failures" )
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

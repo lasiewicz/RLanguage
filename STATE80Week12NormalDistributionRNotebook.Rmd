@@ -1,0 +1,675 @@
+---
+title: 'Lecture 12: The Normal Distribution R Notebook'
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+
+# A Mystery About Binomial Distributions
+
+The binomial distribution has a most remarkable property, and in fact this will lead us to one of the great theorems in all of mathematics. 
+
+Let's investigate a seemingly uninteresting question: what happens to the binomial distribution when we fix the probability of success $p$ and then increase the number of trials $n$. We'll start by looking at a histogram of a binomial distribution where we fix the probability of success is $p = 0.5$ and then increase $n$, the number of trials, starting with $n = 8$:
+```{r}
+number.trials <- 8
+
+random.binomial.sample <- rbinom(100000, number.trials, 0.5)
+
+hist( random.binomial.sample,
+      main = "Histogram of binomial random sample (n=8)",
+      xlab = "Number of successes", ylab = "Probability",
+      prob = TRUE,
+      breaks = -0.5:(number.trials + 0.5),
+      col = "salmon2")
+```
+
+This graph is symmetric, which is not surprising since $p = 0.5$, and it has a single big hump. But it's not particularly smooth, and you can see each of the individual steps very clearly.
+
+Let's now increase the number of trials to $n = 20$, keeping the probability of success fixed at $p = 0.5$:
+```{r}
+number.trials <- 20
+
+random.binomial.sample <- rbinom(100000, number.trials, 0.5)
+
+hist( random.binomial.sample,
+      main = "Histogram of binomial random sample (n = 20)",
+      xlab = "Number of successes",
+      ylab = "Probability",
+      prob = TRUE,
+      breaks = -0.5:(number.trials + 0.5),
+      col = "salmon2")
+```
+
+Again, the graph is symmetic, and now you can start to see a distinctive shape for the distribution. Let's try this now with $n = 50$ trials, again with a fixed probability of success $p = 0.5$:
+```{r}
+number.trials <- 50
+
+random.binomial.sample <- rbinom(100000, number.trials, 0.5)
+
+hist( random.binomial.sample,
+      main = "Histogram of binomial random sample (n = 50)",
+      xlab = "Number of successes",
+      ylab = "Probability",
+      prob = TRUE,
+      breaks = -0.5:(number.trials + 0.5),
+      col = "salmon2")
+```
+
+Now you should be able to see this distinctive shape for the histogram emerge. Let's try this again with $n = 100$:
+```{r}
+number.trials <- 100
+
+random.binomial.sample <- rbinom(100000, number.trials, 0.5)
+
+hist( random.binomial.sample,
+      main = "Histogram of binomial random sample (n = 100)",
+      xlab = "Number of successes",
+      ylab = "Probability",
+      prob = TRUE,
+      breaks = -0.5:(number.trials + 0.5),
+      col = "salmon2")
+```
+
+Finally, we'll try this with $n = 200$ trials:
+```{r}
+number.trials <- 200
+
+random.binomial.sample <- rbinom(100000, number.trials, 0.5)
+
+hist( random.binomial.sample,
+      main = "Histogram of binomial random sample (n = 200)",
+      xlab = "Number of successes",
+      ylab = "Probability",
+      prob = TRUE,
+      breaks = -0.5:(number.trials + 0.5),
+      col = "salmon2")
+```
+
+Now the shape should be very clear; it's actually quite graceful and beautiful. Remember, the actual data itself is discrete, so it's not a smooth curve, but with so many trials it starts to look a smooth conntinuous curve.
+
+OK, that was nice, but we picked a nice value for $p$, the probability of success. Instead of choosing $p = 0.5$, which is symmetrical, what would happen if we chose $p = 0.2$? Surely we won't see a similar curve, because now the binomial distribution is based on a non-symmetrical probability of success. OK, let's try it out! We'll start as before with $n = 8$ trials:
+```{r}
+number.trials <- 8
+
+random.binomial.sample <- rbinom(100000, number.trials, 0.2)
+
+hist( random.binomial.sample,
+      main = "Histogram of binomial random sample (n = 8)",
+      xlab = "Number of successes",
+      ylab = "Probability",
+      prob = TRUE,
+      breaks = -0.5:(number.trials + 0.5),
+      col = "salmon2")
+```
+
+Clearly, this graph is not symmetrical, and it's difficult to see the characteristic shape here. OK, let's try this with $n = 20$ trials:
+```{r}
+number.trials <- 20
+
+random.binomial.sample <- rbinom(100000, number.trials, 0.2)
+
+hist( random.binomial.sample,
+      main = "Histogram of binomial random sample (n = 20)",
+      xlab = "Number of successes",
+      ylab = "Probability",
+      prob = TRUE,
+      breaks = -0.5:(number.trials + 0.5),
+      col = "salmon2")
+```
+
+This graph is still asymmetric, but it's a little less so than before. Now let's try $n = 50$ trials:
+```{r}
+number.trials <- 50
+
+random.binomial.sample <- rbinom(100000, number.trials, 0.2)
+
+hist( random.binomial.sample,
+      main = "Histogram of binomial random sample (n = 50)",
+      xlab = "Number of successes",
+      ylab = "Probability",
+      prob = TRUE,
+      breaks = -0.5:(number.trials + 0.5),
+      col = "salmon2")
+```
+
+Hey! We can start to see the characteristic shape emerge! The graph is asymmetric with respect to the entire range, but it looks like it's symmetric with respect to the center of the hump. Now let's try this with $n = 100$ trials:
+```{r}
+number.trials <- 100
+
+random.binomial.sample <- rbinom(100000, number.trials, 0.2)
+
+hist( random.binomial.sample,
+      main = "Histogram of binomial random sample (n = 100)",
+      xlab = "Number of successes",
+      ylab = "Probability",
+      prob = TRUE,
+      breaks = -0.5:(number.trials + 0.5),
+      col = "salmon2")
+```
+
+The distinctive shape is clearly observable, and despite the fact that the distribution is asymmetric with respect to the entire range 0 to 100, it's symmetric with respect to the center of the hump. Finally, let's try this one last time, this time with $n = 200$ trials:
+```{r}
+number.trials <- 200
+
+random.binomial.sample <- rbinom(100000, number.trials, 0.2)
+
+hist( random.binomial.sample,
+      main = "Histogram of binomial random sample (n = 200)",
+      xlab = "Number of successes",
+      ylab = "Probability",
+      prob = TRUE,
+      breaks = -0.5:(number.trials + 0.5),
+      col = "salmon2")
+```
+
+Here, for $n = 200$ trials, the curve seems completely symmetric with respect to the center of the hump, and the shape looks very similar to the shape that we found with $p = 0.5$.
+
+I encourage you to conduct your own experiments with these histograms: fix a particular probability of success $p$, and then see what the histogram looks like as you increase the number of trials $n$. You'll find that no matter what probability of success $p$ you choose, you'll end up with this characteristic curve, as long as you're willing to make the number of trials $n$ sufficiently large.
+
+
+
+
+
+# Sums of Random Variables
+
+The binomial distribution is a *sum* of random variables: that is, a binomial distribution with $n$ trials is really a sum of $n$ independent Bernoulli random variables, each of which has the same common probability of success $p$. What we saw in the previous section is that the distinctive shape emerged as the number of terms in the sum increased. Is this something that is only limited to sums of Bernoulli random variables, or is it a more general phenomenon? To answer this question, we'll repeat our experiment with two other distributions: the continuous uniform distribution and the exponential distribution. In each case, we'll see what happens to the histogram as we increase the number of terms in the sum of random variables.
+
+
+### Sums of uniform random variables
+
+Just to refresh our memory of what a continuous uniform distribution looks like, we'll start out by creating a random sample of 100,000 random uniform variables:
+```{r}
+sample.1 <- runif(100000)
+```
+
+Let's make a quick histogram of this simulated data:
+```{r}
+hist( sample.1,
+      main = "Histogram of continuous uniform distribution",
+      xlab = "x", ylab = "Density",
+      prob = TRUE,
+      breaks = 20,
+      col = "skyblue1" )
+```
+
+
+What is the distribution of the *sum* of two independent uniform random variables? That is, if we draw a sample of size $n = 2$ from the uniform distribution, and then add the two numbers together, what is the resulting distribution?
+```{r}
+number.replications <- 100000
+
+result.vector <- numeric( number.replications)
+
+for( replication.index in 1:number.replications ) {
+    result.vector[ replication.index ] <- sum( runif(2) )
+}
+
+hist( result.vector,
+      main = "Histogram of sum of two uniform random variables",
+      xlab = "x", ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "skyblue" )
+```
+
+Interesting -- kind of a pyramid structure!
+
+
+Now suppose we increase the sample size to 3? What is the distribution of the sum of 3 independent observations from a uniform distribution?
+```{r}
+number.replications <- 100000
+
+result.vector <- numeric( number.replications)
+
+for( replication.index in 1:number.replications ) {
+    result.vector[ replication.index ] <- sum( runif(3) )
+}
+
+hist( result.vector,
+      main = "Histogram of sum of 3 uniform random variables",
+      xlab = "x", ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "skyblue" )
+```
+
+OK -- still kind of a pyramid-shaped thing, although now not quite as sharply peaked. What happens when we increase the sample size to 10?
+```{r}
+number.replications <- 100000
+
+result.vector <- numeric( number.replications)
+
+for( replication.index in 1:number.replications ) {
+    result.vector[ replication.index ] <- sum( runif(10) )
+}
+
+hist( result.vector,
+      main = "Histogram of sum of 10 uniform random variables",
+      xlab = "x", ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "skyblue" )
+```
+
+This is no longer the sharply peaked pyramid, but now has more of curved shaped. Finally, let's see what we get with a sample of size 100:
+```{r}
+number.replications <- 100000
+
+result.vector <- numeric( number.replications)
+
+for( replication.index in 1:number.replications ) {
+    result.vector[ replication.index ] <- sum( runif(100) )
+}
+
+hist( result.vector,
+      main = "Histogram of sum of 100 uniform random variables",
+      xlab = "x", ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "skyblue" )
+```
+
+You can really see the curve shape to this distribution, and it looks identical to the shape that we found with our experiments with the binomial distribution. Notice that there isn't really much difference between the overall shape for a sample of 10 random variables as opposed to 100 random variables.
+
+
+### Sums of exponential random variables
+
+Let's try this again, but now with an exponential distribution. Just to refresh our memory, let's look at a histogram for an exponential distribution with rate parameter 1:
+```{r}
+number.replications <- 100000
+
+result.vector <- numeric( number.replications)
+
+for( replication.index in 1:number.replications ) {
+    result.vector[ replication.index ] <- sum( rexp(1) )
+}
+
+# I'm going to filter out some of the extreme values,
+# just to make the graph a little more informative
+
+filtered.result.vector <- result.vector[ result.vector <= 8 ]
+
+hist( filtered.result.vector,
+      main = "Histogram of an exponential random variable",
+      xlab = "x", ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "skyblue" )
+```
+
+Now let's look at the histogram for the sum of 2 independent observations from an exponential distribution with rate parameter $r = 1$:
+```{r}
+number.replications <- 100000
+
+result.vector <- numeric( number.replications)
+
+for( replication.index in 1:number.replications ) {
+    result.vector[ replication.index ] <- sum( rexp(2, rate = 1) )
+}
+
+filtered.result.vector <- result.vector[ result.vector <= 12 ]
+
+hist( filtered.result.vector,
+      main = "Histogram of the sum of 2 exponential random variables",
+      xlab = "x", ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "skyblue" )
+```
+
+Notice that already, with a sample size of only 2 observations, you can start to see some sort of hump-shaped thing emerging.
+
+OK, now let's try a sample of size 3:
+```{r}
+number.replications <- 100000
+
+result.vector <- numeric( number.replications)
+
+for( replication.index in 1:number.replications ) {
+    result.vector[ replication.index ] <- sum( rexp(3) )
+}
+
+filtered.result.vector <- result.vector[ result.vector <= 12 ]
+
+hist( filtered.result.vector,
+      main = "Histogram of the sum of 3 exponential random variables",
+      xlab = "x", ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "skyblue" )
+```
+
+Now you can definitely see the hump shape here, although the graph is not symmetrical -- there is clearly a long tail out to the right.
+
+How about a sample of size 10:
+```{r}
+number.replications <- 100000
+
+result.vector <- numeric( number.replications)
+
+for( replication.index in 1:number.replications ) {
+    result.vector[ replication.index ] <- sum( rexp(10) )
+}
+
+filtered.result.vector <- result.vector[ result.vector <= 25 ]
+
+hist( filtered.result.vector,
+      main = "Histogram of the sum of 10 exponential random variables",
+      xlab = "x", ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "skyblue" )
+```
+
+With a sum of 10 observations, the sum is now clearly starting to converge to the familiar shape, although you can still detect a little bit of an asymmetry.
+
+Finally, let's see what happens with a sum of $n = 100$ observations:
+```{r}
+number.replications <- 100000
+
+result.vector <- numeric( number.replications)
+
+for( replication.index in 1:number.replications ) {
+    result.vector[ replication.index ] <- sum( rexp(100) )
+}
+
+filtered.result.vector <- result.vector[ result.vector <= 140 ]
+
+hist( filtered.result.vector,
+      main = "Histogram of the sum of 100 exponential random variables",
+      prob = TRUE,
+      breaks = 50,
+      col = "skyblue" )
+```
+
+Here the asymmetry is virtually undetectable.
+
+### Summary
+
+Let's summarize what we found with these experiments:
+
+* We were focused on *sums* of independent random variables, each of which had the same probability distribution.
+
+* We looked at three very different sums of independent random variables: sums of Bernoulli random variables (i.e. the binomial distribution), sum of continuous uniform random variables, and sums of exponential distributions.
+
+* For a small number of terms in the sum, say $n = 2$ or $n = 3$, the histograms for the different distributions looked very different.
+
+* As we increased the number of terms in the sum, the shapes of the histograms seemed to all converge to some limiting form, and after a while it didn't matter if we took more terms in the sum, because the resulting shape was always the same.
+
+* Most remarkably, the limiting shape was always the same, regardless of whether we were working with sums of Bernoulli random variables, uniform random variables, or exponential random variables.
+
+This is one of the deepest and most profound concepts in mathematics, and it's called the *Central Limit Theorem*. The idea behind the CLT is that no matter what the distribution is, if we take a sum of $n$ independent observations from that distribution and add them together, we'll always end up with the same shape.
+
+
+# The Normal Distribution
+
+You might think that this limiting distribution is so important that it should have its own name, and it does: it's called the normal distribution. This is a continuous probability distribution that has two parameters, $\mu$ and $\sigma^2$. The parameter $\mu$ can take on any real number, even negative values, while the parameter $\sigma^2$ can only have a positive value.
+$$
+f(x)\ =\ \frac{1}{\sqrt{2 \pi \sigma^2}} \cdot e^{-\frac{1}{2} \cdot \frac{(x - \mu)^2}{\sigma^2}},\ \ \ -\infty < x < + \infty
+$$
+It can be a little hard to read all that notation in the exponent, so sometimes I'll write:
+$$
+f(x)\ =\ \frac{1}{\sqrt{2 \pi \sigma^2}} \cdot \exp \left \{-\frac{1}{2} \cdot \frac{(x - \mu)^2}{\sigma^2} \right \},\ \ \ -\infty < x < + \infty
+$$
+
+This is very scary, I admit, but you'll never have to deal with this expression, and you'll always be able to work with the standard built-in R functions like usual.
+
+
+
+### The cumulative and survival probability functions
+
+There are no nice (or even unpleasant) algebraic expressions for the cumulative probability function and survival probability function for a normal distribution, so you have to use the built-in R function `pnorm()` function to calculate these values.
+
+
+### The expected value and variance
+
+The expected value of a normally distributed random variable with parameter $\mu$ is just the value of $\mu$:
+$$
+\hbox{E}[X]\ =\ \mu
+$$
+Likewise, the variance of a normally distributed random variable with parameter $\sigma^2$ is just the value of $\sigma^2$:
+$$
+\hbox{Var}[X]\ =\ \sigma^2
+$$
+
+### The normal distribution in R
+
+We use all of our standard techniques in R to work with the normal distribution. However, there is an important technical issue to keep in mind: when you specify a distribution in R, you do \textbf{\textsf{not}} specify the variance $\sigma^2$. Instead, you have to specify the *standard deviation*, which is the square root of the variance. We'll see this in the example, and you must keep this in mind at all times.
+
+OK, let's first generate a sample of random data from a normal distribution. I'm going to pick $\mu = 25$, and a variance of $\sigma^2 = 16$. TRemember that to use the R functions for the normal distribution, we have to remember to use the standard deviation, not the variance, and in this case the standard deviation is:
+$$
+\sigma\ =\ \sqrt{ \sigma^2 }\ =\ \sqrt{ 16 }\ =\ 4
+$$
+Here's the R code to generate a random sample of size 100,000 from a normal distribution with mean $\mu = 25$ and standard deviation $\sigma = 4$:
+```{r}
+normal.random.sample <- rnorm( 100000, mean = 25, sd = sqrt(16) )
+normal.random.sample <- normal.random.sample[ normal.random.sample <= 40 ]
+normal.random.sample <- normal.random.sample[ normal.random.sample >= 10 ]
+```
+
+Let's make a nice histogram of this data, and superimpose a normal density curve:
+```{r}
+hist( normal.random.sample,
+      main = "Histogram of normal data",
+      xlab = "x", ylab = "Density",
+      prob = TRUE,
+      breaks = 9.5:40.5,
+      col = "salmon2")
+
+curve( dnorm(x, mean = 25, sd = sqrt(16)), lwd = 5, col = "darkred", add = TRUE )
+```
+
+It can also be instructive to look at a stripchart of this data. Unfortunately, our sample of 100,000 is too large, and it will ovewhelm the stripchart display. But if we take the first 2000 observations and make the dots smaller using the `cex = 0.5` option then the graph will be better:
+```{r}
+
+stripchart( normal.random.sample[ 1:2000 ],
+            main = "Stripchart of normal data",
+            xlab = "x", ylab = "Density",
+            xlim = c(10, 40), ylim = c(0,2),
+            method = "jitter", jitter = 0.5,
+            pch = 19, cex = 0.5,
+            col = "navy")
+```
+
+You can see from the stripchart that the density is symmetric, with more points concentrated in the center of the chart.
+
+
+What is the cumulative probability that this random variable will be less than or equal to the particular value 23? We can use the `pnorm()` function to calculate this:
+```{r}
+pnorm( 23, mean = 25, sd = sqrt(16) )
+```
+
+What do we find when we check this with our simulated data?
+```{r}
+mean( normal.random.sample <= 23 )
+```
+
+What is the probability that this random variable will be strictly greater than the particular value 29.5? This is a survival probability, and as usual we can calculate this using the `pnorm()` function with the `lower.tail = FALSE` option:
+```{r}
+pnorm( 29.5, mean = 25, sd = sqrt(16), lower.tail = FALSE )
+```
+
+What do we find with our simulated data?
+```{r}
+mean( normal.random.sample > 29.5 )
+```
+
+Finally, we know from the specification that the mean of this normal distribution is $\mu = 25$. We can check that with our simulation data:
+```{r}
+mean( normal.random.sample )
+```
+
+Likewise, we know that the variance should be 16, and our simulated data gives:
+```{r}
+var( normal.random.sample )
+```
+
+So now you can work with the normal distribution!
+
+
+
+
+
+# The Central Limit Theorem For Sums
+
+There's really no single ``Central Limit Theorem'', because there are many variations depending on the stated assumptions. But we will focus on one version that captures the ideas most clearly.
+
+Suppose we have a set of independent and identically distributed random variables:
+$$
+X_1, X_2, \ldots, X_n
+$$
+The phrase "identically distributed" means that each random variable $X_1, X_2, \ldots, X_n$ has the same probability distribution. Thus, they will each have the same expected value, which we'll denote as $\hbox{E}[X]$, and the same variance, which we'll denote as $\hbox{Var}[X]$.
+
+
+
+Now we form the sum of these random variables:
+$$
+S\ =\ X_1 + X_2 + \ldots + X_n
+$$
+
+Then the Central Limit Theorem has three main components:
+
+* The expected value of the sum $S$ is just $n$ times the expected value of the individual random variables:
+$$
+\hbox{E}[S]\ =\ n \cdot \hbox{E}[X]
+$$
+
+* Next, the variance of the sum $S$ is $n$ times the variance of the individual random variables:
+$$
+\hbox{Var}[X]\ =\ n \cdot \hbox{Var}[X]
+$$
+
+* Finally, as $n$ gets larger and larger, the distribution of $S$ becomes more and more approximately normal.
+
+The first 2 points are easy to prove, and in fact we have all the tools to do them. However, the third point, showing that the distribution of $S$ becomes approximately normal as $n$ becomes large, is very difficult, and requires a great deal of highly technical mathematics. We won't go through the proof here, but we'll explore this process in our final problem set.
+
+Let's see how the Central Limit Theorem works with our previous examples. Recall the uniform distribution has a mean of 1/2:
+$$
+\hbox{E}[X]\ =\ \frac{1}{2}
+$$
+So now let's consider a sum of 100 independent uniform random variables:
+$$
+S\ =\ X_1 + X_2 + \ldots + X_{100}
+$$
+
+Then the Central Limit Theorem says that this sum $S$ will have an expected value of 50:
+$$
+\hbox{E}[S]\ =\ 100 \times \frac{1}{2}\ =\ 50
+$$
+
+For the variance, we know that the variance of a continuous uniform random variable is:
+$$
+\hbox{Var}[X]\ =\ \frac{1}{12}
+$$
+Therefore, the Central Limit Theorem says that this sum will have a variance of 100/12:
+$$
+\hbox{Var}[S]\ =\ 100 \times \hbox{Var}[X]\ =\ 100 \times \frac{1}{12}\ =\ \frac{100}{12}
+$$
+
+Remember, the built-in R functions for the normal distribution require the standard deviation, not the variance, so we have:
+$$
+\hbox{StdDev}[X]\ =\ \sqrt{ \hbox{Var}[X]}\ =\ \sqrt{ \frac{100}{12}}\ =\ 2.88675
+$$
+
+So now we'll generate 100,000 samples of sums of 100 uniform random variables, create a histogram, and then see if the Central Limit Theorem can actually predict the correct normal distribution curve:
+
+```{r}
+number.replications <- 100000
+
+result.vector <- numeric( number.replications)
+
+for( replication.index in 1:number.replications ) {
+    result.vector[ replication.index ] <- sum( runif(100) )
+}
+
+hist( result.vector,
+      main = "Histogram of sum of 100 uniform random variables",
+      prob = TRUE,
+      breaks = 50,
+      col = "skyblue" )
+
+curve( dnorm(x, 50, sqrt(100/12)), lwd = 2, col = "navy", add = TRUE)
+```
+
+You'll get a chance in your homework to do the same demonstration for the exponential distribution.
+
+Let's review the procedure for constructing a normal approximation using the Central Limit Theorem. We start with a collection of independent and identically distributed random variables $X_1, X_2, \ldots, X_n$, each of which has the same common expectation $\hbox{E}[X]$ and the same common variance $\hbox{Var}[X]$. Now define $S$ as the sum of these $n$ independent and identically distributed random variables $X_1, X_2, \ldots, X_n$:
+$$
+S\ =\ X_1 + X_2 + \ldots + X_n
+$$
+What is the limiting distribution of $S$ as $n$ becomes large? To calculate this, we perform a three-step process:
+
+* First, we calculate the expectation $\hbox{E}[X]$ and variance $\hbox{Var}[X]$ of the individual variables.
+
+* Next, we can use $\hbox{E}[X]$ and $\hbox{Var}[X]$ to calculate the expected value and variance of the sum. The expectation of $S$ is:
+$$
+\hbox{E}[S]\ =\ n \cdot \hbox{E}[X]
+$$
+The variance of $S$ is:
+$$
+\hbox{Var}[S]\ =\ n \cdot \hbox{Var}[X]
+$$
+
+* Finally, the Central Limit Theorem states that the distribution of $S$ will be approximately normal, with mean $\hbox{E}[S]$ and variance $\hbox{Var}[S]$.
+
+
+
+
+# The Standard Normal Distribution
+
+One of the remarkable aspects of the normal distribution is that although there are infinitely many different possible choices for the parameters $\mu$ and $\sigma^2$, nonetheless all normal distributions can be analyzed in terms of one very special normal distribution, called the *standard normal distribution*. This distribution has mean $\mu = 0$ and variance (and standard deviation) $\sigma^2 = 1$.
+
+What is so special about the standard normal distribution? It's that we can create *any* normal distribution with mean $\mu$ and variance $\sigma^2$ by a simple transformation of a standard normal random variable. Let $Z$ denote a standard normal random variable. Then if we first multiply $Z$ by $\sigma$, and then add $\mu$, we will obtain a normal distribution with mean $\mu$ and variance $\sigma^2$. 
+Let's try this out! We will first generate a random sample from a standard normal distribution:
+```{r}
+standard.normal.sample <- rnorm(100000)
+```
+Note that if you don't supply R with any parameters for a normal distribution, it automatically assumes that you want a standard normal distribution.
+
+Now we'll transform this sample by multiplying by 4, and then adding 25. This should give us a normal distribution with mean $\mu = 25$ and variance $\sigma^2 = 4^2 = 16$. Let's see:
+```{r}
+transformed.sample <- 4 * standard.normal.sample + 25
+cat( "Mean of transformed sample:", mean( transformed.sample), "\n" )
+cat( "Variance of transformed sample:", var( transformed.sample), "\n" )
+```
+
+Actually, we're not done yet! Let's make a histogram and fit the appropriate normal density curve, just to be sure that we have the right distribution:
+```{r}
+hist( transformed.sample,
+      main = "Histogram of transformed standard normal data",
+      prob = TRUE,
+      breaks = 50,
+      col = "salmon2" )
+
+curve( dnorm(x, 25, sqrt(16)), lwd = 3, col = "darkred", add = TRUE)
+```
+
+We can go in the opposite direction as well. Suppose we have a general normal random variable, with mean $\mu$ and variance $\sigma^2$. Then if we first subtract $\mu$, and then divide by $\sigma$, we will obtain a standard normal random variable.
+
+Let's try this out, with a sample from a normal distribution with mean $\mu = 25$ and variance $\sigma^2 = 16$. First, we'll generate a random sample of size $n = 100,000$, and then we'll perform the transformation:
+```{r}
+random.normal.sample <- rnorm(100000, 25, 4)
+transformed.normal.sample <- (random.normal.sample - 25) / 4
+```
+
+The mean and variance of `transformed.normal.sample` should be 1 and 0, respectively:
+```{r}
+cat( "Mean of transformed data:", mean( transformed.normal.sample), "\n" )
+cat( "Variance of transformed data:", var( transformed.normal.sample), "\n" )
+```
+
+Finally, let's make a histogram of this transformed data, and see how well a density curve for a normal distribution with mean $\mu = 0$ and variance $\sigma^2 = 1$ fits the data:
+```{r}
+hist( transformed.normal.sample,
+      main = "Histogram of transformed normal data",
+      prob = TRUE,
+      breaks = 50,
+      col = "salmon2" )
+
+curve( dnorm(x, 0, 1), lwd = 3, col = "darkred", add = TRUE)
+```
+
+
+

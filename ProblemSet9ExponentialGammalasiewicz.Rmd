@@ -1,0 +1,649 @@
+---
+title: "Problem Set 9: The Exponential and Gamma Distributions"
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Instructions
+
+**Due:** Wednesday, April 24, 2019
+
+#Instructions
+
+First, save this notebook with a title consisting of "ProblemSet9" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet9Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+
+
+
+
+# Problem 1
+
+### Problem Statement
+
+Let $X$ be an exponential random variable with rate parameter $r = 1/8$. Then the density function for $X$ is:
+$$
+f_X(x)\ =\ \frac{1}{8} \cdot e^{-x/8},\ \ x \geq 0
+$$
+
+### Part (a)
+
+Draw a random sample of 10,000 observations from this distribution, and name this sample `problem.1.sample`. Construct a histogram of this sample, and then superimpose the density function using the built-in `curve()` function in R. (Hint: remember to use the `add = TRUE` option.)
+
+**Answer**
+```{r}
+problem.1.sample <- rexp(10000,rate=1/8)
+hist(problem.1.sample,main="Problem 1 Sample Histogram",xlab="x",ylab="Density",breaks=50,prob="TRUE",col="blue")
+curve(dexp(x,rate=1/8),lwd=2,add=TRUE)
+```
+
+
+
+
+### Part (b)
+
+The cumulative probability function $F_X(x) = \Pr(X \leq x)$ for an exponential random variable with rate parameter $r$ is:
+$$
+F_X(x)\ =\ \Pr(X \leq x)\ =\ 1 - e^{-r \cdot x},\ \ x \geq 0,\ r \geq 0
+$$
+Calculate the cumulative probability $F_X(12) = \Pr(X \leq 12)$ for an exponential random variable with rate parameter $r = 1/8$ using this formula. Then do the same calculation using the built-in R function `pexp()`.
+
+**Answer**
+```{r}
+answer1<-1-exp(-((1/8)*12))
+answer2<-pexp(12,rate=1/8)
+cat (answer1)
+cat("\n")
+cat (answer2)
+```
+
+
+
+
+### Part (c)
+
+Verify your result in part (b) using the simulated data `problem.1.sample` from part (a). (Hint: create a logical vector that is `TRUE` exactly when a value in `problem.1.sample` is less than or equal to 12, and then determine what proportion of the elements in this vector are `TRUE`.)
+
+**Answer**
+
+```{r}
+mean(problem.1.sample<=12)
+```
+
+
+
+
+
+
+### Part (d)
+
+The expected value and variance of an exponential random variable with rate parameter $r$ are:
+\begin{eqnarray*}
+\hbox{E}[X] & = & \frac{1}{r}\\
+\\
+\hbox{Var}[X] & = & \frac{1}{r^2}
+\end{eqnarray*}
+Calculate the expected value and variance for the random variable $X$ from part (a).
+
+**Answer**
+
+```{r}
+expectedvalue<-(1/(1/8))
+cat ("expected value ",expectedvalue,"\n")
+cat ("varience",expectedvalue^2)
+```
+
+
+
+
+### Part(e)
+
+Use the simulated data stored in `problem.1.sample` to verify your calculations in part (d) of the expected value and variance of $X$.
+
+**Answer**
+```{r}
+mean(problem.1.sample)
+var(problem.1.sample)
+```
+
+
+
+
+\newpage
+# Problem 2
+
+### Problem Statement
+
+Let $Y$ be a continuous random variable with density function:
+$$
+f_X(x)\ =\ 3 e^{-3x},\ \ x \geq 0
+$$
+
+### Part (a)
+
+What is the name of the probability distribution of $X$? What is the parameter for this distribution?
+
+**Answer**
+This is an exponential with rate parameter 3
+
+
+
+
+
+### Part (b)
+
+Draw a random sample of 10,000 independent observations from the distribution $Y$, and call this sample `problem.2.sample`. Create a histogram for this distribution, and then superimpose the density curve for the distribution that you named in part (a).
+
+**Answer**
+
+
+```{r}
+problem.2.sample <- rexp(10000,rate=3)
+hist(problem.2.sample,main="Problem 2 Sample Histogram",xlab="x",ylab="Density",breaks=50,prob="TRUE",col="blue")
+curve(dexp(x,rate=3),lwd=2,add=TRUE)
+```
+
+
+
+
+
+### Part (c)
+
+Calculate the survival probability $S_X(0.5) = \Pr(X > 0.5)$ for the distribution you specified in part (a) using the appropriate built-in R function (remember the `lower.tail` option!).
+
+**Answer**
+
+
+```{r}
+exp(-3*.5)
+pexp(.5,rate=3,lower.tail = FALSE)
+```
+
+
+
+
+
+### Part (d)
+
+Use your simulated data from part (b) to very your answer in part (c).
+
+**Answer**
+```{r}
+mean(problem.2.sample>.5)
+```
+
+
+
+
+### Part (e)
+
+Calculate the expected value and variance for the density in part (a).
+
+**Answer**
+
+```{r}
+#expected value
+1/3
+#varience
+(1/3)^2
+```
+
+
+
+
+### Part (f)
+
+Use your simulated data from part (a) to verify your calculations of the expected value and variance of $X$ in part (e).
+
+**Answer**
+
+```{r}
+mean(problem.2.sample)
+var(problem.2.sample)
+```
+
+
+
+
+
+\newpage
+# Problem 3
+
+### Part (a)
+
+Suppose $W$ is an exponential random variable with an expected value of $W$ is $\hbox{E}[W] = 12.5$. What is the rate parameter $r$?
+
+**Answer**
+e(w)=1/r
+
+e(w)=1/r
+r*e(w)=1
+r=1/e(w)
+r=(12.5)^-1
+```{r}
+(12.5)^-1
+```
+
+### Part (b)
+
+Draw a random sample of 10,000 observations from an exponential distribution with the rate parameter that you determined in part (a) and store this result in a variable named `problem.3.sample`. Create a histogram of your data, and then superimpose the density curve for this exponential distribution.
+
+**Answer**
+
+```{r}
+problem.3.sample <- rexp(10000,rate=0.08)
+hist(problem.3.sample,main="Problem 1 Sample Histogram",xlab="x",ylab="Density",breaks=50,prob="TRUE",col="red")
+curve(dexp(x,rate=0.08),lwd=2,add=TRUE)
+```
+
+
+
+
+### Part (c)
+
+Use your simulated data from part (b) to verify that the rate parameter you calculated in part (a) gives the correct expected value.
+
+**Answer**
+```{r}
+mean(problem.3.sample)
+```
+
+
+
+
+
+
+
+\newpage
+# Problem 4
+
+In this problem, you must evaluate the integral:
+$$
+\int_{7.5}^{12.3} \frac{1}{10} e^{-x/10} dx\ =\ ???
+$$
+
+### Part (a)
+
+What type of probability distribution is being integrated here? What are the parameters? What are the lower and upper limits of integration?
+
+**Answer**
+
+
+
+
+
+Exponential distrubition ,  rate = 1/10
+upper limit 12.3
+lower limit 7.5
+
+
+### Part (b)
+
+Use an appropriate built-in probability function in R to evaluate this integral. (Hint: it starts with the letter 'p', and you'll have to use it twice with slightly different input values and perform a subtraction.)
+
+**Answer**
+
+
+
+
+```{r}
+pexp(12.3,rate=1/10)-pexp(7.5,rate=1/10)
+```
+
+
+### Part (c)
+
+Construct a simulation that will approximately evaluate the integral, and compare your estimate with the value you calculated in part (b).
+
+**Answer**
+
+
+
+
+```{r}
+problem.4.sample <- rexp(10000,rate=1/10)
+mean(problem.4.sample>7.5)-mean(problem.4.sample>=12.3)
+
+```
+
+
+
+
+\newpage
+# Problem 5
+
+Now we're going to do this all over again, but for the gamma distribution. From lecture, we saw that a *gamma distribution* with shape parameter $a>0$ and rate parameter $r>0$ has the density function:
+$$
+f_X(x)\ =\ \frac{r^a \cdot x^{a-1} \cdot e^{-rx}}{\Gamma(a)},\ \ x \geq 0
+$$
+For this problem, let $X$ be a random variable that has a gamma distribution with shape parameter $a = 4$ and rate parameter $r = 1/9$.
+
+### Part (a)
+
+Draw a sample of 10,000 independent observations from this gamma distribution, and display a histogram of the values. Then superimpose a gamma density with a shape parameter $a = 4$ and rate parameter $r = 1/9$ by using the `curve()` function with the `add = TRUE` option.
+
+**Answer**
+
+```{r}
+problem.5.sample <- rgamma(10000,shape=4,rate=1/9)
+hist(problem.5.sample,main="Problem 5 Sample Histogram",xlab="x",ylab="Density",breaks=50,prob="TRUE",col="blue")
+curve(rgamma(x,rate=1/9,shape=4),lwd=2,add=TRUE)
+```
+
+
+
+
+
+
+### Part (b)
+
+Calculate the survival probability $S_X(62.7)\ =\ \Pr(X \geq 62.7)$ using the built-in R function `pgamma()`.
+
+**Answer**
+
+```{r}
+pgamma(62.7,rate=1/9,shape=4,lower.tail = FALSE)
+```
+
+
+
+
+
+
+
+### Part (c)
+
+Use your simulated data from part (a) to verify your calculation in part (b).
+
+**Answer**
+
+
+
+
+)
+```{r}
+mean(problem.5.sample>62.7)
+
+```
+
+
+
+
+### Part (d)
+
+The expected value and variance of a gamma random variable with shape parameter $a$ and rate parameter $r$ are:
+\begin{eqnarray*}
+\hbox{E}[X] & = & \frac{a}{r}\\
+\\
+\hbox{Var}[X] & = & \frac{a}{r^2}
+\end{eqnarray*}
+Calculate the expected value and variance of a gamma random variable with shape parameter $a = 4$ and rate parameter $r = 1/9$.
+
+**Answer**
+
+
+
+```{r}
+4/(1/9)
+4/(1/9)^2
+```
+
+
+
+
+
+### Part (e)
+
+Use your simulated data from part (a) to verify your calculations in part (d).
+
+**Answer**
+
+```{r}
+mean(problem.5.sample)
+var(problem.5.sample)
+```
+
+
+
+
+
+
+
+\newpage
+# Problem 6
+
+### Problem Statement
+
+Let $Y$ be a continuous random variable with density function:
+$$
+f_Y(y)\ =\ \frac{(2.7)^{6.4} \cdot y^{5.4} \cdot e^{-2.7y}}{\Gamma(6.4)},\ \ y \geq 0
+$$
+
+### Part (a)
+
+What is the name of the probability distribution of $X$? What are the parameters for this distribution?
+
+**Answer**
+
+sharp=6.4
+rate=2.7
+game distrbution
+
+
+
+
+### Part (b)
+
+Draw a random sample of 10,000 independent observations from the distribution $Y$, and call this sample `problem.6.sample`. Create a histogram for this distribution, and then superimpose the density curve for the distribution that you specified in part (a).
+
+**Answer**
+
+
+
+```{r}
+problem.6.sample <- rgamma(10000,rate=2.7,shape=6.4)
+hist(problem.6.sample,main="Problem 6 Sample Histogram",xlab="x",ylab="Density",breaks=50,prob="TRUE",col="blue")
+curve(rgamma(x,rate=2.7,shape=6.4),lwd=2,add=TRUE)
+```
+
+
+
+
+### Part (c)
+
+Use a built-in R function to calculate the cumulative probability of this distribution at $x = 1.8$; that is, $F_Y(1.8)\ =\ \Pr(Y \leq 1.8)$.
+
+**Answer**
+
+```{r}
+
+pgamma(1.8,rate=2.7,shape=6.4)
+```
+
+
+
+
+
+### Part (d)
+
+Use your simulated data from part (b) to verify your answer in part (c).
+
+**Answer**
+
+```{r}
+mean(problem.6.sample<=1.8)
+```
+
+
+
+
+
+
+### Part (e)
+
+Calculate the expected value and variance for the density in part (a).
+
+**Answer**
+
+```{r}
+6.4/2.7
+6.4/(2.7)^2
+```
+
+
+
+
+
+
+### Part (e)
+
+Use your simulated data from part (a) to verify your calculations of the expected value and variance of $X$ in part (d).
+
+**Answer**
+```{r}
+mean(problem.6.sample)
+var(problem.6.sample)
+```
+
+
+
+
+
+
+
+\newpage
+# Problem 7
+
+Recall from Problem 5 that if $W$ is a random variable that has a gamma distribution with shape parameter $a$ and rate paramater $r$, then the expected value and variance are:
+\begin{eqnarray*}
+\hbox{E}[W] & = & \frac{a}{r}\\
+\\
+\hbox{Var}[W] & = & \frac{a}{r^2}
+\end{eqnarray*}
+Suppose you don't know either the shape parameter or the rate parameter, but you do know the actual numerical values of the expectation and variance of $W$:
+\begin{eqnarray*}
+\hbox{E}[X] & = & 5.7\\
+\\
+\hbox{Var}[X] & = & 12.2
+\end{eqnarray*}
+
+### Part (a)
+
+Calculate the values of the shape parameter $a$ and the rate parameter $r$.
+
+**Answer**
+e(x)=a/r
+e(x)=a
+```{r}
+problem.7.expectation<-5.7
+problem.7.variance<-12.2
+problem.7.shape<-problem.7.expectation^2/problem.7.variance
+problem.7.rate<-problem.7.expectation/problem.7.variance
+problem.7.shape
+problem.7.rate
+```
+
+
+
+
+### Part (b)
+
+Show that the shape and rate parameters that you calculated in part (a) will give the correct values when you substitute them into the formulas for the expected value and the variance.
+
+**Answer**
+```{r}
+problem.7.shape/problem.7.rate
+problem.7.shape/problem.7.rate^2
+```
+
+
+
+### Part (c)
+
+Draw a random sample of 10,000 independent observations from a gamma distribution with the shape and rate parameters that you calculated in part (a). Superimpose the density curve for the specified gamma distribution and then use this data to verify your calculations in part (b) by calculating the sample mean and sample variance.
+
+**Answer**
+
+
+
+
+```{r}
+problem.7.sample <- rgamma(10000,rate=problem.7.rate,shape=problem.7.shape)
+hist(problem.7.sample,main="Problem 7 Sample Histogram",xlab="x",ylab="Density",breaks=50,prob="TRUE",col="blue")
+curve(rgamma(x,,rate=problem.7.rate,shape=problem.7.shape),lwd=2,add=TRUE)
+```
+
+
+
+
+
+
+
+\newpage
+# Problem 8
+
+In this problem, we will evaluate the definite integral:
+$$
+\int_{2.3}^{7.1} \frac{(1.3)^{5.8} \cdot y^{4.8} e^{-1.3y}}{\Gamma(5.8)} \cdot dy\ =\ ???
+$$
+
+### Part (a)
+
+What type of probability distribution is being integrated here? What are the parameters? What are the lower and upper limits of integration?
+
+**Answer**
+
+```{r}
+pgamma(7.1,rate=1.3,shape=5.8)-pgamma(2.3,rate=1.3,shape=5.8)
+```
+
+
+
+
+
+
+### Part (b)
+
+Use an appropriate built-in probability function in R to evaluate this integral. (Hint: it starts with the letter 'p', and you'll have to use it twice with slightly different input values and then subtract.)
+
+**Answer**
+
+
+
+
+```{r}
+problem.8.sample<-rgamma(10000,rate=1.3,shape=5.8)
+mean((problem.8.sample>2.3)&(problem.8.sample<=7.1))
+```
+
+
+
+### Part (c)
+
+Construct a simulation that will approximately evaluate the integral, and compare your estimate with the value you calculated in part (b).
+
+**Answer**
+
+
+```{r}
+problem.8.sample <- rgamma(10000,shape=5.8,rate=1.3)
+hist(problem.8.sample,main="Problem 8 Sample Histogram",xlab="x",ylab="Density",breaks=50,prob="TRUE",col="green")
+curve(rgamma(x,shape=5.8,rate=1.3),lwd=2,add=TRUE)
+```
+
+
+
+
+
+
+
+
+
+

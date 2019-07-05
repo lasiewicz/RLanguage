@@ -1,0 +1,344 @@
+---
+title: "Problem Set 4"
+subtitle: 'Type your name here'
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+
+# Instructions
+
+**Due:** Wednesday, February 27, 2019
+
+#Instructions
+
+First, save this notebook with a title consisting of "ProblemSet4" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet4Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+
+
+
+
+# Problem 1
+
+### Problem Statement
+
+In roulette a *column bet* consists of betting that the number will be in one of the columns of the layout. A winning \$1 wager on a column bet results in a \$3 payout, and as usual a losing \$1 wager results in a \$0 payout. Assume that we are playing roulette in an American casino.
+
+**Part (a)**
+
+Calculate the expected value of the payout for a \$1 wager on the third column.
+
+**Part (b)**
+
+Calculate the variance of the payout for a \$1 wager on the third column.
+
+**Part (c)**
+
+Construct a simulation that verifies your results from Parts a) and b).
+
+**Note:** The third column contains the numbers 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, and 36. 
+
+
+
+
+### Problem Solution
+
+**Part (a)**
+
+```{r}
+
+straight.up.expected.profit <- 3 * (12/38)  + (-1) * (26/38)
+straight.up.expected.profit
+```
+
+
+**Part (b)**
+
+
+
+
+**Part (c)**
+
+
+
+
+
+
+
+
+# Problem 2
+
+### Problem Statement
+
+A player places a \$3 bet on the second column, and a \$4 bet on the third dozen. Assume that we are playing roulette in an American casino.
+
+**Part (a)**
+
+Calculate the expected value of the profit for a \$1 wager on the third column.
+
+**Part (b)**
+
+Calculate the variance of the profit for a \$1 wager on the third column.
+
+**Part (c)**
+
+Construct a simulation that verifies your results from Parts a) and b).
+
+**Note:** The third column contains the numbers 2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, and 35. 
+
+
+
+
+
+### Problem Solution
+
+**Part (a)**
+
+
+
+
+**Part (b)**
+
+
+
+
+**Part (c)**
+
+
+
+
+
+
+
+
+
+
+
+# Problem 3
+
+### Problem Statement
+
+In all of our examples, we've been analyzing the results for American casinos, which have both a 0 pocket and a 00 pocket. In European casinos, there is only the 0 pocket, and there is no 00 pocket. Thus, the house advantage is smaller.
+
+**Part a)**
+
+Calculate the expected profit for a 1 euro wager on the odd numbers in a European casino.
+
+**Part b)**
+
+Calculate the variance of the profit for a 1 euro wager on the odd numbers in a European casino.
+
+**Part c)**
+
+Build a simulation that verifies your calculations in Parts a) and b).
+
+
+### Problem Solution
+
+**Part a)**
+
+
+
+
+**Part b)**
+
+
+
+
+**Part c)**
+
+
+
+
+
+
+
+# Problem 4
+
+### Problem Statement
+
+Like other European casinos, English casinos use a roulette wheel with only a 0, and no double zero 00, so that there are only 37 possible outcomes, not 38 as in an American casino. Color bets also have a slightly different profit structure:
+
+* A 1 pound winning bet on red will return a profit of 1 pound, just as before.
+
+* If a 1 pound bet loses because the number is black, the player loses the entire wager, for a profit of -1 pound, also just as before.
+
+* However, if a 1 pound bet loses because the number is 0, the player loses only half the wager, for a profit of -0.5 pounds.
+
+**Part a)**
+
+Calculate the expected profit for a 1 pound bet on red in an English casino.
+
+**Part b)**
+
+Calculate the variance of the profit for a 1 pound bet on red in an English casino.
+
+**Part c)**
+
+Build a simulation to verify your calculations in Parts a) and b).
+
+### Problem Solution
+
+**Part a)**
+
+
+
+
+**Part b)**
+
+
+
+
+
+
+**Part c)**
+
+
+
+
+
+
+
+
+
+
+# Problem 5
+
+### Problem Statement
+
+In lecture, we worked out the expected payout and profit for a \$2 bet on Black and a \$3 bet on the Second Dozen. What about the variance of this bet?
+
+**Part (a)**
+
+In lecture, we saw that the expected value of the payout for this bet is 180/38.
+```{r}
+combined.bet.expected.payout <- 180/38
+combined.bet.expected.payout
+```
+Calculate the variance of this bet by using the formula from the original definition, where the variance is defined as the expectation of the squared deviations from the expected value.
+
+
+**Part (b)** Calcuate the second moment of the payout for this wager i.e. the expected value of the square of the payout.
+
+
+**Part (c)** Using your result in Part (b), along with your knowledge of the expected value of the payout for this bet, calculate the variance using the alternative formula.
+
+
+### Problem Solution
+
+
+**Part (a)**
+
+
+
+
+**Part (b)**
+
+
+
+
+**Part (c)**
+
+
+
+
+
+
+
+#Problem 6
+
+### Problem Statement
+
+Construct a simulation that will verify your variance calculation from Problem 5.
+
+
+### Problem Solution
+
+
+
+
+# Problem 7
+
+### Problem Statement
+
+In the roulette scene from the great classic movie *Casablanca*, Rick (played by Humphrey Bogart) tells the young Bulgarian man to bet on 22, and he wins. Then, Rick tells him to leave all his winnings on 22, and the young man wins again! That seems improbable.
+
+**Part (a)**
+
+Calculate the exact value for this probability. You should bear in mind that Casablanca was under French rule at the time.
+
+
+**Part (b)**
+
+Construct a simulation to verify your calculation in Part (a). The probability will be a very small number, so to get decent accuracy you'll want to run many more simulation replications; one million should be sufficient to get a reasonable good approximation.
+
+### Problem Solution
+
+**Part (a)**
+
+
+
+
+
+**Part (b)**
+
+
+
+
+
+
+
+
+# Problem 8
+
+Now we're going to look at a game that is difficult to analyze using the formal tools that we've developed in this course so far, but can be modeled using a simulation in a straightforward way. I hope this will illustrate to you how powerful simulation can be, in that we can use it to study complex probabilistic systems that can be challenging to understand with a purely mathematical approach.
+
+### Problem Statement
+
+The Chevalier de Mere is playing a game with his friend Blaise Pascal. Pascal has two urns, each containing 10 balls numbered from 1 to 10, and he plays by drawing a ball at random from each urn and then adding the values together. The Chevalier has one urn that contains 20 balls numbered from 1 to 10, and he plays by drawing one ball from the urn. If the Chevalier's number is strictly greater than Pascal's sum, then Pascal must pay the Chevalier 1 euro. If the Chevalier's number is strictly less than Pascal's sum, then the Chevalier must pay Pascal 1 euro. If the Chevalier's number is equal to Pascal's sum, then the game is declared a draw, and neither player pays out anything.
+
+**Part (a)**
+
+What is the probability is that the Chevalier will win this game? Design a simulation that will provide an approximate estimate of this value.
+
+**Part (a) Advanced**
+
+If you'd like a little bit of a challenge, you could actually answer 5 questions:
+
+* What is the probability that the Chevalier will win the game?
+
+* What is the probability that the Chevalier will lose the game?
+
+* What is the probability that the Chevalier will draw the game?
+
+* What is the expected profit per game for the Chevalier?
+
+* What is the variance of the profit per game for the Chevalier?
+
+**Hint:** Set up 4 different result vectors: one for the Chevalier winning, one for the Chevalier drawing, one for the Chevalier losing, and one for the Chevalier's profit. Then update these result vectors based on what the result of each simulated game.
+
+
+
+**Big hint:** To help you along, I'll even tell what the exact answers are. The winning probability is 45%, the drawing probability is 5%, and the losing probability is 50%. The expected profit per game for the Chevalier is -0.05, and the variance of the profit per game is 0.9475. So your simulation should generate approximate answers that are very close to these values.
+
+
+
+
+
+
+
+
+### Problem Solution
+
+
+
+
+
+
+

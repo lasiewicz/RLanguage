@@ -1,0 +1,648 @@
+---
+title: "STAT E-80: Problem Set 6 Solutions"
+subtitle: 'Type your name here'
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+
+# Instructions
+
+**Due:** Wednesday, March 13, 2019
+
+#Instructions
+
+First, save this notebook with a title consisting of "ProblemSet6" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet6Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+
+
+
+# Problem 1
+
+Tom Gravy, start quarterback of the champion New England Clam Chowder, and his glamorous supermodel wife Gazelle love tacos! Unfortunately, they've been spending a lot of money on tacos lately, and it's becoming a problem for the household budget. Last week, Tom and Gazelle bought tacos 10 times from the local taco truck. This vector lists who made each purchase:
+```{r}
+buyer.vector <- c( "Tom", "Tom", "Gazelle", "Tom", "Gazelle",
+                   "Gazelle", "Tom", "Gazelle", "Tom", "Tom")
+```
+This vector lists the dollar amount of each purchase:
+```{r}
+amount.vector <- c( 8, 22, 7, 12, 14, 9, 37, 19, 8, 31)
+```
+Your challenge is to figure out who is making really big purchases at the taco truck.
+
+### Part (a)
+
+First, by hand, determine the conditional probability that Tom Gravy purchased tacos, given that the dollar amount of the purchase is strictly greater than \$10. That means that you should only consider the purchases that are greater than \$10, and find the proportion of those purchases for which Tom Gravy was the buyer. This is a very simple calculation -- focus on the purchases that were over \$10, and then determine what proportion of them were made by Tom Gravy.
+
+**Answer**
+
+There were 10 purchases overall:
+
+* Four of the purchases were for more than \$10 and were made by Tom Gravy: the second for \$22, the fourth for \$12, the seventh for \$37, and the tenth for \$31.
+
+* Two of the purchases were for more than \$10 and were made by Gazelle: the fifth for \$14 and the eigth for \$19.
+
+Thus there were a total of 6 purchases that were for more than \$10, and Tom made 4 of those purchases, so the proportion is 4 out of 6:
+```{r}
+4/6
+```
+
+
+
+
+### Part (b)
+
+Now you're done with the calculations for this problem. Instead, we're going to see how to calculte the value in part (a) by using vectorized operations. First, consider these lines of code:
+```{r}
+indexing.vector <- amount.vector > 10
+indexing.vector
+```
+In words, explain *exactly* what type of object `indexing.vector` is, what the information in `indexing.vector` is, and how `indexing.vector` is constructed from `amount.vector`.
+
+**Answer** This is a *logical* vector , consisting of TRUE and FALSE values, and is of length 10. The vector has a TRUE in those positions where `amount.vector` has a value that is strictly greater than 10, and a FALSE in positions where `amount.vector` has a value that is less than or equal to 10. The vector is constructed by a vectorized operation in which each element is compared with the value 10.
+
+
+
+
+
+### Part (c)
+
+Now consider these lines of code:
+```{r}
+filtered.vector <- buyer.vector[ indexing.vector ]
+filtered.vector
+```
+In words, explain *exactly* what type of object `filtered.vector` is, what the information in `filtered.vector` tells us, and how `filtered.vector` is constructed from `buyer.vector`.
+
+**Answer** `filtered.vector` is a character vector (i.e. a vector that consists of character strings) of length 6. It consists of those elements of `buyer.vector` for whom the corresponding purchase was strictly greater than \$10. `filtered.vector` is created using the process of logical indexing, in which a logical vector (in this case `indexing.vector`) is used to select elements of another vector of the same length by retaining only those elements for which the corresponding element in the logical vector is TRUE.
+
+
+
+
+
+### Part (d)
+
+Now consider this line of code:
+```{r}
+filtered.vector == "Tom"
+```
+In words, explain *exactly* what type of object is produced by this code, what the information in the output of this code is telling us, and how this is constructed from `filtered.vector`.
+
+**Answer** This object is a logical vector, consisting of the values TRUE and FALSE. It has the value TRUE in exactly those locations where the character vector `filtered.vector` has the value "Tom"", so it is indicating those positions in `filtered.vector` where the value is "Tom". This is constructed using a vectorized operation in which each element of `filtered.vector` is compared to the value "Tom", and if the element is equal to "Tom" then the output vector has the value TRUE, and if the element is not equal to "Tom" then the output vector has the value FALSE.
+
+
+
+
+
+
+### Part (e)
+
+Now consider this line of code:
+```{r}
+mean( filtered.vector == "Tom" )
+```
+In words, explain *exactly* what type of object is produced by this code, what the information in the output of this code is telling us, and how this is constructed from `filtered.vector`. How does the answer in part (a) compare with the output of this line of code?
+
+**Answer** The object produced by this code is a numerical value. This numerical value represents the proportion of elements in `filtered.vector` that are equal to the value "Tom". Since `filtered.vector` represents the buyer of any taco order of greater than \$10, this numerical value represents the proportion of purchases greater than \$10 that were made by Tom. This happens because as we saw in part (d) the input information to the `mean()` function in this code is a logical vector consisting of the value TRUE in exactly those positions where `filtered.vector` has the value "Tom", and when the `mean()` function is applied to a logical vector, it returns the proportion of elements in the vector that are TRUE. 
+
+The value that we obtained in this code is *exactly* the same as what we calculated in part (a). There, we performed our calculation by hand, but in this code example we were able to fully automate the process:
+
+* First, in part (b) we determined which purchases were for more than \$10.
+
+* Second, in part (c) we determined who made those purchases for more than \$10.
+
+* Third, in part (d) we determined whether or not it was Tom who made the purchases for more than \$10.
+
+* Finally, in part (e) we calculated the proportion of purchases over \$10 that were made by Tom.
+
+That's a lot of work! Remarkably, we can put it all together in two lines of code:
+```{r}
+filtered.vector <- buyer.vector[ amount.vector > 10 ]
+mean( filtered.vector == "Tom" )
+```
+
+
+
+
+
+
+# Problem 2
+
+Chicken Curry is one of the best players in the NBA. In any game, the total number of points that he scores follows this probability distribution:
+
+|Points|Probability|
+|:----:|:---------:|
+| 20 | 0.15 |
+| 25 | 0.25 |
+| 30 | 0.35 |
+| 35 | 0.15 |
+| 40 | 0.10 |
+
+Let $A$ denote the event that Chicken Curry scores 35 or more points in a 
+game, and $B$ denote the event that Chicken Curry scores 30 or more points in a game.
+
+### Part (a)
+
+What is $\Pr(A)$, the unconditional probability that Chicken will score 35 or more points in a game? (Unconditional means that you don't have any additional information about Chicken's total points, so you calculate it just like you usually would.)
+
+**Answer** Chicken can score 35 or more points in a single game in two ways: either by scoring 35 points in a game, which happens with probability 0.15, or by scoring 40 points in a game, which happens with probability 0.10. So the probability that Chicken will score 35 or more points is 0.15 + 0.10 = 0.25.
+
+```{r}
+problem.2.probability.A <- 0.15 + 0.10
+problem.2.probability.A
+```
+
+
+
+### Part (b)
+
+What is $\Pr(B)$, the unconditional probability that Chicken will score 30 or more points in a game?
+
+**Answer** Chicken can score 30 or more points in a single game in three ways ways: by
+
+* By scoring 30 points in a game, which occurs with probability 0.35
+
+* By scoring 35 points in a game, which happens with probability 0.15.
+
+* By scoring 40 points in a game, which happens with probability 0.10. 
+
+So the probability that Chicken will score 30 or more points is 0.35 + 0.15 + 0.10 = 0.60.
+
+```{r}
+problem.2.probability.B <- 0.35 + 0.15 + 0.10
+problem.2.probability.B
+```
+
+
+
+### Part (c)
+
+What is the event $A\ \textbf{and}\ B$? Is there a simpler way to specify this event?
+
+**Answer** The event $A\ \textbf{and}\ B$ is the intersection of the events $A$ and $B$. Since the event $A$ is actually just a subset of the event $B$, then $A\ \textbf{and}\ B$ is really just the event $A$. That is, event $A$ is that Chicken scores 35 or more points, and event $B$ is that Chicken scores 30 or more points, and if we say that both of them are true then all we're really saying is that Chicken scored 35 or more points. So in this case the event $A\ \textbf{and}\ B$ is really just the same as the event $A$.
+
+Note that the $A\ \textbf{and}\ B$ is the same as the event $A$ is a very special case, and it's true only because of the specific way that we've defined the events $A$ and $B$. It's not true in general that $A\ \textbf{and}\ B$ is the same as $A$.
+
+
+
+
+
+### Part (d)
+
+Calculate $\Pr(A\ |\ B)$ i.e. the conditional probability that Chicken Curry scores 35 or more points, given that he scores 30 or more points. Use the standard formula:
+$$
+\Pr( A\ |\ B)\ =\ \frac{ \Pr( A\ \textbf{\textsf{and}}\ B ) }{ \Pr( B)}
+$$
+
+**Answer** First, from part (c), we know that in this case the event $A\ \textbf{and}\ B$ is the same as the event $A$. Thus, we can rewrite the conditional probability definition as:
+$$
+\Pr( A\ |\ B)\ =\ \frac{ \Pr( A ) }{ \Pr( B)}
+$$
+Remember, this formula is **not** true in general, and it's true in this problem only because of how we've defined the events $A$ and $B$.
+
+We saw in part (a) that event $A$ has probability 0.25, and in part (b) we saw that event $B$ has probability 0.60. Thus the conditional probability of $A$ given $B$ is 0.25 / 0.60 = 5/12.
+
+```{r}
+0.25 / 0.60
+```
+
+
+
+
+
+### Part (e)
+
+Construct a simulation that will verify your result in part (d). Remember to use the filtering technique that we used to model the fact that our probability is conditional on the event $B$.
+
+**Answer**
+
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, let's sample from the probability distribution
+    # for Chickens' scores:
+    
+    chicken.score <- sample( c(20, 25, 30, 35, 40), 1, replace = FALSE,
+                         prob = c(0.15, 0.25, 0.35, 0.15, 0.10 ) )
+    
+    # Now we can store this value in the result.vector
+    
+    result.vector[ replication.index ] <- chicken.score
+}
+
+# Now we have to use our filtering technique. First, let's filter
+# out the scores that are greater than or equal to 30:
+
+filtered.vector <- result.vector[ result.vector >= 30 ]
+
+# Now that we've filtered the scores, let's take the mean
+# of the scores that are greater than 35:
+
+cat( "The mean of the filtered scores greater than 35 is:",
+     mean( filtered.vector >= 35 ), "\n" )
+```
+
+The result should be close to 0.4167.
+
+
+
+
+
+
+
+# Problem 3
+
+Suppose we have an urn with 3 red balls and 2 white balls. We sample two balls from the urn, without replacement, and would like to determine the conditional probability that the first ball is red, given that the second ball is red. Let $X_1$ denote the color of the first ball, and $X_2$ denote the color of the second ball.
+
+### Part (a)
+
+Calculate $\Pr(X_1 = \hbox{Red}\ \textbf{\textsf{and}} X_2 = \hbox{Red})$ i.e. the probability that the first ball is red and the second ball is red. (Remember that we are sampling without replacement.)
+
+**Answer** For the first draw, there are a total of 5 balls in the urn, 3 of which are red. Therefore the probability of selecting a red ball in the first ball is 3/5. If the first ball is red, then after the first draw the urn will contain a total of 4 balls, 2 of them red and 2 of them white (remember that we are sampling without replacement). Thus the probability of drawing a red ball in the second draw, given that the first draw was a red ball, is 2/4, or equivalently 1/2. Thus, the probability of drawing the first ball as red, and the second ball as red, is 3/5 times 1/2, which is 3/10:
+
+```{r}
+3/5 * 1/2
+```
+
+
+### Part (b)
+
+Calculate $\Pr(X_1 = \hbox{White}\ \textbf{\textsf{and}} X_2 = \hbox{Red})$ i.e. the probability that the first ball is white, and the second ball is red.
+
+**Answer** This is basically the same argument as in part (a). For the first draw, there are a total of 5 balls in the urn, 3 of which are red. Therefore the probability of selecting a white ball in the first ball is 2/5. If the first ball is white, then after the first draw the urn will contain a total of 4 balls, 3 of them red and 1 of them white (remember that we are sampling without replacement). Thus the probability of drawing a red ball in the second draw, given that the first draw was a white ball, is 3/4. Finally, the probability of drawing the first ball as white, and the second ball as red, is 2/5 times 3/4, which is 3/10:
+
+```{r}
+2/5 * 3/4
+```
+
+
+
+
+### Part (c)
+
+Using your results in parts (a) and (b), calculate $\Pr(X_2 = \hbox{Red})$ i.e. the probability that the second ball is red.
+
+**Answer** There are two possible ways to draw a red ball in the second draw: either the first ball is red, or the first ball is white. In part (a) we calculated that the probability of the first case is 0.3, while in part (b) we calculated that the probability of the second case is also 0.3. So the total probability is 0.3 + 0.3 = 0.6.
+
+```{r}
+0.3 + 0.3
+```
+
+
+
+
+### Part (d)
+
+Let $X_1$ denote the color of the first ball, and $X_2$ denote the color of the second ball. Using parts (a) and (c), calculate the conditional probability that the first ball is red, given that the second ball is red. Use the formula from the standard definition of conditional probability:
+$$
+\Pr(X_1 = \hbox{Red}\ |\ X_2 = \hbox{Red})\ =\ \frac{ \Pr(X_1 = \hbox{Red}\ \textbf{and}\ X_2 = \hbox{Red} ) }{ \Pr( X_2 = \hbox{Red})}
+$$
+
+**Answer** We know from part (a) that the probability of the numerator is 0.3, and from part (c) that the probability of the denominator is 0.6. Thus, the conditional probability is 0.3 / 0.6 = 0.5.
+
+```{r}
+0.3 / 0.6
+```
+
+
+### Part (e)
+
+Construct a simulation to verify your calcution in part (d).
+
+```{r}
+number.replications <- 100000
+
+first.ball.vector <- character( number.replications )
+second.ball.vector <- character( number.replications )
+
+# Here we actually model the urn with its five balls:
+
+urn.vector <- c( "Red", "Red", "Red", "White", "White" )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, let's simulate the process of sampling the
+    # two balls. Remember that we are sampling without
+    # replacement.
+    
+    urn.sample <- sample( urn.vector, 2, replace = FALSE)
+    
+    # Now let's store the results of the sample into two vectors,
+    # one that keeps track of the first ball, and one that keeps
+    # track of the second ball.
+    
+    first.ball.vector[ replication.index ] <- urn.sample[ 1 ]
+    second.ball.vector[ replication.index ] <- urn.sample[ 2 ]
+}
+
+## Now that we've generated our raw data, we need to filter
+## the simulation results to reflect the fact that we are
+## calculating a conditional probability.
+
+filtered.first.ball.vector <- first.ball.vector[ second.ball.vector == "Red" ]
+mean( filtered.first.ball.vector == "Red" )
+```
+This value should be close to 0.50.
+
+
+
+# Problem 4
+
+Chicken Curry's great rival in the NBA is Kobe Beef. In any game, the total number of points that Kobe scores follows this probability distribution:
+
+|Points|Probability|
+|:----:|:---------:|
+| 20 | 0.10 |
+| 25 | 0.20 |
+| 30 | 0.40 |
+| 35 | 0.20 |
+| 40 | 0.10 |
+
+For your reference, here is the probability distribution for Chicken Curry's scores:
+
+|Points|Probability|
+|:----:|:---------:|
+| 20 | 0.15 |
+| 25 | 0.25 |
+| 30 | 0.35 |
+| 35 | 0.15 |
+| 40 | 0.10 |
+
+You should assume that the total number of points that Chicken scores is independent from the total number of points that Kobe scores.
+
+### Part (a)
+
+Using the Law of Total Probability, perform a mathematical calculation to determine the exact probability that Kobe scores more points than Chicken. Use the probability distribution for Chicken's total points from Problem 2.
+
+**Answer** Let the random variable $K$ denote Kobe's score. The Law of Total Probability allows us to calculate the unconditional probability of $K$ by working with the conditional probability of $K$ across a set of cases:
+
+* We first calculate the probability that Kobe scores 20 points, and Kobe scores more than Chicken.
+
+* We next calculate the probability that Kobe scores 25 points, and Kobe scores more than Chicken.
+
+* We continue in this way with the cases where Kobe scores 30, 35, or 40 points, in each case calculating the probability that Kobe scores more points than Chicken does.
+
+* When we have obtained all of these values, we then add them together to obtain the overall total probability that Kobe scores more than Chicken does.
+
+Let's start with the case where Kobe scores 20 points. Instead of saying "Kobe scores more points than Chicken does", I'm going to simply say "Kobe Wins", just to make the notation a little more compact. Then we can write our conditional probability formula as:
+$$
+\Pr(\hbox{Kobe Wins}\ |\ K = 20)\ =\ \frac{ \Pr( \hbox{Kobe Wins}\ \textbf{and}\ K = 20 ) }{ \Pr( K = 20 )}
+$$
+
+Multiplying through by $\Pr(K = 20)$, we have:
+$$
+\Pr(\hbox{Kobe Wins}\ |\ K = 20) \cdot \Pr( K = 20 )\ =\ \Pr( \hbox{Kobe Wins}\ \textbf{and}\ K = 20 )
+$$
+
+Now, what is the probability that Kobe scores more than Chicken, given that Kobe scores exactly 20 points? Since Chicken will always score at least 20 points, then Kobe cannot score more than Chicken does, so this probability is 0. Thus we have:
+$$
+\Pr(\hbox{Kobe Wins}\ |\ K = 20) \ =\ 0
+$$
+The probabililty that Kobe scores 20 points is:
+$$
+\Pr( K = 20 )\ =\ 0.10
+$$
+Putting all this together, we have:
+$$
+\Pr( \hbox{Kobe Wins}\ \textbf{and}\ K = 20 ) = 0 \times 0.10\ =\ 0
+$$
+
+Next, consider the case where Kobe scores exactly 25 points. In this case, Kobe will outscore Chicken if Chicken scores 20 points, and this occurs with probability 0.15. Thus, the conditional probability that Kobe scores more than Chicken, given that Kobe scores exactly 25 points, is 0.15:
+$$
+\Pr(\hbox{Kobe Wins}\ |\ K = 25) \ =\ 0.15
+$$
+The unconditional probability that Kobe scores exactly 25 points is:
+$$
+\Pr( K = 25 )\ =\ 0.20
+$$
+
+Putting all this together, we have:
+$$
+\Pr( \hbox{Kobe Wins}\ \textbf{and}\ K = 25 ) = 0.15 \times 0.20\ =\ 0.03
+$$
+
+Let's do one more. Suppose Kobe scores exactly 30 points; what is the probability that he will score more than Chicken? If Kobe scores 30 points, then he will score more than Chicken when Chicken scores either 20 or 25 points, and these events have probabilities 0.15 and 0.25, respectively. Thus,
+$$
+\Pr(\hbox{Kobe Wins}\ |\ K = 30) \ =\ 0.15 + 0.25\ =\ 0.40
+$$
+
+Kobe scores exactly 30 points with probability 0.40:
+$$
+\Pr( K = 30 )\ =\ 0.40
+$$
+
+Putting all this together, we have:
+$$
+\Pr( \hbox{Kobe Wins}\ \textbf{and}\ K = 30 ) = 0.40 \times 0.40\ =\ 0.16
+$$
+
+For the case that Kobe scores exactly 35 points, you should find that:
+$$
+\Pr( \hbox{Kobe Wins}\ \textbf{and}\ K = 35 ) = 0.75 \times 0.2\ =\ 0.15
+$$
+
+For the case that Kobe scores exactly 40 points, you should find that:
+$$
+\Pr( \hbox{Kobe Wins}\ \textbf{and}\ K = 40 ) = 0.90 \times 0.1\ =\ 0.15
+$$
+
+Then adding all of this together, we have:
+```{r}
+(0 * 0.10) + (0.15 * 0.2) + (0.4 * 0.4) + (0.75 * 0.2) + (0.9 * 0.1)
+```
+
+
+
+### Part (b)
+
+Construct a simulation to verify your calculation in part (a).
+
+**Answer** This is straightforward, and in fact you don't need to use any concepts that involve conditional probability.
+
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First we simulate Chicken's score:
+    
+    chicken.score <- sample( c(20, 25, 30, 35, 40), 1, replace = TRUE,
+                             prob = c(0.15, 0.25, 0.35, 0.15, 0.10) )
+    
+    # Next we simulate Kobe's score:
+    
+    kobe.score <- sample( c(20, 25, 30, 35, 40), 1, replace = TRUE,
+                             prob = c(0.1, 0.2, 0.4, 0.2, 0.1) )
+    
+    # Finally, we test to see if Kobe's score is greater
+    # than Chicken's score:
+    
+    if( kobe.score > chicken.score ) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+# Finally, we calculate the proportion of times
+# that Kobe scored higher than Chicken:
+
+mean( result.vector )
+```
+
+
+
+# Problem 5
+
+Suppose we have a diagnostic test for a certain disease. A "positive" test result means that the test has indicated that the patient has the disease, while a "negative" test result means that the test has indicated that the patient does not have the disease. Unfortunately, while the test usually works well, it's not perfect, and the test results are not always correct:
+
+* If a patient has the disease, then the test will correctly identify this 95\% of the time, but will mistakenly return a negative result 5\% of the time.
+
+* If a patient does not have the disease, then the test will correctly identify this 90\% of the time, but will mistakenly return a positive result 10\% of the time.
+
+The disease is rare, so that only 2\% of the population has the disease.
+
+
+### Part (a)
+
+Use the Law of Total Probability to calculate the unconditional probability of a positive test result. Hint: think about how you can express the statements about the error probabilities as conditional probabilities.
+
+**Answer** Let $T^+$ and $T^-$ denote the events of a positive or negative test result, respectively. Similarly, let $D^+$ and $D^-$ denote the presence or absence of disease. Let's first consider the case where the patient does have the disease. Then the conditional probability of a positive test result, given that the patient has the disease, is 0.95:
+$$
+\Pr( T^+\ |\ D^+ )\ =\ 0.95
+$$
+
+and the patient will have the disease with probability 0.02. Then the joint probability that the patient has the disease and received a positive test score is:
+$$
+\Pr(T^+\ \textbf{and}\ D^+)\ =\ 0.95 \times 0.02
+$$
+
+Now let's consider the case where the patient does not have the disease. Then the conditional probability of a positive test result, given that the patient does not have the disease, is 0.10:
+$$
+\Pr( T^+\ |\ D^- )\ =\ 0.10
+$$
+
+The unconditional probability that the patient will not have the disease is 0.98:
+$$
+\Pr( D^- )\ =\ 0.98
+$$
+
+Then the joint probability that the patient receives a positive test result and does not have the disease is:
+$$
+\Pr(T^+\ \textbf{and}\ D^+)\ =\ 0.10 \times 0.98
+$$
+
+Putting this all together, the unconditional probability of a positive test result is:
+$$
+\Pr( T^+ )\ =\ (0.95 \times 0.02) + (0.10 \times 0.98)\ =\ 0.117
+$$
+
+Let's do this in R:
+```{r}
+(0.95 * 0.02) + (0.10 * 0.98)
+```
+
+
+
+
+
+# Problem 6
+
+This is a continuation of Problem 5, and you should assume that all the information in the problem statement for Problem 5 still holds.
+
+### Part (a)
+
+Now we want to construct a simulation to check our calculation in Problem 5, and also to ask some new questions. We'll use conditional probabilities to develop a new method for simulating data:
+
+* As usual, we'll use 10,000 simulation replications; we'll interpret this as using the test on 10,000 patients in the population.
+
+* Create two result vectors, one to store the disease status, and the other to store the test status.
+
+* First, for each patient, simulate the disease status.
+
+* Next, for each patient, simulate the test result. This will depend on their disease status, so you'll have to use an `if()` statement to determine which random generator to use.
+
+* Once you've simulated the disease status and test result for a patient and stored these in the appropriate vector, you're done with that patient.
+
+Thus, at the end of this part of the simulation, you should have two vectors, one of which holds the true disease status of each patient, and the other which holds the test result for that patient.
+
+**Answer**
+
+```{r}
+number.replications <- 1000000
+
+disease.vector <- character( number.replications )
+test.vector <- character( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    disease.status <- sample( c("Disease", "No Disease"), 1,
+                                prob = c(0.02, 0.98) )
+    
+    if( disease.status == "Disease" ) {
+        test.status <- sample( c("Positive", "Negative"), 1,
+                                 prob = c(0.95, 0.05) )
+    } else {
+        test.status <- sample( c("Positive", "Negative"), 1,
+                                 prob = c(0.10, 0.90) )
+    }
+    
+    disease.vector[ replication.index ] <- disease.status
+    test.vector[ replication.index ] <- test.status
+}
+```
+
+
+
+
+### Part (b)
+
+As a check on your simulation, determine if the percentage of simulations where the patient had the disease is close to 2\%.
+
+```{r}
+mean( disease.vector == "Disease" )
+```
+This value should be close to 0.02.
+
+
+
+### Part (c)
+
+As a check on your simulation, determine if the percentage of postive tests is close to the value that you calculated in Problem 5.
+
+**Answer** We can use vectorized operations to determine the proportion of elements in `test.vector` that are equal to the character string "Positive":
+```{r}
+mean( test.vector == "Positive" )
+```
+This value should be close to 0.117, which we calculated in Problem 5.
+
+### Part (d)
+
+Now, employing our standard filtering technique, use your simulated data to obtain an approximate estimate of the conditional probability that the patient has the disease, given that the test result is positive.
+
+**Answer**
+
+```{r}
+filtered.vector <- disease.vector[ test.vector == "Positive" ]
+mean( filtered.vector == "Disease" )
+```
+This value should be close to 0.162
+
+
+
+
+
+
+
+
+

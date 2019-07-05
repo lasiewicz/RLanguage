@@ -1,0 +1,499 @@
+---
+title: "Lecture 9: The Geometric Distribution"
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Probability Distributions
+
+R has a standard approach to naming functions for probability distributions;
+
+* A probabability function that starts with a 'd' will calculate $\Pr(X = k)$, the probability that a random variable $X$ will take on a specific value $k$. For instance, to calculate the probability that a binomial random variable with $n = 8$ and $p = 0.6$ takes on the specific value $k = 4$, we have:
+```{r}
+dbinom(4, 8, 0.6)
+```
+* A probability function that starts with a 'p' will calculate $\Pr(X \leq k)$, the probability that a random variable $X$ is less than some specific value $k$. For instance, to calculate the cumulative probability that a binomial random variable with $n = 10$ and $p = 0.3$ is less than or equal to the specific value $k = 4$, we have:
+```{r}
+pbinom(4, 10, 0.3)
+```
+* Finally, a probability function that starts with an 'r' will generate random values from the specified distribution. Thus, to generate 20 random values from binomial distribution with $n = 12$ and $p = 0.4$, we have:
+```{r}
+rbinom( 20, 12, 0.4)
+```
+
+
+# Histograms
+
+It can be very powerful to visualize a probability distribution. The *histogram* enables us to do this.
+
+First, let's generate some random data for us to play with:
+```{r}
+random.sample <- rbinom( 10000, 50, 0.1 )
+```
+Now we can graph this with the `hist()` function:
+```{r}
+hist( random.sample )
+```
+
+This is useful, and interesting, but we can do a lot better. The `hist()` function can take many options:
+
+* We can set the label for the $x$-axis with the `xlab =` option.
+
+* We can set a main title for the graph with the `main =` option.
+
+* We can set the range of the $x$-axis with the `xlim =` option.
+
+* We can set the range of the $y$-axis with the `ylim =` option.
+
+* We can set the color of the bars using the `col =` option.
+
+* We can control the size of the histograms bins using the `breaks =` option.
+
+In general, we'll also want to set `prob = TRUE`; I'll explain what's going on with this and why we do it in a couple of weeks. Here's a nicer histogram:
+```{r}
+hist( random.sample,
+      xlab = "Number of successes",
+      main = "Histogram of binomial random variables",
+      prob = TRUE,
+      xlim = c(0, 50),
+      col = "salmon1")
+```
+
+Here's a histogram of a binomial distribution with $n = 100$ and $p = 0.5$; this distribution has a variance of 25.
+```{r}
+hist( rbinom(100000, 100, 0.5),
+      main = "Histogram of binomial(100, 0.5) distribution",
+      prob = TRUE,
+      xlab = "Number of successes",
+      xlim = c(0,100),
+      ylim = c(0,0.15),
+      col = "plum" )
+```
+
+Here's a histogram of a binomial distribution with $n = 100$ and $p = 0.1$; this distribution has a variance of 9, so it's less spread out. Notice that we need to set the $x$ and $y$ limits so that the two graphs both give the same display.
+```{r}
+hist( rbinom(100000, 100, 0.1),
+      main = "Histogram of binomial(100, 0.1) distribution",
+      prob = TRUE,
+      xlab = "Number of successes",
+      xlim = c(0, 100),
+      ylim = c(0,0.15),
+      col = "cyan3")
+```
+
+
+
+# Accumulating variables
+
+Sometimes it can be useful to update a variable in R. For instance, suppose the philosopher Z'a'phma is playing 8-spot Keno tickets, and we want to keep track of the number of times he has lost. So we create this variable:
+```{r}
+number.losses <- 0
+```
+Now Z'a'phma buys a Keno ticket, and it loses, so we want to increment this variable. We can use this code:
+```{r}
+number.losses <- number.losses + 1
+```
+How does this work? First, R evaluates the right-hand side of the statement. The variable `number.losses` has the value 0, and we add 1 to it, so the right-hand side of the statement evaluates to 1. Then we assign this value to `number.losses`, so now `number.losses` has the value 1:
+```{r}
+number.losses
+```
+Now suppose Z'a'phma buys another Keno ticket, and this also loses. Then we can update again:
+```{r}
+number.losses <- number.losses + 1
+number.losses
+```
+We don't just have to update with the number 1. We can update with anything -- R will evaluate the right-hand side, and then assign it to the variable on the left-hand side. Let's use a `for` loop to calculate the sum of the numbers from 1 to 10:
+```{r}
+total.sum <- 0
+
+for( number.index in 1:10 ) {
+    total.sum <- total.sum + number.index
+}
+
+total.sum
+```
+Of course, we can calculate this sum using a simple vectorized operation:
+```{r}
+sum( 1:10 )
+```
+
+In general vectorized operations are preferred in R. However, this is not a course in R programming, and I want you to use the programming techniques that you are most comfortable with. If you need to use a `for` loop to solve a problem, that's fine, although you should also make an effort to learn methods that are more idiomatic to R.
+
+
+
+
+
+
+
+# `While` loops
+
+When we run a `for` loop, the loop will run for a fixed number of times, and then stop.
+```{r}
+
+for( replication.index in 1:10 ) {
+    cat( replication.index, "Hi Mom!\n")
+}
+```
+
+With a `while` loop, we don't pre-specify the number of times through the loop, but instead we keep on looping until a test becomes `FALSE`. For instance, this `while` loop will run as long as the value of the variable `replication.index` is strictly less than 11, but once the value of `replication.index` is greater than or equal to 11, the loop stops.
+```{r}
+replication.index <- 1
+while( replication.index < 11 ) {
+    cat( replication.index, "Hi Mom!\n")
+    replication.index <- replication.index + 1
+}
+```
+
+On the basis of this example, you might wonder what the value of a `while` loop is, since the output was exactly the same. The point is that the `while` loop doesn't have to have a pre-determined length, and this flexibility can be very useful when dealing with situations where we repeat a process until some condition is met. For instance, suppose we have an urn filled with 2 red balls and 8 white balls, and we continually sample from the urn until we draw a red ball. How many trials did it take to observe a red ball? We can use a `while` loop, along with an accumulator random variable, to model this system:
+```{r}
+number.trials <- 0
+
+urn.vector <- c( rep("Red", 2), rep("White", 8) )
+
+ball.status <- "White"
+
+while( ball.status == "White" ) {
+    
+    ball.status <- sample( urn.vector, 1 )
+    
+    if (ball.status == "White" ) {
+        number.trials <- number.trials + 1
+    }
+}
+
+number.trials
+```
+Run this code chunk a number of times; you should find that the value of `number.trials` can change each time you run the code, because the number of trials required to obtain a red ball is dependent on the random sampling process of drawing a ball from an urn. This is the sort of situation for which `while` loops are ideal.
+
+The danger with a while loop is that if you do not correctly handle the looping test you will get an infinite loop. Consider this code, which you should **NOT** run:
+```{r eval = FALSE}
+
+number.trials <- 0
+
+urn.vector <- rep("White", 8)
+
+ball.status <- "White"
+
+while( ball.status == "White" ) {
+    
+    ball.status <- sample( urn.vector, 1 )
+    
+    if (ball.status == "White" ) {
+        number.trials <- number.trials + 1
+    }
+}
+
+number.trials
+```
+Now the `urn.vector` consists entirely of White balls, and so the value of `ball.status` will never change, and the loop will never terminate. If this happens to you, you should see a little red stop sign icon in the right-hand corner, and you can try to halt the process by clicking on that. In the worst-case scenario, however, you might have to shut down R and start again. The moral of the story is to be very careful with `while` loops: they can be very useful, but they can also be very dangerous!
+
+
+
+
+
+
+# Infinite Series
+
+An *infinite series* is an infinite sum. We are especially interested in the *geometric series*:
+$$
+1 + x + x^2 + \ldots\ =\ \sum_{k=0}^\infty x^k
+$$
+We saw in lecture that if $|x| < 1$ then it made sense to interpret the geometric series as:
+$$
+1 + x + x^2 + \ldots\ =\ \frac{1}{1-x}
+$$
+What this means is that as we take more and more terms of the infinite series on the left-hand side, the sum gets closer and closer to the value on the right-hand side. Let's see an example of this, when $x = 2/3$. We'll take the first 40 terms on the left-hand side, so this becomes:
+$$
+1 + \left ( \frac{2}{3} \right )^1 + \left ( \frac{2}{3} \right )^2 + \ldots + \left ( \frac{2}{3} \right )^{40}\ =\ \frac{1}{1 - \frac{2}{3}}\ =\ 3
+$$
+To evaluate this sum, we'll use our method of the accumulator variable.
+```{r}
+# First, we'll set the number of terms to 40
+
+number.terms <- 40
+
+# Now let's set the value of x:
+
+x <- 2/3
+
+# Finally, total.sum will be our accumulator variable,
+# and we will initialize it to 0:
+
+total.sum <- 0
+
+# Now we enter the for loop:
+
+for( power.index in 0:number.terms ) {
+    
+    # Each time through the loop, we will add a
+    # higher power of x to the total:
+    
+    total.sum <- total.sum + x^power.index
+}
+
+# Now that we're done with the loop, we can 
+# display the total:
+
+total.sum
+```
+
+We can modify this code to create a vector with the all the cumulative totals:
+```{r}
+# First, we'll set the number of terms to 40
+
+number.terms <- 40
+
+# Now let's set the value of x:
+
+x <- 2/3
+
+# total.sum will be our accumulator variable,
+# and we will initialize it to 0:
+
+total.sum <- 0
+
+# Now we'll create a vector to keep track
+# of all the cumulative totals:
+
+cumulative.total.vector <- numeric( number.terms )
+
+# Now we enter the for loop:
+
+for( power.index in 0:number.terms ) {
+    
+    # Each time through the loop, we will add a
+    # higher power of x to the total:
+    
+    total.sum <- total.sum + x^power.index
+    
+    # Now we store the current value of total.sum
+    # in the cumulative.total.vector. Notice that
+    # we have to add 1 to the power.index:
+    
+    cumulative.total.vector[ power.index + 1 ] <- total.sum
+}
+
+# Now that we're done with the loop, we can 
+# display the cumulative.total.vector, which
+# will have all the running totals:
+
+cumulative.total.vector
+```
+With this vector of the running totals, you can see how the cumulative sums gradually converge to the value 3.
+
+Did you notice that we had to add to `power.index` when we stored the value of `total.sum` in the `cumulative.total.vector`. Why is that? The first time through the loop, the value of `power.index` is 0, but our vectors always start at position 1. If we try to store the value of `total.sum` at the location of `power.index`, we will be attempting to store it at position 0, and R will ignore that. Instead, by adding 1 to `power.index`, we will properly store the first value of `total.score` into the first position of the vector.
+
+
+
+
+
+
+
+# The Geometric Distribution
+
+With the geometric distribution, we have a sequence of Bernoulli trials, where each trial is either a success or a failure, and all the trials have a common probability of success $p$. Then a geometric random variable is the number of failures before the first success.
+
+Let $X$ be a geometric random variable with probability of success $p$. The probability function for this random variable is:
+$$
+\Pr(X = k)\ =\ (1-p)^k \cdot p
+$$
+The cumulative probability for the geometric random variable is:
+$$
+\Pr(X \leq k)\ =\ 1 - (1-p)^{k+1}
+$$
+The expected value of a geometric random variable is:
+$$
+\hbox{E}[X]\ =\ \frac{1-p}{p}
+$$
+The variance of a geometric random variable is:
+$$
+\hbox{Var}[X]\ =\ \frac{1-p}{p^2}
+$$
+
+Let' work through an example and calculate some concrete results. Suppose we have a geometric distribution with probability of success $p = 0.2$. Then the probability of observing exactly 3 failures before the first success is:
+$$
+\Pr(X = 3)\ =\ (1 - 0.2)^3 \times 0.2 = 0.1024
+$$
+We could also calculate this value using the built-in R probability function `dgeom()`:
+```{r}
+dgeom(3, 0.2)
+```
+Let's see an example of calculating cumulative probabilities. The probability of observing at most 5 failures before the first success is:
+$$
+\Pr(X \leq 5)\ =\ 1 - (1 - 0.2)^{5 + 1}\ =\ 0.73786
+$$
+We could also calculate this using the built-in R function `pgeom()`:
+```{r}
+pgeom(5, 0.2)
+```
+The expected value of the random variable will be:
+$$
+\hbox{E}[X]\ =\ \frac{1-0.2}{0.2}\ =\ 4
+$$
+The variance of the random variable will be:
+$$
+\hbox{Var}[X]\ =\ \frac{1-0.2}{0.2^2}\ =\ 20
+$$
+
+Now let's see how to simulate a geometric random variable. Here we will use a `while` loop to repeatedly sample Bernoulli random variables with a probability of success $p = 0.2$:
+```{r}
+# Since this is a geometric random variable,
+# we'll start by specifying the probability of success:
+
+probability.success <- 0.2
+
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, we set up the variable that keeps track of
+    # the whether or not a success has occurred:
+    
+    failure.status <- "Failure"
+    
+    # Now we have an accumulator random variable
+    # that will keep track of the number of failures
+    # before the first success:
+    
+    number.failures <- 0
+    
+    # Now we enter the while loop
+    
+    while( failure.status == "Failure" ) {
+        
+        # First, let's run a trial, which will either be
+        # a success or a failure:
+        
+        failure.status <- sample( c("Success", "Failure"), 1,
+                               prob = c(probability.success, 1 - probability.success) )
+        
+        # Now let's check to see if the trial is a failure
+        # If the trial is a Failure, then update the 
+        # accumulator variable that is counting the number
+        # of failures.
+        
+        if( failure.status == "Failure" ) {
+            number.failures <- number.failures + 1
+        }
+        
+    }
+    
+    result.vector[ replication.index ] <- number.failures
+}
+```
+
+Now let's see how well the simulation results agree with our exact calculation. First, we found that the probability that the random variable takes on the specific value 3 is $\Pr(X = 3)\ =\ 0.1024$. Our simulation gives the estimate:
+```{r}
+mean( result.vector == 3 )
+```
+Next, we found that the cumulative probability $\Pr(X \leq 5)$ is 0.73786. Our simulation gives:
+```{r}
+mean( result.vector <= 5 )
+```
+We found that the expected value of the distribution is $\hbox{E}[X] = 4$. Our simulation gives:
+```{r}
+mean( result.vector )
+```
+Finally, we found that the variance of the distribution is $\hbox{Var}[X] = 20$. Our simulation gives:
+```{r}
+var( result.vector )
+```
+
+
+
+
+
+
+
+
+Let's make a histogram of this distribution:
+```{r}
+hist( result.vector,
+      prob = TRUE,
+      xlab = "Number of failures",
+      main = "Simulation of geometric random variable with p = 0.2",
+      col = "seagreen2",
+      breaks = 0:(max(result.vector) + 1) )
+```
+
+The `hist` function automatically scales the $x$-axis so that it can include the maximum value in the data vector. But because we ran our simulation with tens of thousands of iterations there are some extreme values that are very large. It can be useful to filter out these values so that the graph becomes more manageable, so we will remove anything greater than 20:
+```{r}
+result.vector <- result.vector[ result.vector <= 20 ]
+
+hist( result.vector,
+      prob = TRUE,
+      xlab = "Number of failures",
+      main = "Simulation of geometric random variable with p = 0.2",
+      col = "seagreen2",
+      breaks = 0:(max(result.vector) + 1) )
+```
+
+
+We can make this basic template more elaborate by making the random sampling process more complex. For instance, suppose Marie Antoinette is playing roulette in a European casino, and for each spin she places a bet on the second dozen. What is the expected number of losses until she first wins?
+
+First, we can calculate this exactly. Marie's probability of success is:
+```{r}
+second.dozen.win.probability <- 12/37
+```
+Thus, the expected number of losses before the first win is:
+```{r}
+(1 - second.dozen.win.probability) / second.dozen.win.probability
+```
+
+Now let's simulate this. We will explicitly model the process of a roulette bet on the second dozen:
+```{r}
+# These are the numbers in the second dozen:
+
+second.dozen.vector <- 13:24
+
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, we set up the variable that keeps track of
+    # the whether or not a success has occurred:
+    
+    failure.status <- "Failure"
+    
+    # Now we have an accumulator random variable
+    # that will keep track of the number of failures
+    # before the first success:
+    
+    number.failures <- 0
+    
+    # Now we enter the while loop
+    
+    while( failure.status == "Failure" ) {
+        
+        # First, let's spin the roulette wheel once:
+        
+        roulette.number <- sample( 0:36, 1 )
+        
+        # Now let's see if the roulette number is in the
+        # second dozen. 
+        
+        if( roulette.number %in% second.dozen.vector ) {
+            failure.status <- "Success"
+        } else {
+            number.failures <- number.failures + 1
+        }
+    }
+    
+    result.vector[ replication.index ] <- number.failures
+}
+
+cat( "Expected number of losses:", mean( result.vector ), "\n" )
+```
+
+
+
+
+

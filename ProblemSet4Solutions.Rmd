@@ -1,0 +1,733 @@
+---
+title: "Problem Set 4 Solutions"
+subtitle: 'Type your name here'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Instructions
+
+**Due:** Wednesday, February 27, 2019
+
+#Instructions
+
+First, save this notebook with a title consisting of "ProblemSet4" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet4Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+
+
+
+
+# Problem 1
+
+### Problem Statement
+
+In roulette a *column bet* consists of betting that the number will be in one of the columns of the layout. A winning \$1 wager on a column bet results in a \$3 payout, and as usual a losing \$1 wager results in a \$0 payout. Assume that we are playing roulette in an American casino.
+
+**Part (a)**
+
+Calculate the expected value of the payout for a \$1 wager on the third column.
+
+**Part (b)**
+
+Calculate the variance of the payout for a \$1 wager on the third column.
+
+**Part (c)**
+
+Construct a simulation that verifies your results from Parts a) and b).
+
+**Note:** The third column contains the numbers 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, and 36. 
+
+
+
+
+### Problem Solution
+
+**Part (a)**
+
+We can use the standard formula for the expected value:
+```{r}
+expected.payout <- (3 * 12/38) + (0 * 26/38)
+expected.payout
+```
+
+
+**Part (b)**
+
+```{r}
+expected.squared.payout <- (3^2 * 12/38) + (0^2 * 26/38)
+expected.squared.payout
+```
+
+The variance is:
+```{r}
+expected.squared.payout - (expected.payout^2)
+```
+
+```{r}
+(3 - 0)^2 * (12/38) * (26/38)
+```
+
+
+
+
+
+
+**Part (c)**
+
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+third.column.vector <- c(3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36)
+
+for( replication.index in 1:number.replications ) {
+    spin.number <- sample( 1:38, 1)
+  
+    if( spin.number %in% third.column.vector ) {
+        result.vector[ replication.index ] <- 3
+    }
+
+    ## Notice that we don't have to do anything
+    ## in the case where the spin.number is 
+    ## not in the third column, because in that
+    ## case the payout is 0, and when we 
+    ## initialize the vector with the numeric()
+    ## function it automatically populates the
+    ## vector with 0.
+}
+
+cat( "The estimated expected payout is:", mean( result.vector ), "\n" )
+
+cat( "The estimated variance of the payout is:", var( result.vector ), "\n" )
+```
+The estimated expected payout should be close to 0.95, and the estimated variance of the payout should be close to 1.94.
+
+
+
+
+
+
+
+# Problem 2
+
+### Problem Statement
+
+A player places a \$3 bet on the second column, and a \$4 bet on the third dozen. Assume that we are playing roulette in an American casino.
+
+**Part (a)**
+
+Calculate the expected value of the profit for a \$1 wager on the third column.
+
+**Part (b)**
+
+Calculate the variance of the profit for a \$1 wager on the third column.
+
+**Part (c)**
+
+Construct a simulation that verifies your results from Parts a) and b).
+
+**Note:** The third column contains the numbers 2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, and 35. 
+
+
+
+
+
+### Problem Solution
+
+**Part (a)**
+
+Calculate the expected value of the profit for a \$1 wager on the third column.
+
+**Answer**
+
+The payout for a winning wager of \$1 on the third column is \$3 dollars, so that the winning profit is \$2. There are 12 numbers in the third column, so the probability of winning the bet is 12/38. On the other hand, the payout for a losing bet is \$0, so the profit is -\$1, and this occurs with probability 26/38. Then the expected profit is:
+```{r}
+problem.2.expected.profit <- (12/38 * 2) + (26/38 * (-1) )
+problem.2.expected.profit
+```
+
+
+**Part (b)**
+
+Calculate the variance of the profit for a \$1 wager on the third column.
+
+**Answer**
+
+One way to calculate the variance is to first calculate the expected value of the squared profit:
+```{r}
+problem.2.expected.squared.profit <- (12/38 * 2^2) + (26/38 * (-1)^2 )
+problem.2.expected.squared.profit
+```
+Then the variance is:
+```{r}
+problem.2.expected.squared.profit - problem.2.expected.profit^2
+```
+
+We could also use the variance formula for a generalized Bernoulli random variable:
+```{r}
+(2 - (-1))^2 * (12/38) * (26/38)
+```
+
+
+
+**Part (c)**
+
+Construct a simulation that verifies your results from Parts a) and b).
+
+**Note:** The third column contains the numbers 2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, and 35. 
+
+```{r}
+third.column.vector <- c(2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35)
+
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    spin.number <- sample( 1:38, 1)
+    
+    if( spin.number %in% third.column.vector ) {
+        result.vector[ replication.index ] <- 2
+    } else {
+        result.vector[ replication.index ] <- -1
+    }
+}
+
+cat( "Variance of profit:", var( result.vector), "\n" )
+```
+The variance of the profit should be close to 1.94.
+
+
+
+
+
+
+
+# Problem 3
+
+### Problem Statement
+
+In all of our examples, we've been analyzing the results for American casinos, which have both a 0 pocket and a 00 pocket. In European casinos, there is only the 0 pocket, and there is no 00 pocket. Thus, the house advantage is smaller.
+
+**Part a)**
+
+Calculate the expected profit for a 1 euro wager on the odd numbers in a European casino.
+
+**Part b)**
+
+Calculate the variance of the profit for a 1 euro wager on the odd numbers in a European casino.
+
+**Part c)**
+
+Build a simulation that verifies your calculations in Parts a) and b).
+
+
+### Problem Solution
+
+**Part a)**
+
+Calculate the expected profit for a 1 euro wager on the odd numbers in a European casino.
+
+```{r}
+expected.profit <- (1 * 18/37) + ((-1)* 19/37)
+expected.profit
+```
+
+
+**Part b)**
+
+Calculate the variance of the profit for a 1 euro wager on the odd numbers in a European casino.
+
+```{r}
+expected.squared.profit <- (1^2 * 18/37) + ((-1)^2 * 19/37)
+expected.squared.profit
+```
+
+And now we can calculate the variance:
+```{r}
+expected.squared.profit - expected.profit^2
+```
+
+We could also use the variance formula for a generalized Bernoulli random variable:
+```{r}
+(1 - (-1))^2 * (18/37) * (19/37)
+```
+
+```{r}
+(1 - (-1))^2 * (18/37) * (19/37)
+```
+
+
+**Part c)**
+
+Build a simulation that verifies your calculations in Parts a) and b).
+First, let's construct the vector of odd numbers:
+```{r}
+odd.vector <- c(1, 3, 5, 7,9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35)
+```
+
+
+```{r}
+number.replications <- 100
+
+profit.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+  spin.number <- sample( 1:37, 1 )
+  
+  if( spin.number %in% odd.vector ) {
+    profit.vector[ replication.index ] <- 1
+  } else {
+    profit.vector[ replication.index ] <- -1
+  }
+}
+
+cat( "The approximate expected value of the profit is:", 
+     mean(profit.vector), "\n")
+cat( "The approximate variance of the profit is:", 
+     round( var( profit.vector ), 5 ), "\n" )
+```
+Your estimate of the expected profit should be close to -0.027, while your estimate of the variance of the profit should be close to 0.999.
+
+
+
+
+
+
+# Problem 4
+
+### Problem Statement
+
+Like other European casinos, English casinos use a roulette wheel with only a 0, and no double zero 00, so that there are only 37 possible outcomes, not 38 as in an American casino. Color bets also have a slightly different profit structure:
+
+* A 1 pound winning bet on red will return a profit of 1 pound, just as before.
+
+* If a 1 pound bet loses because the number is black, the player loses the entire wager, for a profit of -1 pound, also just as before.
+
+* However, if a 1 pound bet loses because the number is 0, the player loses only half the wager, for a profit of -0.5 pounds.
+
+**Part a)**
+
+Calculate the expected profit for a 1 pound bet on red in an English casino.
+
+**Part b)**
+
+Calculate the variance of the profit for a 1 pound bet on red in an English casino.
+
+**Part c)**
+
+Build a simulation to verify your calculations in Parts a) and b).
+
+### Problem Solution
+
+**Part a)**
+
+This is a standard expected value calculation, although you have to remember to use the European convention of a 37-pocket wheel, rather than a 38-pocket wheel:
+```{r}
+problem.4.expected.profit <- (1 * 18/37) + ((-1)* 18/37) + ((-0.5) * 1/37)
+problem.4.expected.profit
+```
+
+
+
+
+**Part b)**
+
+Now we calculated the expected squared profit:
+```{r}
+problem.4.expected.squared.profit <- (1^2 * 18/37) + ((-1)^2 * 18/37) + ((-0.5)^2  * 1/37)
+problem.4.expected.squared.profit
+```
+
+And finally the variance:
+```{r}
+problem.4.expected.squared.profit - problem.4.expected.profit^2
+```
+
+Note that we cannot use the formula for a generalized Bernoulli random variable here, because that only applies to situations where the random variable takes on exactly two values, and in this problem the profit random variable takes on 3 values.
+
+
+
+**Part c)**
+
+First, let's copy the code for the `red.vector` from the Lecture 4 notebook:
+```{r}
+red.vector <- c(1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36)
+```
+
+The simulation is very straightforward:
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+  spin.number <- sample( 0:36, 1 )
+  
+  if( spin.number %in% red.vector ) {
+    result.vector[ replication.index ] <- 1
+  } else if (spin.number == 0) {
+    result.vector[ replication.index ] <- -0.5
+  } else {
+    result.vector[ replication.index ] <- -1
+  }
+}
+
+cat( "The expected profit is:", mean( result.vector ), "\n" )
+cat( "The variance of the profit is:", 
+     round( var(result.vector), 2), "\n" )
+```
+The expected value should be close to -0.014, and the variance should be close to 0.98.
+
+
+
+
+
+# Problem 5
+
+### Problem Statement
+
+In lecture, we worked out the expected payout and profit for a \$2 bet on Black and a \$3 bet on the Second Dozen. What about the variance of this bet?
+
+**Part (a)**
+
+In lecture, we saw that the expected value of the payout for this bet is 180/38.
+```{r}
+combined.bet.expected.payout <- 180/38
+combined.bet.expected.payout
+```
+Calculate the variance of this bet by using the formula from the original definition, where the variance is defined as the expectation of the squared deviations from the expected value.
+
+
+**Part (b)** Calcuate the second moment of the payout for this wager i.e. the expected value of the square of the payout.
+
+
+**Part (c)** Using your result in Part (b), along with your knowledge of the expected value of the payout for this bet, calculate the variance using the alternative formula.
+
+
+### Problem Solution
+
+**Part (a)**
+
+In lecture, we saw that the expected value of the payout for this bet is 180/38.
+```{r}
+combined.bet.expected.payout <- 180/38
+combined.bet.expected.payout
+```
+Calculate the variance of this bet by using the formula from the original definition, where the variance is defined as the expectation of the squared deviations from the expected value.
+
+**Answer**
+
+The payout for this bet can take on 4 values:
+
+* First, the number can be 14, 16, 18, 19, 21, or 23, in which case both bets pay off. The payout for the Black bet will be $2 \times \$2 = 4$, while the payout for the Second Dozen bet will be $3 \times \$3 = 9$, for a total payout of \$13. This will occur with probability 6/38.
+
+* Second, the number can be 1, 3, 5, 7, 9, 12, 25, 27, 30, 32, 34, or 36, in which case the Black bet wins, but the Second Dozen bet loses. Then the payout is $2 \times \$2 = \$4$ for the winning Black bet but $0 \times \$3 = \$0$ for the losing bet on the Second Dozen, for a net payout of $\$4 + \$0 = \$4$. This will occur with probability 12/38.
+
+* Third, the number can be 13, 15, 17, 20, 22, or 24, in which case the wager on Black loses, but the bet on the Second Dozen wins. Then the payout is $2 \times \$0 = \$0$ for the losing Black bet but $3 \times \$3 = \$9$ for the losing bet on the second dozen, for a net payout of $\$0 + \$9 = \$9$. This will occur with probability 6/38.
+
+* Finally, any other number means that both bets lose, so the payout is just \$0. This will occur with probability 14/38.
+
+Let's define the payout vector and the associated probability vector:
+```{r}
+problem.5.payout.vector <- c(13, 4, 9, 0)
+problem.5.probability.vector <- c(6/38, 12/38, 6/38, 14/38)
+```
+
+
+Then we saw in the Lecture 4 notebook that the expected payout was:
+```{r}
+problem.5.expected.payout <- sum( problem.5.payout.vector *
+                                      problem.5.probability.vector )
+problem.5.expected.payout
+```
+
+Now we can calculate the variance using the original definition:
+```{r}
+expected.payout <- sum( 
+    (problem.5.payout.vector - problem.5.expected.payout)^2 * 
+        problem.5.probability.vector )
+expected.payout
+```
+
+
+
+
+**Part (b)** Calcuate the second moment of the payout for this wager i.e. the expected value of the square of the payout.
+
+**Answer**
+
+The expected squared payout is:
+```{r}
+problem.5.expected.squared.payout <- sum( problem.5.payout.vector^2 *
+                                      problem.5.probability.vector )
+problem.5.expected.squared.payout
+```
+
+
+
+
+
+**Part (c)** Using your result in Part (b), along with your knowledge of the expected value of the payout for this bet, calculate the variance using the alternative formula.
+
+**Answer**
+
+```{r}
+problem.5.expected.squared.payout - problem.5.expected.payout^2
+```
+This is the same number that we obtained in part (a).
+
+
+
+
+
+
+#Problem 6
+
+### Problem Statement
+
+Construct a simulation that will verify your variance calculation from Problem 5.
+
+
+### Problem Solution
+
+This is actually a very easy problem. In the Lecture 4 notebook, we already have code to handle simulating random draws with this bet. Thus all you have to do is to change the very last line of code, so that it now calculates the variance of the result vector, not the mean:
+```{r}
+
+second.dozen.vector <- 13:24
+
+black.vector <- c(1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36)
+
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, let's spin the roulette wheel:
+    
+    roulette.outcome <- sample(1:38, 1, replace = TRUE )
+    
+    # We'll initialize the payout to 0, and then
+    # increment it depending on whether or not the
+    # second dozen or black bets paid off:
+    
+    payout <- 0
+    
+    ## First we'll check to see if the Second Dozen
+    ## bet won:
+    
+    if( roulette.outcome %in% second.dozen.vector ) {
+        
+        ## Here the Second Dozen bet won, so
+        ## we increment the payout value
+        ## by 3 * $3 = 9:
+        
+        payout <- payout + 9
+        
+    }
+    
+    if( roulette.outcome %in% black.vector ) {
+        
+        ## Here the Black bet won, so
+        ## increment the payout value
+        ## by 2 * $2 = $4:
+        
+        payout <- payout + 4
+    }
+    
+    ## Now we store the total payout
+    ## in result.vector:
+    
+    result.vector[ replication.index ] <- payout
+}
+
+cat( "The estimated variance of the payout is:", 
+     round( var( result.vector ), 2), "\n" )
+```
+This value should be close to 22.09.
+
+
+
+# Problem 7
+
+### Problem Statement
+
+In the roulette scene from the great classic movie *Casablanca*, Rick (played by Humphrey Bogart) tells the young Bulgarian man to bet on 22, and he wins. Then, Rick tells him to leave all his winnings on 22, and the young man wins again! That seems improbable.
+
+**Part (a)**
+
+Calculate the exact value for this probability. You should bear in mind that Casablanca was under French rule at the time.
+
+
+**Part (b)**
+
+Construct a simulation to verify your calculation in Part (a). The probability will be a very small number, so to get decent accuracy you'll want to run many more simulation replications; one million should be sufficient to get a reasonable good approximation.
+
+### Problem Solution
+
+**Part (a)**
+
+Calculate the exact value for this probability. You should bear in mind that Casablanca was under French rule at the time.
+
+**Answer**
+
+The hint about the fact that Casablanca was under French rule is to remind you to use the European convention of a 37-pocket wheel, not the American convention of a 38-pocket wheel. The probability of the ball landing in number 22 for an individual spin of the wheel is 1/37, and since the wheel spins are independent then the probability of two 22s in row is:
+```{r}
+1/37^2
+```
+
+
+
+**Part (b)**
+
+Construct a simulation to verify your calculation in Part (a). The probability will be a very small number, so to get decent accuracy you'll want to run many more simulation replications; one million should be sufficient to get a reasonable good approximation. However, if your machine can't handle this, try to use as large a value as you reasonably can.
+
+**Answer**
+
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    roulette.spin <- sample(1:37, 2, replace = TRUE )
+    
+    if( all( roulette.spin == 22) ) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+
+```
+This value should be close to 0.0007.
+
+
+
+
+
+
+
+
+# Problem 8
+
+Now we're going to look at a game that is difficult to analyze using the formal tools that we've developed in this course so far, but can be modeled using a simulation in a straightforward way. I hope this will illustrate to you how powerful simulation can be, in that we can use it to study complex probabilistic systems that can be challenging to understand with a purely mathematical approach.
+
+### Problem Statement
+
+The Chevalier de Mere is playing a game with his friend Blaise Pascal. Pascal has two urns, each containing 10 balls numbered from 1 to 10, and he plays by drawing a ball at random from each urn and then adding the values together. The Chevalier has one urn that contains 20 balls numbered from 1 to 20, and he plays by drawing one ball from the urn. If the Chevalier's number is strictly greater than Pascal's sum, then Pascal must pay the Chevalier 1 euro. If the Chevalier's number is strictly less than Pascal's sum, then the Chevalier must pay Pascal 1 euro. If the Chevalier's number is equal to Pascal's sum, then the game is declared a draw, and neither player pays out anything.
+
+**Part (a)**
+
+What is the probability is that the Chevalier will win this game? Design a simulation that will provide an approximate estimate of this value.
+
+**Part (a) Advanced**
+
+If you'd like a little bit of a challenge, you could actually answer 5 questions:
+
+* What is the probability that the Chevalier will win the game?
+
+* What is the probability that the Chevalier will lose the game?
+
+* What is the probability that the Chevalier will draw the game?
+
+* What is the expected profit per game for the Chevalier?
+
+* What is the variance of the profit per game for the Chevalier?
+
+**Hint:** Set up 4 different result vectors: 1 for the Chevalier winning, 1 for the Chevalier drawing, 1 for the Chevalier losing, and 1 for the Chevalier's profit. Then update these result vectors based on what the result of each simulated game.
+
+
+
+**Big hint:** To help you along, I'll even tell what the exact answers are. The winning probability is 45%, the drawing probability is 5%, and the losing probability is 50%. The expected profit per game for the Chevalier is -0.05, and the variance of the profit per game is 0.9475. So your simulation should generate approximate answers that are very close to these values.
+
+
+
+### Problem Solution
+
+I'll do the simpler version first.
+```{r}
+number.replications <- 10000
+
+# Here we just need one result vector:
+
+winning.vector <- logical( number.replications )
+
+for( replication.index in 1:number.replications ) {
+  
+    # Pascal draws a number from each of his urns,
+    # and then adds them together:
+    
+    pascal.number <- sum( sample(1:10, 2, replace = TRUE) )
+    
+    # The Chevalier draws one number from his only urn:
+    
+    chevalier.number <- sum( sample(1:20, 1, replace = TRUE) )
+  
+    # Now we test to see if the Chevalier won:
+    
+    if( pascal.number < chevalier.number ) {
+        winning.vector[ replication.index ] <- TRUE
+    }
+}
+
+cat( "The estimated winning probability is:", mean( winning.vector ), "\n" )
+
+```
+
+
+
+
+Now let's do the more complicated version:
+
+```{r}
+number.replications <- 10000
+
+# Here we just need one result vector:
+
+winning.vector <- logical( number.replications )
+drawing.vector <- logical( number.replications )
+losing.vector <- logical( number.replications )
+profit.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+  
+    # Pascal draws a number from each of his urns,
+    # and then adds them together:
+    
+    pascal.number <- sum( sample(1:10, 2, replace = TRUE) )
+    
+    # The Chevalier draws one number from his only urn:
+    
+    chevalier.number <- sum( sample(1:20, 1, replace = TRUE) )
+  
+    # Now we test to see if the Chevalier won:
+    
+    if( pascal.number < chevalier.number ) {
+        profit.vector[ replication.index ] <- 1
+        winning.vector[ replication.index ] <- TRUE
+    } else if (pascal.number > chevalier.number) {
+        profit.vector[replication.index ] <- -1
+        losing.vector[ replication.index ] <- TRUE
+    } else {
+        drawing.vector[ replication.index ] <- TRUE
+    }
+}
+
+cat( "The estimated winning probability is:", mean( winning.vector ), "\n" )
+cat( "The estimated drawing probability is:", mean( drawing.vector ), "\n" )
+cat( "The estimated losing probability is:", mean( losing.vector), "\n" )
+cat( "The estimated expected profit per game is:", mean( profit.vector ), "\n" )
+cat( "The estimated variance of the profit per game is:",
+       round(var( profit.vector),5), "\n" )
+```
+

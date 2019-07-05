@@ -1,0 +1,280 @@
+---
+title: "Problem Set 10 Solutions"
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Instructions
+
+**Due:** Wednesday, May 1, 2019
+
+#Instructions
+
+First, save this notebook with a title consisting of "ProblemSet6" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet6Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+
+
+
+
+# Problem 1
+
+For this first problem, we will review the standard built-in functions for working with the normal distribution.
+
+### Problem Statement
+
+Let $X$ be a normally distributed random variable with mean $\mu = 37.4$ and variance $\sigma^2 = 21.8$.
+
+### Part (a)
+
+Draw a random sample of 10,000 observations from this distribution, and name this sample `problem.1.sample`. Construct a histogram of this sample, and then superimpose the density function using the built-in `curve()` function in R. (Hint: remember to use the `add = TRUE` option.)
+
+**Answer**
+
+
+
+### Part (b)
+
+Use a built-in R function to calculate the cumulative probability that the random variable $X$ is less than or equal to 42.3.
+
+**Answer**
+
+
+
+### Part (c)
+
+Now use the simulated data from part (a) to verify that the cumulative probability at $x = 42.3$ really is approximately equal to your answer in part (b).
+
+**Answer**
+
+
+
+
+### Part (d)
+
+Check your simulated data to make sure that it has the same mean and variance as the problem statement specifies.
+
+**Answer**
+
+
+
+
+\newpage
+# Problem 2
+
+### Problem Statement
+
+Consider this integral:
+$$
+\int_{60}^{72.5} \frac{1}{\sqrt{2 \pi \times 25}} \exp \left( -\frac{1}{2} \cdot \frac{(x - 65)^2}{25} \right ) \cdot dx
+$$
+
+### Part (a)
+
+What kind of density function is being integrated? What are the parameters of this density function, and what are their values? What are the upper and lower limits of the integral?
+
+**Answer**
+
+
+
+### Part (b)
+
+Evaluate this integral using the built-in R function `pnorm()`.
+
+**Answer**
+
+
+
+
+
+
+
+### Part (c)
+
+Evaluate this integral by constructing a simulation using the `rnorm()` function.
+
+**Answer**
+
+
+
+
+
+
+
+\newpage
+# Problem 3
+
+### Part (a)
+
+Marie Antoinnete is studying armadillos, and models their weight as being normally distributed with a mean of 10 lbs and a standard deviation of 2 lbs. She decides to classify individuals weighing more than 1.5 standard deviations above the mean as "heavy". What is the probability that a randomly chosen armadillo will be classified as "heavy"? Store this value in the variable `heavy.armadillo.prob`.
+
+**Answer**
+
+
+
+
+### Part (b)
+
+Using the built-in R function `rnorm()`, draw a sample of 10,000 independent values that represent armadillo weights using the information from part (a). Then check to make sure that the percentage of values greater than 1.5 standard deviations above the mean is close to the value that you calculated in part (a).
+
+**Answer**
+
+
+
+
+### Part (c)
+
+Marie now captures 100 armadillos and weighs each one. What is the probability that at least 5 of the armadillos in the sample will be classified as "heavy"?
+
+**Answer**
+
+
+
+
+### Part (d)
+
+Construct a simulation to verify your calculation in part (a). You should use the `rnorm()` function to model drawing a sample of armadillos, and then write code to determine how many of the armadillos are heavy.
+
+**Answer**
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+# Problem 4
+
+The distance that Feline Forrest can hit a golf ball is normally distributed with mean $\mu = 300$ yards and variance $\sigma^2 = 100$. The distance that Dill Pickelson can hit a golf ball is normally distributed with mean $\mu = 290$ yards and variance $\sigma^2 = 225$. Feline and Dill play a game where each player hits a golf ball, and the winner is the one who hits it for the longest distance. Construct a simulation to estimate the probability that Feline will win this game.
+
+**Answer**
+
+
+
+
+
+
+
+
+\newpage
+# Problem 5
+
+Suppose we have 60 independent and identically distributed random variables $X_1, X_2, \ldots, X_{60}$, each of which is exponentially distributed with rate parameter $r = 0.2$. We then construct the sum $S$:
+$$
+S\ =\ X_1 + X_2 + \ldots + X_{60}
+$$
+
+### Part (a)
+
+Since each of the independent random variables $X_1, X_2, \ldots, X_n$ has the same distribution, we can denote this common distribution by $X$. Calculate the expected value of $X$ and the variance of $X$.
+
+**Answer**
+
+
+### Part (b)
+
+Calculate the expected value and variance of the sum $S$.
+
+**Answer**
+
+
+### Part (c)
+
+Now construct a simulation with at least 10,000 replication to verify your calculations in part (b):
+
+* For each replication, first draw a random sample of 60 values from an exponential distribution with rate parameter $r = 0.2$.
+
+* Next, calculate the sum of these 60 random values, and store that in your `result.vector`.
+
+* Finally, when the `for` loop is finished, calculate the mean and variance of the `result.vector`.
+
+**Answer**
+
+
+
+
+### Part (d)
+
+Create a histogram of your `result.vector` from part (c), and superimpose a normal curve with the mean and variance that you calculated in part (b). (Note: remember that the Central Limit Theorem gives an approximation, so the fit might not be perfect.)
+
+**Answer**
+
+
+
+
+
+
+
+\newpage
+# Problem 6
+
+### Problem Statement
+
+Each time Chicken Curry attempts a shot, he scores 0, 1, 2, or 3 points with these probabilities:
+
+|Score|Probability|
+|:---:|:---------:|
+| 0 | 0.30 |
+| 1 | 0.25 |
+| 2 | 0.30 |
+| 3 | 0.15 |
+
+### Part (a)
+
+Calculate the expected value and variance of Chicken's score for one attempt.
+
+**Answer**
+
+
+
+
+
+### Part (b)
+
+Suppose Chicken takes 80 shots. What is the expected value and variance of the total points that he scores? (The total points that he scores are the sum of the points for all the individual shots that he takes.)
+
+**Answer**
+
+
+
+
+### Part (c)
+
+Construct a simulation for Chicken's 80 shots, and use it to check your calculations in part (b).
+
+**Answer**
+
+
+
+
+### Part (d)
+
+Display a histogram of your simulated data from part (c), and superimpose a graph of the approximate normal density curve using the Central Limit Theorem.
+
+**Answer**
+
+
+
+
+
+
+
+
+
+
+
+
+
+

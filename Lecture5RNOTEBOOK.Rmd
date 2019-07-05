@@ -1,0 +1,457 @@
+---
+title: "Lecture 5: Lotto and Combinatorial Numbers R Notebook"
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+
+
+# R Stuff
+
+
+### Sampling without replacement
+
+We can sample without replacement using the `sample()` function with the `replace` option set to `FALSE`. Thus, to draw a sample of size $n = 5$ without replacement from the range of numbers 1 through 10 we have:
+```{r}
+sample( 1:10, 5, replace = FALSE )
+```
+
+Actually, we don't even need to do that, because by default R will assume that `sample()` does not use replacement. Thus, we could have written the previous code as:
+```{r}
+sample( 1:10, 5 )
+```
+
+This is why in the past whenever we've used the `sample()` function we've always included the option `replace = TRUE`, because we were always sampling with replacement, and we needed to override the default setting.
+
+You might also wonder what happens if we try to draw a sample size that's greater than the length of the vector we're sampling from. If we're sampling with replacement, there's no problem, because we always "replace" the value that we observe. But if we are sampling without replacement, then attempting to draw a sample size greater than the length of the vector we're sampling from will generate an error:
+```{r error = TRUE}
+sample( 1:10, 12, replace = FALSE )
+```
+
+If you're sampling without replacement, you don't have to include `replace = FALSE` in your code, because that's the default. Personally, I like to do it anyway, because it just makes the code very clear about what I'm doing. But if you don't feel like doing it, it's not a problem.
+
+
+### The `rep()` function
+
+We've seen a few ways to construct vectors:
+
+* The `c()` function allows us to construct completely arbitrary vectors, but if the vector that we want to construct has some sort of pattern then this function can't exploit it.
+
+* The colon operator allows us a quick way to construct a range of integers.
+
+* The `seq()` function is a generalization of the colon operator, and allows us to construct sequences that don't necessarily progress with increments of 1.
+
+Another function that will be very useful for us is the `rep()` function, which simply repeats a value a specified number of times. This function takes two arguments: the first is the value that will be repeated, and the second argument is the number of repetitions. For instance, if we want a vector with 7 repetitions of the value 3, we could write:
+```{r}
+rep(3, 7)
+```
+Make sure you specify your arguments correctly! If you reverse them, you'll get something that is very different from what you wanted:
+```{r}
+rep(7, 3)
+```
+The value to be repeated does not have to be a numeric value. It could also be a logical value. For instance, we could make a vector with 5 repetitions of the value TRUE like this:
+```{r}
+rep(TRUE, 5)
+```
+We could also use this with character vectors:
+```{r}
+rep("Black", 8)
+```
+We can construct more complex vectors by first using `rep()` to create repetitive structures, and then using `c()` to combine these vectors together. We'll use that later on in this notebook when we want to model an urn with many balls in it.
+
+
+
+
+### The `factorial()` and `choose()` functions
+
+The `factorial()` function is very simple. Mathematically, the factorial function for a positive integer $n$ is defined as the product of $n$ with all the positive integers less than $n$:
+$$
+n!\ =\ n \times (n-1) \times (n-2) \times \ldots 3 \times 2 \times 1
+$$
+For instance, 5! equals 120:
+\begin{eqnarray*}
+5! & = & 5 \times 4 \times 3 \times 2 \times 1\\
+& = & 120
+\end{eqnarray*}
+
+The built-in R function `factorial()` takes an integer argument and returns its factorial:
+```{r}
+factorial(5)
+```
+
+
+The *binomial coefficient* for the values $n$ and $k$ is defined as:
+$$
+{n \choose k}\ =\ \frac{ n! }{k! \cdot (n-k)!}
+$$
+Thus, if $n = 7$ and $k = 3$, the binomial coefficient is:
+\begin{eqnarray*}
+{7 \choose 3} & = & \frac{ 7! }{3! \cdot (7-3)!}\\
+\\
+& = & \frac{7!}{ 3! \cdot 4!}\\
+\\
+& = & \frac{5,040}{6 \times 24}\\
+\\
+& = & 35
+\end{eqnarray*}
+We could in principle calculate this in R using the `factorial()` function:
+```{r}
+factorial(7) / (factorial(3) * factorial(4))
+```
+But a better approach is to use the built-in function `choose()`. This function takes two arguments: the first is $n$, the total number of objects, and the second is $k$, the number of objects selected without replacement. Thus, to calculate the number of ways to select 3 objects from a collection of 7 objects, we have:
+```{r}
+choose(7, 3)
+```
+
+
+### The `dhyper()` and `phyper()` functions
+
+We've seen in lecture that the hypergeometric probability function can be calculated as:
+$$
+\Pr(X = x)\ =\ \frac{ {m \choose x} \cdot {n \choose k-x} }{ {m+n \choose k} }
+$$
+
+Here $m$ denotes the number of red balls in the population, $n$ denotes the number of white balls in the population, $k$ denotes the size of the sample that is drawn without replacement, and $x$ represents the number of red balls observed in the sample. We saw in lecture that if $m=6$, $n=9$, and $k=5$, then the probability that $X = 3$ is 0.23976. We could calculate this value using the `choose()` function:
+```{r}
+choose(6,3) * choose(9, 2) / choose(15, 5)
+```
+But a better approach is to use the built-in function `dhyper()`, which takes 4 arguments:
+
+* The first argument is $x$, the number of red balls observed in the sample.
+
+* The second argument is $m$, the number of red balls in the population.
+
+* The third argument is $n$, the number of white balls in the population.
+
+* The fourth argument is $k$, the number of balls in the sample.
+
+Thus, we can use this function to calculate the hypergeometric probability:
+```{r}
+dhyper( 3, 6, 9, 5 )
+```
+
+If we want to calculate the cumulative probability i.e. the probability that the number of red balls in the sample is *at most* 3, then instead of `dhyper()` we use the built-in R function `phyper()`:
+```{r}
+phyper(3, 6, 9, 5)
+```
+
+
+
+
+
+
+### A cool vectorized calculation
+
+I've mentioned that R can do *vectorized* operations: that is, if an expression would normally evaluate to a number, but at one point a vector of values is used in place of an argument, then R will calculate that expression for every value in the vector. For instance, suppose we want to calculate the values of the function $e^x$ for each integer value of $x$ from 1 to 5. One approach would be to write out each function call, changing the value of the input argument:
+```{r}
+exp(1)
+exp(2)
+exp(3)
+exp(4)
+exp(5)
+```
+But we could also do this in one line of code like this:
+```{r}
+exp(1:5)
+```
+R takes the expression `1:5`, evaluates it as a vector ranging from 1 to 5, and then calculates the value of `exp(x)` for each of these values.
+
+Here's a cute application of this idea. Consider this binomial coefficient identity:
+$$
+\sum_{k=0}^n {n \choose k}\ =\ 2^n
+$$
+Let's evaluate this for $n = 10$. We could type in all 11 binomial coefficients and then sum them, but this is a lot of work. Instead, we can use the colon operator:
+```{r}
+choose(10, 0:10)
+```
+Now all we have to do is to add these using the `sum()` function:
+```{r}
+sum( choose(10, 0:10) )
+```
+And this is exactly $2^{10} = 1,024$. Nice!
+
+
+
+
+
+# The Hypergeometric Distribution
+
+In lecture, we saw how two examples of how to calculate hypergeometric probabilities. Let's work through both of them.
+
+### First example
+
+We'll start with the problem from lecture where we had an urn with 4 red balls and 4 white balls, and we draw a sample of size 4 without replacement. What is the probability that we observe *exactly* 2 red balls?
+
+First, in lecture I showed how to derive an expression for this probability:
+\begin{eqnarray*}
+		\Pr(X = 2) & = & 
+		\frac{ \displaystyle {4 \choose 2} \cdot {4 \choose 2} }
+		{\displaystyle {8 \choose 4} }\\
+		\\
+		& = & \frac{36}{70}\\
+		\\
+		& = & 0.51429
+\end{eqnarray*}
+
+Let's calculate this a few ways. First, we can use the above formula, evaluating the binomial coefficients with `choose()`:
+```{r}
+choose(4, 2) * choose(4, 2) / choose(8, 4)
+```
+
+Next, we can use the `dhyper()` function, which will give us the probability without us having to code up the formula:
+```{r}
+dhyper( 2, 4, 4, 4)
+```
+
+Notice that this is *exactly* the value that we calcualted before.
+
+Finally, let's build a simulation, using the `sample()` function with the `replace = FALSE` option to model sampling without replacement:
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+urn.vector <- c( "red", "red", "red", "red", "white", "white", "white", "white")
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( urn.vector, 4, replace = FALSE )
+    
+    red.ball.count <- sum( my.sample == "red" )
+    
+    if(red.ball.count == 2) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+```
+
+We could actually have written the body of the simulation in a more compact form:
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+urn.vector <- c( "red", "red", "red", "red", "white", "white", "white", "white")
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( urn.vector, 4, replace = FALSE )
+    
+    result.vector[ replication.index ] <- (sum( my.sample == "red" ) == 2)
+}
+
+mean( result.vector )
+```
+
+Another approach would be to represent the urn with a vector of 1s and 0s, like this:
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+urn.vector <- c( 1, 1, 1, 1, 0, 0, 0, 0 )
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( urn.vector, 4, replace = FALSE )
+    
+    red.ball.count <- sum( my.sample )
+    
+    if(red.ball.count == 2) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+```
+
+
+### Second example
+
+In the second example (slides 106-110) we have an urn with 6 red balls and 9 white balls, and we draw a sample of size 5 without replacement. What is the probability of drawing exactly 3 red balls in the sample?
+
+Let's first of all evaluate using the explicit formula with binomial coefficients:
+\begin{eqnarray*}
+		\Pr(X = 3) & = & \frac{\displaystyle {6 \choose 3} \cdot {9 \choose 2} }{\displaystyle {15 \choose 5} }\\
+		\\
+		& = & \frac{ 20 \times 36 }{ 3,003}\\
+		\\
+		& = & 0.23976
+\end{eqnarray*}
+Here's the R code for calculating this:
+```{r}
+choose(6, 3) * choose(9, 2) / choose(15, 5)
+```
+
+Now we'll use the `dhyper()` function:
+```{r}
+dhyper(3, 6, 9, 5)
+```
+
+Finally, let's simulate this. We could construct a vector that models the balls in the urn by explicitly typing in every value:
+```{r}
+urn.vector <- c( "Red", "Red", "Red", "Red", "Red", "Red",
+                 "White", "White", "White", "White", "White",
+                 "White", "White", "White", "White" )
+urn.vector
+```
+But this is tedious. Instead, we could use the `rep()` function to model the red and white balls, and then combine these together using the `c()` function:
+```{r}
+urn.vector <- c( rep("Red", 6), rep("White", 9) )
+urn.vector
+```
+
+Now our simulation is almost the same as what we did before, with a few modifications:
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( urn.vector, 5, replace = FALSE )
+    
+    red.ball.count <- sum(my.sample == "Red")
+    
+    if( red.ball.count == 3 ) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+```
+
+
+I'm going to use some very compressed code here; see if you can figure it out. If not, that's OK, and you can always use the other approaches we've seen previously.
+```{r}
+number.replications <- 100000
+
+result.vector <- logical( number.replications )
+
+urn.vector <- c( rep(1, 6), rep(0, 9) )
+
+for( replication.index in 1:number.replications ) {
+    
+    result.vector[ replication.index ] <- 
+        (sum( sample(urn.vector, 5) ) == 3)
+}
+
+mean( result.vector )
+```
+
+
+
+
+
+### Calculating the cumulative probability
+
+There's no simple closed form solution for the cumulative probability function for the hypergeometric distribution. That means that if you want to calculate a cumulative probability, you just have to calculate each individual probability and add them all up. First, here are the individual probabilities:
+```{r}
+dhyper(0, 6, 9, 5)
+dhyper(1, 6, 9, 5)
+dhyper(2, 6, 9, 5)
+dhyper(3, 6, 9, 5)
+```
+
+Now we add all of these up:
+```{r}
+sum(
+    dhyper(0, 6, 9, 5),
+    dhyper(1, 6, 9, 5),
+    dhyper(2, 6, 9, 5),
+    dhyper(3, 6, 9, 5)
+)
+```
+
+We could have also used the `phyper()` function:
+```{r}
+phyper(3, 6, 9, 5)
+```
+
+We could also use the cool vectorized operation to create the vector of individual probabilities:
+```{r}
+dhyper(0:3, 6, 9, 5)
+```
+
+Then we can sum all the individual probabilities in one line of code:
+```{r}
+sum( dhyper(0:3, 6, 9, 5) )
+```
+
+
+As always, let's do a quick simulation to check our calculations:
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+urn.vector <- c( rep(1, 6), rep(0, 9) )
+
+for( replication.index in 1:number.replications ) {
+    
+    sample.vector <- sample( urn.vector, 5, replace = FALSE )
+    
+    if( sum( sample.vector ) <= 3 ) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+```
+
+
+
+# Keno
+
+In Keno, we always have a total of 80 balls in the urn, and we always select 20 of them. So the only question is how red balls there are i.e. how many numbers have been selected on a player's ticket.
+
+Let's consider the case of a 4-spot ticket, where a player selects 4 numbers. Then we can think of this as an urn with 4 red balls and 76 white balls. The probability of drawing a sample of size 20 that contains all 4 red balls is:
+```{r}
+dhyper(4, 4, 76, 20)
+```
+I mentioned in lecture that the Massachusetts Lottery Keno website reports this probability in the form "1 : 1/$p$", so they would report this winning probability as:
+```{r}
+1 / dhyper(4, 4, 76, 20)
+```
+This is indeed the value that you can see on the website. How about the probability of observing three of the four red balls in the sample of size 20?
+```{r}
+dhyper(3, 4, 76, 20)
+```
+Finally, the probability of observing 2 of the red balls in the sample is:
+```{r}
+dhyper(2, 4, 76, 20)
+```
+
+To calculate the expected payout, we first need to put these probabilities into a vector:
+```{r}
+keno.4.spot.probability.vector <-
+    c( dhyper(4, 4, 76, 20), dhyper(3, 4, 76, 20), dhyper(2, 4, 76, 20) )
+keno.4.spot.probability.vector
+```
+
+We could also construct this vector using the cool vectorized operation:
+```{r}
+keno.4.spot.probability.vector <- dhyper(4:2, 4, 76, 20)
+keno.4.spot.probability.vector
+```
+
+Now we define the payout vector:
+```{r}
+keno.4.spot.payout.vector <- c(100, 4, 1)
+```
+
+Finally we can calculate the expected value:
+```{r}
+sum( keno.4.spot.payout.vector * keno.4.spot.probability.vector )
+```
+
+So the payout for a \$1 wager on a 4-spot ticket is about 69 cents, which means the player can expect to lose on average 31 cents for every dollar wagered. This is much more than the expected loss in a casino playing roulette!
+
+
+

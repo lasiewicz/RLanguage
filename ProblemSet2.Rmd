@@ -1,0 +1,309 @@
+---
+title: "Problem Set 2"
+subtitle: 'Type your name here'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Instructions
+
+**Due:** Wednesday, February 13, 2019
+
+#Instructions
+
+First, save this notebook with a title consisting of "ProblemSet2" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet2Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+
+
+
+
+# Problem 1
+
+## Problem Statement
+
+**Part a) **
+
+The Chevalier de Mere would like to play his dice game in which he rolls multiple dice and wins if at least one of them is a 1. Unfortunately, he only has 3 dice. Using the formal mathematical methods we saw in lecture, calculate the exact value of the probability that he will win this game.
+
+**Part b)**
+
+Using a simulation, calculate an approximate value for the probability that the Chevalier de Mere will win this game with only three dice. You are welcome to copy the code from the lecture and modify it, although you should write a comment indicating where you made any changes.
+
+
+## Problem Solution
+
+**Part a)**
+
+
+
+
+
+**Part b)**
+
+
+
+
+
+
+# Problem 2
+
+## Problem Statement
+
+**Part a)**
+
+The Chevalier de Mere just searched in his waistcoat and found two more dice, so now he has a total of 5 dice to roll. He will win the game if at least one of the five dice is a 1. Using the formal mathematical methods we saw in lecture, caluclate the exact value of the probability that he will win this game.
+
+**Part b)**
+
+Using a simulation, calculate an approximate value for the probability that the Chevalier de Mere will win this game with five dice. Again, you are welcome to modify the code from the lecture, but be sure to comment on where you changed it.
+
+
+
+
+## Problem Solution
+
+
+**Part a)**
+
+
+
+
+
+**Part b)**
+
+
+
+
+
+
+# Problem 3
+
+### Problem Statement
+
+The Chevalier de Mere would like to play his second dice game, where he rolls a set of dice and wins if they all come up as 1. However, he now has 3 dice instead of 2. To compensate for the difficulty of having all 3 dice come up as 1, the game consists of rolling the dice 140 times. Note that there are now $6^3 = 216$ elements in the sample space.
+
+**Part a)**
+
+Using the formal mathematical methods we saw in lecture, what is the exact value of the probability that the Chevalier will win the game?
+
+**Part b)**
+
+Using a simulation approach, calculate an approximate value for the probability that the Chevalier will win the game.
+
+### Problem Solution
+
+**Part a)**
+
+
+
+
+**Part b)**
+
+
+
+
+
+
+# Problem 4
+
+### Problem Statement
+
+The Chevalier de Mere would like to have a definite advantage in the 3 dice game from Problem 3 but not so big that it is noticeable, and he decides that he would like to set the game up so that the probability of winning is 52\%. He has asked you to determine the smallest number of rolls so that the probability of winning the game is at least 52\%.
+
+In this problem, we don't want to see every step that you took. Just tell us what the final answer is, and provide code that verifies this value.
+
+**Part a)**
+
+Solve this by using the formal mathematical methods we saw in lecture. You'll have to make a guess about how many rolls are required, calculate the probability of winning the game, and then see if it's bigger than 52\%. Use trial-and-error to find the smallest number of rolls that will still have a probability of at least 52\%.
+
+**Part b)**
+
+Take the answer that you calculated in Part a) and use that in a simulation to verify that the probability of winning is very close to 52\%.
+
+### Problem Solution
+
+**Part a)**
+
+
+
+
+
+
+**Part b)**
+
+
+
+
+
+
+# Problem 5
+
+### Problem Statement
+
+The Chevalier de Mere finds the dice games in Problems 3 and 4 to be extremely tedious, so he has devised a new game. He has 3 urns, each of which contains 5 balls labelled from 1 to 5. The balls in the urns are mixed up and one ball is drawn from each urn. The Chevalier wins if at least one of the balls has the value 1.
+
+**Part a)**
+
+Using the formal methods we saw in lecture, calculate the exact probability that the Chevalier will win the game.
+
+**Part b)**
+
+Using a simulation, calculate an approximate value for the probability that the Chevalier will win the game.
+
+
+### Problem Solution
+
+**Part a)**
+
+
+
+
+
+
+**Part b)**
+
+
+
+
+
+
+
+
+
+# Problem 6
+
+### Problem Statement
+
+In clinical trials, researchers often compare two treatments to see if one is better than the other. However, sometimes even when there is no real difference between the two treatments, the statistical test can indicate that there is a difference. This is called a *false positive* result, and in statistical theory it is known as a *Type I error*. Typically, a clinical trial is designed so that the probability of a Type I error is 5%.
+
+**Part a)**
+
+Suppose 10 independent clinical trials are conducted, but in each trial there is no real difference between the two treatments. What is the probability that at least one of them will result in a Type I error? Use the methods from lecture to calculate the exact value of this probability.
+
+**Part b)**
+
+Verify your answer in Part a) by constructing a simulation that will provide an approximation to the the true probability.
+
+
+### Problem Solution
+
+**Part a)**
+
+
+
+
+
+**Part b)**
+
+
+
+
+
+
+
+
+
+
+# Problem 7
+
+An insurance company has 20 policyholders. Each year, each policyholder submits a claim amount that ranges from $1 to $2,000, with each claim amount equally likely.
+
+
+### Problem Statement
+
+**Part a)**
+
+What is the probability that all policyholders will submit a claim that is strictly greater than to $100? Use the methods from lecture to calculate the exact value of this probability. **Hint:** Notice that this is different from many of the other problems that we've seen. Previously, you had to calculate the probability that *at least* 1 thing occurred, but now you have to calculate the probability that *all* the things are occurring. Remember that the policyholders are all independent.
+
+**Part b)**
+
+Verify your answer in Part a) by constructing a simulation to model the annual claims for the insurance company.
+
+
+
+### Problem Solution
+
+**Part a)**
+
+
+
+
+
+
+**Part b)**
+
+
+
+
+
+
+
+
+# Problem 8
+
+### Problem Statement
+
+In Renaissance Florence, there was a popular dice game in which three dice were rolled, and players bet on the sum of the dice. In this problem, you will calculate the probability that the three dice will sum to 10.
+
+**Part a)**
+
+In the first, we will perform an exact calculation of this probability using the classical theory of probability. To do this, it is necessary to count the number of outcomes in the event "The sum of the dice is 10", and unfortunately there is no simple trick for doing this -- instead, you just have to explicitly list every possibility, so there's some labor involved in solving this problem. Assume that the three dice are colored red, white, and blue. Then systematically enumerate all the outcomes in the event, and display them in an R markdown table. **Hint:** pick a value for the red die, and then consider all possible combinations of the white and blue dice that will lead to a sum of 10. I'll get you started with setting up the table and considering all the outcomes where the red die equals 1:
+
+|Count|Red Die|White Die|Blue Die|Sum|
+|----:|:-----:|:-------:|:------:|:-:|
+|    1|   1   |    3    |    6   | 10|
+|    2|   1   |    4    |    5   | 10|
+|    3|   1   |    5    |    4   | 10|
+|    4|   1   |    6    |    3   | 10|
+
+Finish this table, and then tell me how many outcomes there are where all three dice sum to 10.
+
+**Part b)**
+
+What is the exact value of the probability of rolling the three dice and observing a total sum of 10?
+
+
+**Part c)**
+
+Verify your answer in Part b) by constructing a simulation to provide an approximate estimate of the true probability. Here are some things to think about:
+
+* How can you write R code to simulate rolling three dice?
+
+* How can you add up the values of the three dice?
+
+* How can you write R code that will evaluate to TRUE if the sum equals 10, and FALSE otherwise?
+
+* How can you store the results of your simulation, and how can you calculate the final proportion of experimental results that are TRUE?
+
+
+### Problem Solution
+
+**Part a) **
+
+
+
+
+
+**Part b)**
+
+
+
+
+
+**Part c)**
+
+
+
+
+
+
+
+
+

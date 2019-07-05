@@ -1,0 +1,883 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Problem 1
+
+Z'a'phma has developed a new game called "Zaf-no", based on a popular entertainment available in local convenience stores across Massachusetts. In this game, a player first chooses 15 numbers from 1 to 100, and then a sample of size $n = 30$ is drawn without replacement from an urn containing 100 balls numbered from 1 to 100. If at least 5 of the player's selected numbers are observed in the sample, the player wins \$10.
+
+### Part (a)
+
+What is the probability in any single game that the player will win?
+
+**Answer**
+
+This is a hypergeometric distribution, and we can turn this problem into a problem about sampling red and white balls from an urn. You can think of the 15 numbers that the player selects as the "red balls", and the remaining 85 numbers as the "white balls". We then draw a sample of size 30, and we count how many of the sampled balls are red. Then a player wins if at least 5 of the sampled balls are red. We can express this in R as:
+```{r}
+problem.1.winning.probability <- phyper( 4, 15, 85, 30, lower.tail = FALSE)
+problem.1.winning.probability
+```
+
+There are actually many different ways to perform this calculation; here's another:
+```{r}
+1 - sum( dhyper(0:4, 15, 85, 30) )
+```
+
+I didn't ask you to do this, but you could write a quick little simulation to verify this value:
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+for(replication.index in 1:number.replications) {
+  
+  zafno.game <- sample( c( rep("Red", 15), rep("White", 85) ),
+                           30, replace = FALSE )
+  
+  red.ball.count <- sum( zafno.game == "Red" )
+  
+  result.vector[ replication.index ] <- (red.ball.count >= 5)
+}
+
+cat( "Simulated probability of winning Zaf-no:", mean(result.vector), "\n" )
+```
+This value should be close to 0.49.
+
+
+
+### Part (b)
+
+What initial wager would make the game fair?
+
+**Answer**
+
+The payout for winning is \$10, while the payout for losing is \$0. Thus, the expected payout is:
+```{r}
+10 * problem.1.winning.probability
+```
+The initial wager should equal this value in order for the game to be fair, in which case the expected profit will be 0.
+
+
+### Part (c)
+
+In "Zaf-no", the initial wager is in fact \$3. What is the casino's expected profit for an individual game with this starting bet?
+
+**Answer**
+
+The casino *always* receives the initial wager, but only pays out \$10 if the player wins. Thus, the expected profit for the casino is:
+```{r}
+3 - 10 * problem.1.winning.probability
+```
+So the casino actually *loses* money on this game! Perhaps Z'a'phma is not such a great prophet after all . . .
+
+
+
+
+### Part (d)
+
+The Chevalier de Mere decides to play this fascinating new game. If he plays 20 times, what is the probability that he will will win at most 5 games?
+
+**Answer**
+
+Now we have to be careful! In part (a), we were concerned about the probability of winning a single game, and to solve that we had to use the hypergeometric distribution. But this problem is asking something very different -- in this part we have a fixed number of trials for a sequence of independent plays of the game (you can think of this as Z`a`phma plays Keno on 20 successive days.) So this is a binomial distribution, where the number of trials is $n = 20$ and the probability of success is the probability of winning a single game of "Zaf-no", which you calculated in part (a). Thus, we have:
+```{r}
+pbinom(5, 20, problem.1.winning.probability)
+```
+
+
+### Part (e)
+
+I know, I know -- there wasn't actually a part (e) on the practice exam that I sent out. I goofed. But you know the deal: let's build a simulation!
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( 10000 )
+
+for(replication.index in 1:number.replications) {
+  
+  zafno.sample <- rhyper(20, 15, 85, 30)
+  
+  zafno.wins <- sum(zafno.sample >= 5)
+
+  result.vector[ replication.index ] <- (zafno.wins <= 5)
+}
+
+cat( "Probability of at most 5 wins:", mean(result.vector), "\n" )
+```
+
+
+\newpage
+# Problem 2
+
+Dill Pickelson has set up a road-side stand to sell his delicious pickles. On average, 6.3 cars must pass the stand without buying an order of pickles before a sale occurs.
+
+### Part (a)
+
+What type of probability is appropriate to model the number of cars that pass by before Dill gets a sale? What are the values of any parameters for this distribution?
+
+**Answer**
+
+For each car, it either stops at Dill's road-side stand and buys some delicious pickles, or it drives by without buying anything. We can think of this in terms of "success" and "failure", where a success is a car stopping to buy pickles and a "failure" is a car driving past without making a purchase. Thus, the probability distribution that is appropriate to model the number of cars that pass by before a sale is the *geometric* distribution. This distribution has 1 parameter: $p$, the probability of success. The problem statement doesn't directly tell us the value of $p$, but it does tell us the expected number of cars that pass by before a sale i.e.\ the expected number of failures before a success. Then we can use this formula:
+$$
+p\ =\ \frac{ 1 }{1 + \hbox{E}[X]}
+$$
+Using the value $\hbox{E}[X] = 6.3$, we have:
+```{r}
+problem.2.success.probability <- 1 / (1 + 6.3)
+problem.2.success.probability
+```
+So the probability of a success is approximately $p = 0.137$.
+
+### Part (b)
+
+Dill just made a sale, and so now he is waiting for his next customer. What is the probability that exactly 2 cars pass by before someone stops to make a purchase?
+
+**Answer**
+
+This is a straight geometric distribution calculation: if $X$ denotes the number of cars that pass by before the next sale, then the problem is asking for the probability $\Pr(X = 2)$. One way to solve this is to directly use the formula for the geometric probability:
+$$
+\Pr(X = k)\ =\ (1-p)^k \cdot p
+$$
+Substituting in the value $p = 0.137$ that we calculated in part (a), we have:
+$$
+\Pr(X = 2)\ =\ (1 - 0.137)^2 \cdot 0.137
+$$
+We can calculate this in R:
+```{r geom.chunk}
+(1 - problem.2.success.probability)^2 * problem.2.success.probability
+```
+
+Of course, we could also use the `dgeom()` function, and this is a little easier:
+```{r}
+dgeom( 2, problem.2.success.probability )
+```
+
+
+
+
+### Part (c)
+
+What is the probability that at least 9 cars will pass by before Dill makes a sale?
+
+**Answer**
+
+This problem is asking for the probability that the number of failures is greater than or equal to 9, which we can write as $\Pr(X \geq 9)$. This is a survival probability, and it's easy to calculate in R. The one thing you have to remember is that the survival probability is always defined in terms of a strict inequality, so we have to write:
+$$
+\Pr(X \geq 9)\ =\ \Pr(X > 8)
+$$
+We can calculate survival probabilities in R using the `pbinom()` function with the `lower.tail = FALSE` option:
+```{r}
+pgeom( 8, problem.2.success.probability, lower.tail = FALSE )
+```
+
+
+
+
+### Part (d)
+
+Construct a simulation that models the cars passing by Dill's roadside pickle stand. You should model the process of waiting until a sale occurs by explicitly using a loop, and the probability of a sale should be determined by the information in the statement of the problem. Use this simulation to verify the expected number of cars passing by before a sale occurs, as well as your answer in part (b).
+
+**Answer**
+
+```{r dill.chunk}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    sale.status <- FALSE
+    number.cars <- 0
+    
+    while( sale.status == FALSE ) {
+        sale.status <- sample( c(TRUE, FALSE), 1, replace = TRUE,
+                               c(problem.2.success.probability, 
+                                 1 - problem.2.success.probability) )
+        
+        if( sale.status == FALSE ) {
+            number.cars <- number.cars + 1
+        }
+    }
+    
+    result.vector[ replication.index ] <- number.cars
+}
+
+cat( "Simulated mean value:", mean( result.vector ), "\n" )
+cat( "Simulated probability X = 2:",
+     mean( result.vector == 2 ), "\n" )
+cat( "Simulated probability X >= 8:",
+     mean( result.vector >= 9), "\n" )
+
+```
+
+
+### Part (e)
+
+Suppose 20 cars drive down the road that Dill's pickle stand is on. What is the probability that exactly 3 of them will purchase an order of pickles, and what is the expected number of pickle sales? Again, use the probability of success that you calculated previously.
+
+**Answer**
+
+This is like Problem 1, part (d). Notice that now we have a fixed number of trials, and the number of successes is random, so this is a problem about a binomial distribution. We can calculate the probability of *exactly* 3 sales using the `dbinom()` function, and we can calculate the expected number of sales using the standard formula for the expectation of a binomial distribution:
+```{r}
+cat( "Probability of exactly 3 sales:", dbinom(3, 20, problem.2.success.probability), "\n" )
+
+cat( "Expected number of sales:", 20 * problem.2.success.probability )
+```
+
+### Part (f)
+
+Construct a simulation to verify your calculations in part (e).
+
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    car.sample <- sample( c(TRUE, FALSE), 20, replace = TRUE,
+                          c(problem.2.success.probability,
+                            1 - problem.2.success.probability) )
+    
+    result.vector[ replication.index ] <- sum( car.sample )
+}
+
+cat( "Probability of exactly 3 sales:", mean( result.vector == 3), "\n" )
+cat( "Simulated mean:", mean(result.vector), "\n" )
+```
+The simulated probability of exactly 3 sales should be approximately 0.24, and the simulated mean should be about 2.74.
+
+
+
+
+
+
+\newpage
+# Problem 3
+
+The Chevalier de Mere is playing a dice game where he rolls 3 fair dice, and wins if the number 6 comes up exactly once.
+
+### Part (a)
+
+What is the probability that the Chevalier de Mere will win this game? Calculate this probability using a built-in probability function in R. Save your value in the variable `problem.3.win.prob`.
+
+**Answer**
+
+This is another binomial distribution problem, where a "success" is defined as the number 6 coming up. There are $n = 3$ trials, because he is rolling 3 dice, and the probability of a "success" is $p = 1/6$. The Chevalier wins the game if *exactly* 1 of the three dice is a 6, so we use the `dbinom()` function to calculate this probability:
+```{r}
+problem.3.win.prob <- dbinom(1, 3, 1/6)
+problem.3.win.prob
+```
+
+
+### Part (b)
+
+Construct a simulation in which you verify your probability calculation in part (a).
+
+**Answer**
+
+We can model the process of rolling 3 fair dice using the `sample()` function:
+```{r dice.chunk}
+result.vector <- logical(10000)
+
+for(i in 1:10000) {
+  dice.roll <- sample(1:6, 3, replace = TRUE)
+  
+  number.of.sixes <- sum(dice.roll == 6)
+  
+  if( number.of.sixes == 1) {
+    result.vector[ i ] <- TRUE
+  }
+}
+
+cat( "Simulated probability of winning:", mean( result.vector ), "\n" )
+```
+The simulated probability of winning should be close to 0.35.
+
+
+### Part (c)
+
+Now suppose the Chevalier plays this game 20 times. What is the probability that he will win at most 8 games?
+
+**Answer**
+
+Once again, we have to switch gears. 
+
+```{r}
+pbinom(8, 20, problem.3.win.prob)
+```
+
+### Part (d)
+
+Construct a simulation to verify your calculation in part (c). Use a built-in probability function in R to generate the random results of playing the game.
+
+**Answer**
+
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+for( replication.index in 1:number.replications ) {
+  
+  chevalier.plays <- sample( c("Win", "Lose"), 20, replace = TRUE,
+                             c(problem.3.win.prob, 1 - problem.3.win.prob) )
+  
+  number.wins <- sum( chevalier.plays == "Win" )
+  
+  if( number.wins <= 8 ) {
+    result.vector[ replication.index ] <- TRUE
+  }
+}
+
+mean( result.vector )
+```
+
+
+
+
+
+
+
+\newpage
+# Problem 4
+
+Marie Antoinette is studying a sample of radioactive Krispy Yum breakfast cereal. The average inter-event time for detecting a particle is exponentially distributed with an average time of 9.8 seconds. 
+
+### Part (a)
+
+What is the rate parameter $r$ for this exponential distribution?
+
+**Answer**
+
+The standard formula for calculating the rate parameter, given the expected value, is:
+$$
+r\ =\ \frac{1}{\hbox{E}[X]}
+$$
+
+Substituting the value $\hbox{E}[X] = 9.8$ given in the problem statement, we have:
+$$
+r\ =\ \frac{1}{9.8}
+$$
+
+Let's calculate this in R:
+```{r}
+problem.3.rate.parameter <- 1/9.8
+cat( "Problem 3 rate parameter:", problem.3.rate.parameter, "\n" )
+```
+
+
+
+### Part (b)
+
+Using the value you obtained in part (a), calculate the variance of the inter-event arrival times.
+
+**Answer**
+
+The standard formula for the variance of an exponential distribution with rate parameter $r$ is:
+$$
+\hbox{Var}[X]\ =\ \frac{1}{r^2}
+$$
+
+Using the value of the rate parameter $r$ that we calculated in part (a) we have:
+$$
+\hbox{Var}[X]\ =\ \frac{1}{0.1020408^2}\ =\ 96.04
+$$
+
+We can compute this in R:
+```{r}
+problem.3.variance <- 1 / problem.3.rate.parameter^2
+cat( "Variance:", problem.3.variance, "\n" )
+```
+
+
+### Part (c)
+
+What is the probability that the inter-event arrival time for a particle will be at most 12.2 seconds?
+
+**Answer**
+
+This is a cumulative probability, and we can calculate it using the `pexp()` function:
+```{r}
+pexp(12.2, rate = problem.3.rate.parameter)
+```
+
+
+
+### Part (d)
+
+Construct a simulation that will model the inter-event arrival times of the Krispy Yumm radioactive particles. You should draw a sample of size at least 10,000.
+
+**Answer**
+
+The way that I worded this problem, you just had to draw a sample of size 10,000, but you didn't have to do anything with it. We do this by using the `rexp()` function:
+```{r}
+problem.3.random.sample <- rexp( 100000, rate = problem.3.rate.parameter)
+```
+
+
+
+### Part (e)
+
+What is the mean and variance of the values in your simulated sample? How do they compare to the values from the problem statement and your calculations in part (b)?
+
+**Answer**
+
+Now that we have our simulated sample, we can use it to calculate the mean and variance:
+```{r}
+cat( "Simulated mean:", mean( problem.3.random.sample ), "\n" )
+cat( "Simulated variance:", var( problem.3.random.sample ), "\n" )
+```
+
+
+### Part (f)
+
+Use your simulated data from part (d) to estimate the probability that inter-event arrival times will be at most 12.2 seconds. How does your simulated value compare with the value that you calculated in part (c)?
+
+**Answer**
+
+Finally, we use our standard technique for calculating a proportion:
+```{r}
+mean( problem.3.random.sample <= 12.2)
+```
+
+
+
+
+
+
+
+\newpage
+# Problem 5
+
+### Part (a)
+
+Consider this integral:
+$$
+\int_{4.2}^{8.7} \frac{1}{7.3} \cdot \exp \left \{ -\frac{x}{7.3}\right \}\cdot dx
+$$
+
+Name the probability distribution that is being integrated, specify any distribution parameters, and state the lower and upper limits of integration. Then evaluate this integral in two ways: first, by using any appropriate built-in R functions, and second by constructing a simulation.
+
+**Answer**
+
+This is an exponential distribution, with rate parameter $r = 1/7.3$. The lower limit of integration is 4.2, and the upper limit is 8.7. We can use the built-in R function `pexp()` to evaluate this integral:
+```{r}
+pexp(8.7, rate = 1/7.3) - pexp(4.2, rate = 1/7.3)
+```
+Now let's do this using a simulation:
+```{r}
+# First, we draw a sample of 10,000 values from
+# an exponential distribution with rate parameter
+# r = 1/7.3
+
+exponential.integral.sample <- rexp( 10000, rate = 1/7.3 )
+
+# Now we use our standard technique to calculate the
+# proportion of elements of the random sample that
+# are between 4.2 and 8.7:
+
+mean( (exponential.integral.sample > 4.2) & (exponential.integral.sample <= 8.7) )
+```
+You should end up with a value close to 0.259.
+
+
+
+### Part (b)
+
+Consider this integral:
+$$
+\int_{0.6}^{1.7} \frac{ 3.5^{4.2} \cdot y^{3.2} \cdot e^{-3.5y} }{\Gamma(4.2)} \cdot dy
+$$
+
+Name the probability distribution that is being integrated, specify any distribution parameters, and state the lower and upper limits of integration. Then evaluate this integral in two ways: first, by using any appropriate built-in R functions, and second by constructing a simulation.
+
+**Answer**
+
+This is a gamma distribution, with rate parameter $r = 3.5$ and shape parameter $a = 4.2$. The lower limit of integration is 0.6, and the upper limit is 1.7. We can use the built-in R function `pgamma()` to evaluate this integral:
+```{r}
+pgamma(1.7, rate = 3.5, shape = 4.2) - pgamma(0.6, rate = 3.5, shape = 4.2)
+```
+
+Now let's do this using a simulation:
+```{r}
+# First, we draw a sample of 10,000 values from
+# a gamma distribution with rate parameter
+# r = 3.5 and shape parameter a = 4.2
+
+gamma.integral.sample <- rgamma( 10000, rate = 3.5, shape = 4.2 )
+
+# Now we use our standard technique to calculate the
+# proportion of elements of the random sample that
+# are between 0.6 and 1.7:
+
+mean( (gamma.integral.sample > 0.6) & (gamma.integral.sample <= 1.7) )
+```
+You should end up with a value close to 0.685.
+
+
+
+
+
+### Part (c)
+
+Consider this integral:
+$$
+\int_{98.3}^{122.7} \frac{1}{\sqrt{ 2\pi \cdot 225}} \cdot \exp \left \{ -\frac{1}{2} \cdot \frac{ (w-108)^2 }{225} \right \}\cdot dw
+$$
+Name the probability distribution that is being integrated, specify any distribution parameters, and state the lower and upper limits of integration. Then evaluate this integral in two ways: first, by using any appropriate built-in R functions, and second by constructing a simulation.
+
+**Answer**
+
+This is a normal distribution, with mean $\mu = 108$ and variance $\sigma^2 = 225$. The lower limit of integration is 98.3, and the upper limit is 122.7. We can use the built-in R function `pnorm()` to evaluate this integral:
+```{r}
+pnorm(122.7, mean = 108, sd = sqrt(225)) - 
+  pnorm(98.3, mean = 108, sd = sqrt(225))
+```
+
+Now let's do this using a simulation:
+```{r norm.chunk}
+# First, we draw a sample of 10,000 values from
+# a normal distribution with mean 108
+# and variance 225:
+
+normal.integral.sample <- rnorm( 10000, mean = 108, sd = sqrt(225) )
+
+# Now we use our standard technique to calculate the
+# proportion of elements of the random sample that
+# are between 98.3 and 122.7:
+
+mean( (normal.integral.sample > 98.3) & (normal.integral.sample <= 122.7) )
+```
+You should end up with a value close to 0.0.578.
+
+
+
+
+
+
+\newpage
+# Problem 6
+
+A baby is considered to be premature if the age at delivery is less than 37 weeks.
+
+### Part (a)
+
+In a certain population, gestational ages are normally distributed with mean $\mu = 39$ and standard deviation $\sigma = 1.8$. For this population, use the appropriate built-in R function to calculate the probability that a newborn will be premature.
+
+**Answer**
+
+The problem is asking for a probability of a baby being born less than 37 weeks, and this is effectively a cumulative probability. Therefore the appropriate built-in R function is `pnorm()`. Notice that the problem statement specifies the standard deviation, not the variance, so we don't have to take a square root.
+```{r}
+pnorm(37, mean = 39, sd = 1.8)
+```
+
+
+
+### Part (b)
+
+Construct a simulation to verify your calculation in part (a).
+
+**Answer**
+
+This is very simple -- we simply draw a sample from a normal distribution, and then determine the proportion of the sample that is less than 37:
+```{r}
+number.replications <- 10000
+
+# Here we draw the random sample:
+
+result.vector <- rnorm( number.replications, mean = 39, sd = 1.8 )
+
+# Now we determine the proportion of the random sample
+# that is less than or equal to 37
+
+mean( result.vector <= 37 )
+```
+
+
+### Part (c)
+
+Now suppose that a diet and wellness intervention is able to increase the mean gestational age to 40 weeks. For this new mean gestational age, use the appropriate built-in R function to calculate the probability that a newborn will be premature. (Assume that the standard deviation remains the same as before.)
+
+**Answer**
+
+This is exactly the same as before, except that now we use a mean value of 40, not 39.
+```{r}
+pnorm(37, mean = 40, sd = 1.8)
+```
+
+### Part (d)
+
+Construct a simulation to verify your calculation in part (a).
+
+**Answer**
+
+Again, this is the same as before, except now we use a mean of 40, not 39.
+```{r}
+number.replications <- 10000
+
+result.vector <- rnorm( number.replications, mean = 40, sd = 1.8 )
+
+mean( result.vector <= 37 )
+```
+
+
+
+
+
+
+\newpage
+# Problem 7
+
+The triangle distribution has the density function:
+$$
+f(x) = 2x,\ \ 0 \leq x \leq 1
+$$
+
+The triangle distribution has expected value 2/3 and variance 1/18. To work with this distribution in R, you need to use a *beta* distribution with parameters `shape1 = 2` and `shape2 = 1`. Thus, to generate 10 random numbers from the "triangle" distribution you would use this code:
+```{r}
+rbeta(10, shape1 = 2, shape2 = 1)
+```
+
+
+### Part (a)
+
+Simulate a sample of at least 10,000 observations from this "triangle" distribution, and use it to verify the expected value and variance in the problem statement above. Then create a histogram of your observed values, and convince yourself that the name of "triangle" distribution is not entirely inappropriate.
+
+```{r}
+# First, let's draw the random sample:
+
+problem.6.triangle.sample <- rbeta(100000, 2, 1)
+
+# Now let's calculate the mean:
+
+cat( "Simulated mean:", mean( problem.6.triangle.sample ), "\n" )
+
+# And finally let's calculate the variance:
+
+cat( "Simulated variance:", var( problem.6.triangle.sample ), "\n" )
+```
+The simulated mean should be close to 0.667, and the simulated variance should be close to 1/18 = 0.056.
+
+
+Here's the histogram:
+```{r}
+hist( problem.6.triangle.sample,
+      main = "Triangle distribution histogram",
+      xlab = "x", ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "darkseagreen2")
+```
+Hmmm . . . does that look like a triangle to you?
+
+
+
+
+
+
+### Part (b)
+
+Now consider 100 independent and identically distributed random variables $X_1$, $X_2$, $\ldots$, $X_{100}$, each of which has a triangle distribution. Let $S$ denote the sum of these 100 random variables:
+$$
+S\ =\ X_1 + X_2 + \ldots + X_{100}
+$$
+What is the expected value and variance of $S$?
+
+**Answer**
+
+We know that $\hbox{E}[X]$, the expected value of the sum $S$, is the sum of the individual expected values $\hbox{E}[X]$:
+$$
+\hbox{E}[S]\ =\ n \cdot \hbox{E}[X]
+$$
+
+For our problem, we know that $n = 100$ and $\hbox{E}[X] = 2/3$. Therefore, the expected value of $S$ is:
+$$
+\hbox{E}[S]\ =\ 100 \cdot \frac{2}{3}\ =\ 66.7
+$$
+
+Likewise, for the variance we have the standard formula:
+$$
+\hbox{Var}[S]\ =\ n \cdot \hbox{Var}[X]
+$$
+
+For our problem, we have $n = 100$ and $\hbox{Var}[X] = 1/18$, so:
+$$
+\hbox{Var}[S]\ =\ 100 \cdot \frac{1}{18}\ =\ 5.56
+$$
+
+Let's calculate these in R:
+```{r}
+problem.6.sum.expected.value <- 100 * 2/3
+cat( "Expected value of S:", problem.6.sum.expected.value, "\n" )
+
+problem.6.sum.var <- 100 * 1/18
+cat( "Variance of S:", problem.6.sum.var, "\n" )
+```
+
+
+### Part (c)
+
+Construct a simulation where 100 independent random values from a triangle distribution are generated, summed, and then stored in a `result.vector`. Confirm that the mean and variance of this simulated data are close to the values that you calculated in part (b). Then create a histogram of the `result.vector`, and superimpose a density curve that will provide a good approximation to the histogram.
+
+**Answer**
+
+```{r}
+# First, here's the usual setup:
+
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+  
+    # The body of the for loop is very simple:
+    # we just draw a sample of 100 observations
+    # from a triangle distribution, add them
+    # together, and then store them in
+    # the result.vector
+  
+    result.vector[ replication.index ] <- sum( rbeta(100, shape1 = 2, shape2 = 1) )
+}
+
+# Now we can print out the mean and variance:
+
+cat( "Simulated mean:", mean( result.vector ), "\n" )
+cat( "Simulated variance:", var( result.vector ), "\n" )
+```
+The simulated mean should be close to 66.67, and the simulated variance should be close to 5.56.
+
+Now we can create a histogram:
+```{r}
+hist( result.vector,
+      main = "Histogram of sum of 100 triangle random variables",
+      xlab = "Sum", ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "darkslategray3" )
+
+curve( dnorm(x, 100 * 2/3, sqrt(100/18) ), lwd = 3, add = TRUE)
+```
+
+
+
+
+
+
+\newpage
+# Problem 8
+
+Feline Forrest and Dill Pickelson have decided to play a new version of golf, called "Golf 5K". In this game, each player continually hits the golf ball until a distance of at least 5,000 yards has been covered, and the player with the fewest strokes wins. Feline's distance is normally distributed, with a mean of 300 yards and a variance of 100 yards (squared), while Dill's distance is normally distributed with a mean of 290 yards and a variance of 625 yards (squared). Construct a simulation to determine the probability that Feline will win the game.
+
+**Hint:** What kind of loop structure should you use to model the number of strokes that Feline or Dill needs to cover the distance, given that you don't know in advance how many strokes will be required?
+
+**Answer**
+
+This is very similar to the other golf games that we've seen. In this problem, we don't know in advance how many strokes it will take for Feline or Dill to reach the end, so we can't use a `for` loop. Instead, we have to use a `while` loop, and we need to keep track of 2 variables: the first is the total number of yards that the player has obtained, and the second is the number of strokes that the player has used. So, for each player, we need to start with 0 for the total distance and 0 for the total strokes, and then each time the player plays a stroke we need to update these variables. To model the distance of a single shot, we sample randomly from the appropriate normal distribution using the `rnorm` function. Let's go!
+```{r}
+# This is our usual setup:
+
+number.replications <- 10000
+result.vector <- numeric( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    # Let's model Feline's score for one game
+  
+    # First, we'll initialize the variables that
+    # keep track of Feline's total distance, and
+    # his total strokes:
+  
+    feline.total.distance <- 0
+    feline.total.strokes <- 0
+    
+    # Now we enter the while loop:
+    
+    while( feline.total.distance < 5000 ) {
+      
+        # We update Feline's total distance with
+        # a random value from a normal distribution
+        # with mean 300 and standard deviation 10:
+      
+        feline.total.distance <- feline.total.distance + rnorm(1, 300, 10)
+        
+        # We also update Feline's strokes by 1:
+        
+        feline.total.strokes <- feline.total.strokes + 1
+    }
+    
+    # At this point, we've exited the while loop,
+    # so that means that Feline's total distance
+    # must be greater than 5000. Also, the
+    # variable feline.total.strokes will hold
+    # the total number of strokes that Feline
+    # took to cover the distance.
+    
+    # Next, we'll model Dill's score for one game:
+    
+    # First, we'll initialize the variables that
+    # keep track of Dill's total distance, and
+    # his total strokes:
+    
+    dill.total.distance <- 0
+    dill.total.strokes <- 0
+    
+    # Now we enter the while loop:
+    
+    while( dill.total.distance < 5000 ) {
+      
+        # We update Dill's total distance with
+        # a random value from a normal distribution
+        # with mean 290 and standard deviation 25:
+      
+        dill.total.distance <- dill.total.distance + rnorm(1, 290, 25)
+        
+        # We also update Dill's strokes by 1:
+        
+        dill.total.strokes <- dill.total.strokes + 1
+    }
+    
+    # At this point, we've exited the while loop,
+    # so that means that Dill's total distance
+    # must be greater than 5000. Also, the
+    # variable dill.total.strokes will hold
+    # the total number of strokes that Dill
+    # took to cover the distance.
+    
+    # Now we can determine if Feline won:
+    
+    if( feline.total.strokes < dill.total.strokes ) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+# Finally, we're out of the for loop, and we can print out
+# a summary of our results:
+
+cat( "Simulated probability that Feline wins:", mean(result.vector), "\n" )
+```
+
+I found an estimated probability of somewhere around 74.6\% for Feline winning the game.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

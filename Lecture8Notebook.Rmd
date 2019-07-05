@@ -1,0 +1,451 @@
+---
+title: 'Lecture 8: Roulette Revisited'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+
+# Disease Screening
+
+First, here's some very simple code that implements the mathematical formula for the positive predictive value. Notice that the values for the sensitivity, specificity, and prevalence are defined at the beginning, and then we use those variables in the formula. This approach makes it easy for us to change the numerical values if we want to do a different calculation.
+```{r}
+sensitivity <- 0.95
+specificity <- 0.90
+prevalence <- 0.02
+
+(sensitivity * prevalence) / ( (sensitivity * prevalence) +
+                                   ((1-specificity) * (1-prevalence) ) )
+```
+
+
+Now we can simulate this:
+
+* We set up the simulation in the usual way, but now we want two result vectors, one to keep track of the true disease status, and the other to keep track of the test result.
+
+* We run the `for` loop as usual:
+
+    * First, we simulate the disease status using the prevalence.
+    
+    * Next, depending on the disease status, we simulate the test result, using either the sensitivity or the specificity.
+    
+    * We store the disease status and the test result in the result vectors.
+    
+* Once we finish the `for` loop, we use our standard filtering technique to determine how many of the subjects with a positive test result really are diseased.
+
+```{r}
+number.replications <- 100000
+
+# We specify the sensitivity, specificity, and prevalence just once,
+# and then use these variables in the code. That way, if we want to
+# use different values, it's easy to make the changes.
+
+sensitivity <- 0.95
+specificity <- 0.90
+prevalence <- 0.02
+
+# We need two result vectors, one for disease status,
+# and the other for the test result.
+
+disease.vector <- character( number.replications )
+test.vector <- character( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, we simulate the disease status
+    
+    disease.status <- sample( c("Diseased", "Healthy"), 1,
+                              prob = c(prevalence, 1-prevalence) )
+    
+    # Now we simulate the test result; this will depend on
+    # the disease status of the patient
+    
+    if( disease.status == "Diseased" ) {
+        
+        # For a subject with disease, we use the sensitivity
+        # to randomly sample the test result
+        
+        test.result <- sample( c("Positive", "Negative"), 1,
+                               prob = c(sensitivity, 1 - sensitivity) )
+        
+    } else {
+        
+        # For a subject without disease, we use the specificity
+        # to randomly sample the test result
+        
+        test.result <- sample( c("Positive", "Negative"), 1,
+                               prob = c(1-specificity, specificity) )
+    }
+    
+    # Now that we have the disease status and the test result,
+    # let's store these in the result vectors:
+    
+    disease.vector[ replication.index ] <- disease.status
+    test.vector[ replication.index ] <- test.result
+}
+
+# Finally, we use our standard 
+filtered.vector <- disease.vector[ test.vector == "Positive" ]
+mean( filtered.vector == "Diseased" )
+
+
+
+```
+
+
+# Bayes' Theorem
+
+Justin uses hashtags in 75\% of his text messages, while Caitlin uses hashtags in only 30\% of her text messages. On the other hand, Caitlin sends 60% of the text messages between the two, while Justin sends 40% of the texts. Now you have encountered this message:
+
+yo wassup wuz u @ that crazee partee?!? #OutOfControl lol
+
+What's the probability that Caitlin sent the message?
+
+We can calculate the probability that Caitlin sent the message, given that a hashtag was in the message, using Bayes' theorem:
+```{r}
+# It's a good idea to define this values once,
+# and then use the variables in the actual code.
+# That way you can change the values easily
+# without having to do a lot of laborious editing.
+
+prob.hashtag.justin <- 0.75
+prob.hashtag.caitlin <- 0.30
+prob.caitlin <- 0.60
+prob.justin <- 1 - prob.caitlin
+
+(prob.hashtag.caitlin * prob.caitlin) / 
+    ( (prob.hashtag.caitlin * prob.caitlin) + (prob.hashtag.justin * prob.justin) )
+```
+
+
+Now let's simulate this. This is essentially exactly the same as our simulation for the disease screening problem, except that we've changed the variable names to reflect the problem statement.
+```{r}
+number.replications <- 100000
+
+prob.hashtag.justin <- 0.75
+prob.hashtag.caitlin <- 0.30
+prob.caitlin <- 0.60
+
+# We need two result vectors, one to keep track of
+# the sender of the message, and the other to keep track
+# of the presence or absence of a hashtag.
+
+sender.vector <- character( number.replications )
+hashtag.vector <- character( number.replications )
+
+# The sender of the message in this problem is analogous
+# to the disease status in the screening problem, while
+# the hashtag is analogous to the diagnostic test.
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, we randomly generate the sender of the message
+    
+    sender <- sample( c("Caitlin", "Justin"), 1,
+                              prob = c(prob.caitlin, 1-prob.caitlin) )
+    
+    # Next, we randomly generate the presence or absence of a hashtag, given
+    # that the sender
+    
+    if( sender == "Caitlin" ) {
+        hashtag.status <- sample( c("Yes", "No"), 1,
+                               prob = c(prob.hashtag.caitlin, 1 - prob.hashtag.caitlin) )
+    } else {
+        hashtag.status <- sample( c("Yes", "No"), 1,
+                               prob = c(prob.hashtag.justin, 1-prob.hashtag.justin) )
+    }
+    
+    # Now we store the sender and hashtag.status in result vectors:
+    
+    sender.vector[ replication.index ] <- sender
+    hashtag.vector[ replication.index ] <- hashtag.status
+    
+}
+
+# Finally, we use standard filtering method. First, we extract those
+# elements of the sender vector that had a hashtag in their email.
+
+filtered.vector <- sender.vector[ hashtag.vector == "Yes" ]
+
+# Next, we determine the proportion of the filtered values
+# that were really sent by Caitlin
+
+mean( filtered.vector == "Caitlin" )
+```
+
+
+
+
+# The Binomial Distribution
+
+### Built-in R functions for the binomial distribution
+
+R has a set of standard conventions for naming functions for probability distributions:
+
+* Functions that start with the letter 'd' give the probability for observing *exactly* one particular value.
+
+* Functions that start with the letter 'p' give the probability for observing *at most* one particular value i.e.\ the cumulative probability.
+
+* Functions that start with the letter 'r' generate random values drawn from the probability distribution.
+
+For instance, suppose we have a binomial random variable with parameters $n = 6$ and $p = 0.4$. Then to calculate the probability of observing *exactly* the value $X = 3$, we use the `dbinom()` function:
+
+* We first specify the particular value that we are interested in (in this case, the value is 3).
+
+* We then specify $n$, the number of trials (in this example this is $n = 6$).
+
+* We finally specify $p$, the probability of success (in this example this is $p = 0.4$).
+
+Thus, we have:
+```{r}
+dbinom( 3, 6, 0.4)
+```
+
+To calculate the probability of observing *at most* the value $X = 3$, or equivalently the probability that $X \leq 3$, we use the `pbinom()` function:
+
+* We first specify the particular value that we are interested in (in this case, the value is 3).
+
+* We then specify $n$, the number of trials (in this example this is $n = 6$).
+
+* We finally specify $p$, the probability of success (in this example this is $p = 0.4$).
+
+Thus, we have:
+```{r}
+pbinom( 3, 6, 0.4)
+```
+We can check this value by explicitly calculating all the individual probabilities using `dbinom()`:
+```{r}
+dbinom(0, 6, 0.4) + dbinom(1, 6, 0.4) + dbinom(2, 6, 0.4) + dbinom(3, 6, 0.4) 
+```
+And this is exactly what we got before.
+
+The way that we have defined the function `pbinom()`, it always calculates the *lower tail* in the sense that it calculates everything less than or equal to the specified value. What if we want the *upper tail*, that is, the probability of observing a value that is strictly greater than the specified value. For instance, what if we want the probability that our example random variable is strictly greater than the value 3? Let's first of all calculate this using brute force:
+```{r}
+dbinom(4, 6, 0.4) + dbinom(5, 6, 0.4) + dbinom(6, 6, 0.4)
+```
+
+We can calculate this value using `pbinom()` by subtracting from 1:
+```{r}
+1 - pbinom(3, 6, 0.4)
+```
+
+Or we can use the option `lower.tail = FALSE`:
+```{r}
+pbinom(3, 6, 0.4, lower.tail = FALSE)
+```
+
+
+Finally, we can generate random values from a binomial distribution using the `rbinom()` function:
+
+* We first specify the number of random values that we want to generate.
+
+* We next specify $n$, the number of trials.
+
+* Finally we specify $p$, the probability of success.
+
+Thus, to generate 12 random variables from our binomial distribution with $n = 6$ and $p = 0.4$, we have:
+```{r}
+rbinom(12, 6, 0.4)
+```
+
+Remember that we can also generate a single binomial random variable by directly modeling the fact that it is defined as a sum of independent Bernoulli random variables, each with a common probability of success. Thus, if we want to generate a single random variable from a binomial distribution with $n = 6$ and $p = 0.4$, we could use the `sample()` function to do this:
+```{r}
+sum( sample( c(1,0), 6, replace = TRUE, prob = c(0.4, 0.6) ) )
+```
+
+
+```{r}
+0.7^5
+```
+
+
+
+### A first simulation
+
+Let's do a simple simulation to see how this works. We'll study Marie Antoinette's game where she draws a sample of size $n = 5$ with replacement from an urn containing 3 red balls and 7 white balls, and success is defined as drawing a red ball. Thus the number of trials is $n = 5$ and the probability of success is $p = 0.3$:
+```{r}
+number.trials <- 5
+probability.success <- 0.3
+```
+
+The probability of observing exactly 2 successes is:
+```{r}
+dbinom(2, number.trials, probability.success)
+```
+Let's simulate this by modeling the binomial random variable as the sum of $n$ individual Bernoulli random variables:
+```{r}
+number.replications <- 10000
+
+number.trials <- 5
+probability.success <- 0.3
+
+result.vector <- logical( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    random.bernoulli.sample <- sample( c(1,0), number.trials, replace = TRUE,
+                                       prob = c(probability.success,
+                                                1 - probability.success) )
+    
+    if( sum( random.bernoulli.sample ) == 2 ) {
+        result.vector[replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+```
+
+
+Now let's calculate the cumulative probability of observing at most 2 successes:
+```{r}
+pbinom(2, number.trials, probability.success)
+```
+The simulation is almost exactly the same, and all we have to do is to change one lie of code:
+```{r}
+number.replications <- 10000
+
+number.trials <- 5
+probability.success <- 0.3
+
+result.vector <- logical( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    random.bernoulli.sample <- sample( c(1,0), number.trials, replace = TRUE,
+                                       prob = c(probability.success,
+                                                1 - probability.success) )
+    
+    # Here we just the change the '==' to '<=':
+    
+    if( sum( random.bernoulli.sample ) <= 2 ) {
+        result.vector[replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+```
+
+
+How about calculating an upper tail? The exact probability of observing a value strictly greater than 2 is:
+```{r}
+pbinom(2, number.trials, probability.success, lower.tail = FALSE)
+```
+Now for the simulation:
+```{r}
+number.replications <- 10000
+
+number.trials <- 5
+probability.success <- 0.3
+
+result.vector <- logical( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    random.bernoulli.sample <- sample( c(1,0), number.trials, replace = TRUE,
+                                       prob = c(probability.success, 
+                                                1 - probability.success) )
+    
+    if( sum( random.bernoulli.sample ) > 2 ) {
+        result.vector[replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+```
+
+
+
+
+
+
+### Expectation and variance
+
+Let's run a simulation to see if the theoretical formulas for the mean and variance do a good job of predicting the experimental mean and variance from a simulation:
+```{r}
+number.replications <- 100000
+
+number.trials <- 5
+probability.success <- 0.3
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    random.sample <- sample( c(1,0), number.trials, replace = TRUE,
+                             prob = c(probability.success, 1 - probability.success) )
+    
+    result.vector[ replication.index ] <- sum( random.sample )
+}
+
+cat( "Expected value (exact):", number.trials * probability.success, "\n" )
+cat( "Expected value (simulated):", mean( result.vector ), "\n" )
+
+cat( "Variance (exact):", number.trials * probability.success * (1-probability.success), "\n" )
+cat( "Variance (simulated):", var( result.vector ), "\n" )
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

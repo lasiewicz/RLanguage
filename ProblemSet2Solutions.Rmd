@@ -2,9 +2,9 @@
 title: "Problem Set 2 Solutions"
 subtitle: 'Type your name here'
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 ---
 
 
@@ -588,6 +588,13 @@ mean( result.vector )
 
 This value should be close to 40%.
 
+```{r}
+a <- 2
+
+if( a == 2 ) {
+    print( "Hi Mom!" )
+}
+```
 
 
 

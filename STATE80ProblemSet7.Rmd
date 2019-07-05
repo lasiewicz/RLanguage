@@ -1,0 +1,274 @@
+---
+title: "Problem Set 7"
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Problem 1
+
+
+A certain disease occurs in 1.5\% of the population. A diagnostic test for this disease has sensitivity 90\% and specificity 85\%.
+
+###Part (a)
+
+What is the probability of a false positive with this test?
+
+**Answer**
+
+
+###Part (b)
+
+What is the probability of a false negative for this test?
+
+
+
+###Part (c)
+
+Using Bayes' theorem, calculate the positive predictive value for this test.
+
+**Answer**
+
+
+###Part (d)
+
+Construct a simulation to verify that your answer in part (c) is correct. You are welcome to borrow the code from the Lecture 8 R notebook and modify it.
+
+**Answer**
+
+
+
+
+
+
+# Problem 2
+
+Justin uses hashtags in 70\% of his text messages, while Caitlin uses hashtags in 35\% of her messages. Caitlin sends 55\% of the text messages between the two, while Justin sends 45\% of the messages. Now you observe the message:
+
+*yo wassup wuz u @ that crazee partee?!? lol*
+
+### Part (a)
+
+Using Bayes' theorem, calculate the conditional probability that Caitlin sent the message.
+
+**Answer**
+
+
+###Part (b)
+
+Construct a simulation to show that your calculation in part (a) is correct.
+
+**Answer**
+
+
+
+
+# Problem 3
+
+An insurance company finds that 85\% of the policyholders are good drivers, and 15\% of the policyholders are bad drivers. A good driver has a 10\% probability of having a car accident in one year, while a bad driver has a 35\% probability of having a car accident in one year.
+
+### Part (a)
+
+The Chevalier de Mere had an accident last year. Use Bayes' theorem to calculate the probability that he is a bad driver.
+
+**Answer**
+
+
+### Part (b)
+
+Construct a simulation to show that your calculation in part (a) is correct.
+
+**Answer**
+
+
+
+
+
+
+# Problem 4
+
+In this problem, we will perform some simple explorations with the binomial distribution.
+
+Suppose we have a binomial distribution with $n = 8$ trials and a probability of success of $p = 0.35$. 
+
+### Part (a)
+
+The standard probability formula for the binomial distribution is:
+$$
+\Pr(X = k)\ =\ {n \choose k} \cdot p^k \cdot (1-p)^{n-k}
+$$
+Using this formula, calculate the probability of observing exactly 4 successes for the binomial distribution specified above.
+
+
+
+
+
+
+### Part (b)
+
+Using the built-in function `dbinom()`, calculate the probability of observing exactly 4 successes for the binomial distribution specified above.
+
+**Answer**
+
+
+
+### Part (c)
+
+Using the built-in function `pbinom()`, calculate the probability of observing no more than 3 successes for this binomial distribution.
+
+**Answer**
+
+
+### Part (d)
+
+Calculate the expected value and variance of this binomial distribution.
+
+**Answer**
+
+
+### Part (e)
+
+Construct a simulation to verify your answers for parts (a) through (d). In this simulation, you should directly model the concept that a binomial random variable is a sum of Bernoulli random variables. To do this, for each replication of the `for` loop you should use the `sample()` function to generate 8 independent Bernoulli random variables with probability of success $p = 0.35$, and then add them together. Do NOT use the `rbinom()` function to generate the random binomial value, because that's too easy -- instead, really try to capture the idea that the binomial distribution is just a sum of Bernoulli random variables.
+
+**Answer**
+
+
+
+
+
+
+# Problem 5
+
+Each day for 3 weeks, the philosopher Z'aph'ma goes to his local convenience store and purchases an 8-spot Massachusetts State Lottery Keno ticket.
+
+### Part (a)
+
+An 8-spot Keno ticket will win some money if at least 4 of the selected numbers match the 20-number sample. What is the probability that an individual 8-spot Keno ticket will win some money i.e.\ have a positive payout? Calculate this value using the `phyper()` function, and store the value in the variable `winning.keno.prob`. Remember that we're only interested in whether or not the ticket wins some money; we don't care about how much the payout is.
+
+**Answer**
+
+
+
+
+
+### Part (b)
+
+What is the probability that Z`aph`ma will have at least 3 winning tickets during the 3-week period that he purchases Keno tickets? Calculate this using the `pbinom()` function and the `winning.keno.prob` value that you calculated in part (a).
+
+**Answer**
+
+
+
+
+
+### Part (c)
+
+Construct a simulation to verify your calculation in part (c):
+
+* Start out the usual way, by defining the number of replications and a logical vector to store your simulation results. Then begin a `for` loop, and for each time through, do this:
+
+    * To simulate playing Keno for 3 weeks, use the `rhyper()` function to draw 21 random values from a hypergeometric distribution. Store this random sample in a variable called `random.sample`.
+
+    * Count how many elements in `random.sample` are greater than or equal to 4, and store this value in a variable called `number.winning.tickets`.
+
+    * Test to see if `number.winning.tickets` is greater than or equal to 3, and if it is, store the value `TRUE` in your result vector.
+
+* When the `for` loop is done, calculate the proportion of `TRUE` values in your result vector.
+
+
+**Answer**
+
+
+
+
+
+# Problem 6
+
+In the game of Chuck-A-Luck, the player places a \$1 wager, selects a number from 1 to 6 and then rolls 3 dice. If the selected number comes up exactly once out of the three dice, the player gets the initial wager back, along with an additional \$1. If the selected number comes up exactly twice out the three dice, then the player gets the initial wager back, along with an additional \$2. Finally, if the selected number comes up on all three of the dice, the player gets the initial wager back, plus an additional \$10.
+
+###Part (a)
+
+Calculate the expected profit for Chuck-A-Luck. Use the `dbinom()` function to calculate the selected number coming up once, twice, or three times on the three dice.
+
+**Answer**
+
+
+###Part (b)
+
+Construct a simulation to verify that your calculation in part (a) of the expected profit was correct. Again, do not use the `rbinom()` function, but instead use `sample()` to directly model the action of rolling three dice.
+
+**Answer**
+
+
+
+
+
+
+
+
+
+# Problem 7
+
+We usually specify a binomial distribution by assigning values to $n$, the number of trials, and $p$, the probability of success. Suppose you don't know either $n$ or $p$, but you do know that the expected value of the distribution is 6, and also that the variance is 1.5:
+\begin{eqnarray*}
+\hbox{E}[X] & = & 6\\
+\\
+\hbox{Var}[X] & = & 1.5
+\end{eqnarray*}
+
+### Part (a)
+
+Using the values of the expected value and variance, calculate the values of $n$ and $p$. Hint: look in the lecture for the algebraic expressions for the mean and variance of a binomial distribution, and then think about what the algebraic expression is for the variance divided by the mean.
+
+**Answer**
+
+
+
+### Part (b)
+
+Using the values of $n$ and $p$ that you obtained in part (a), conduct a simulation to show that the resulting binomial distribution really does have an expected value of 6 and a variance of 1.5. Once again, don't use the built-in `rbinom()` function to generate random binomial values, but instead use the `sample()` function to generate $n$ independent Bernoulli random variables, each with common probability of success $p$. Once you've finished the simulation, calculate the mean and variance of the `result.vector` and show that they are very close to the values specified in the problem statement.
+
+**Answer**
+
+
+
+
+
+# Problem 8
+
+Chicken Curry takes 40 shots, and for each shot he scores a basket with probability $p = 0.42$. Kobe Beef is a total ball hog, and he takes 55 shots, but for each each shot he scores a basket with probability $p = 0.35$. Assume that all the shots are independent of one another. What is the probability that Kobe will score more baskets than Chicken? Answer this by constructing a simulation. You'll have to determine how to model Chicken's number of baskets, as well as Kobe's number of baskets, and then what to do with the results.
+
+**Answer**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

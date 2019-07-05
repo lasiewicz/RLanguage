@@ -320,7 +320,7 @@ Construct a simulation to validate your answer in Problem 4. That is, show that 
 ```{r}
 # We specify the number of replications:
 
-number.replications <- 100000
+number.replications <- 10000
 
 # Also, we create storage for our simulation replications:
 
@@ -558,6 +558,34 @@ mean( profit.vector )
 
 Your final answer should be very close to 3.5.
 
+
+
+
+```{r}
+p <- dhyper(6,12,68,20)
+1/p
+
+p <- dhyper(0,12,68,20)
+1/p
+```
+
+
+
+
+```{r}
+dhyper(2, 10, 30, 10)
+dhyper(2, 10, 35, 10)
+dhyper(2, 10, 40, 10)
+dhyper(2, 10, 45, 10)
+dhyper(2, 10, 50, 10)
+dhyper(2, 10, 60, 10)
+dhyper(2, 10, 70, 10)
+```
+
+
+```{r}
+dhyper(2, 10, 21:45, 10)
+```
 
 
 

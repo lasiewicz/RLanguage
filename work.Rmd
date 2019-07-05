@@ -1,0 +1,47 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+Now we can calculate the expected value:
+```{r}
+x.expected.value <- sum( x.support.vector * x.probability.vector )
+x.expected.value
+```
+We calculated the value 1.8 in the previous lecture.
+
+Now we can calculate the squared deviations from the mean:
+```{r}
+(x.support.vector - x.expected.value)^2
+```
+We calculated these values in lecture, but it would great if you got a calculator and checked all of these by hand.
+
+Finally, to calculate the expected value of the squared deviations from the mean, we have to weight each squared deviation from the mean by its associated probability, and then add all these terms up. First, the weighted values are:
+```{r}
+(x.support.vector - x.expected.value)^2 * x.probability.vector
+```
+
+Finally, we add up all these terms to obtain the variance:
+```{r}
+sum( (x.support.vector - x.expected.value)^2 * x.probability.vector )
+```
+And 19.56 is exactly the value that we calculated in lecture.
+
+
+Let's try the alternative formula for calculating the variance. First, we calculate the *second moment*, which is the expected value of the square of $X$:
+```{r}
+x.squared.expected.value <-

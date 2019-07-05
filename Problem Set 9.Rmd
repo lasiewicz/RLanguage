@@ -1,0 +1,953 @@
+\documentclass[12pt]{article}
+
+\title{Problem Set 9: Inference for Discrete Data}
+\author{MATH E-156: Mathematical Statistics}
+\date{Due April 22, 2018}
+
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{amssymb}
+
+\newtheorem{theorem}{Theorem}[section]
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\renewcommand\qedsymbol{$\blacksquare$}
+	
+\begin{document}
+	
+	\maketitle
+
+
+
+
+
+\section*{Problem 1}
+
+In lecture we saw how to construct a test for comparing the difference between two population proportions. Now we will construct a one-sample test for a proportion.
+
+\subsection*{Problem Statement}
+
+Suppose an experiment consists of running $n$ independent trials each of which has a common probability of success $p$, and then observing $X$, the total number of success occuring during these trials. Thus, $X$ is a binomial random variable with parameters $n$ and $p$. Then the sample proportion, denoted $\widehat{p}$, is defined as:
+$$
+\widehat{p}\ =\ \frac{X}{n}
+$$
+We would like to use this sample proportion to make an inference about the true population probability of success, denoted $p$.
+
+\bigskip
+\noindent
+{\bf Part (a)} Suppose the experimenter wants to test a particular value $\widetilde{p}$ for the population probability of success $p$. She has no particular reason to expect that the true population probability of success is either greater than or less than this particular value $\widetilde{p}$. What are the null and alternative hypotheses?
+
+\bigskip
+\noindent
+{\bf Part (b)} What is an algebraic expression for the expected value of the sample proportion $\widehat{p}$?
+
+\bigskip
+\noindent
+{\bf Part (c)} What is an algebraic expression for the variance of the sample proportion $\hbox{Var}[ \widehat{p} ]$?
+
+\bigskip
+\noindent
+{\bf Part (d)} Assuming that $n$ is sufficiently large for the Central Limit Theorem to hold, use the sample proportion $\widehat{p}$ and its expected value and variance to construct a random variable $Z$ that is approximately a standard normal random variable.
+
+\bigskip
+\noindent
+{\bf Part (e)} What is the form of this approximate standard normal random variable $Z$ when the null hypothesis is true?
+
+
+
+
+
+\subsection*{Problem Solution}
+
+\noindent
+{\bf Part (a)} Suppose the experimenter wants to test a particular value $\widetilde{p}$ for the population probability of success $p$. She has no particular reason to expect that the true population probability of success is either greater than or less than this particular value $\widetilde{p}$. What are the null and alternative hypotheses?
+
+\bigskip
+\noindent
+{\bf Solution} Since the experimenter has no particular reason to expect that the true population probability of success is either greater than or less than the particular value $\widetilde{p}$, a two-sided test is appropriate here. Thus, the null and alternative hypotheses are:
+\begin{eqnarray*}
+H_0: p = \widetilde{p}\\
+H_A: p \neq \widetilde{p}
+\end{eqnarray*}
+
+
+
+
+
+\vspace{0.1in}
+\noindent
+{\bf Part (b)} What is an algebraic expression for the expected value of the sample proportion $\widehat{p}$?
+
+\bigskip
+\noindent
+{\bf Solution} The expected value of $\widehat{p}$ is:
+\begin{eqnarray*}
+\hbox{E}[ \widehat{p} ] & = & \hbox{E} \left [ \frac{X}{n} \right ]\\
+\\
+& = & \frac{ \hbox{E}[X] }{n}\\
+\\
+& = & \frac{n \cdot p}{ n }\\
+\\
+& = & p
+\end{eqnarray*}
+So, just as the expected value of the sample mean is the population mean, the expected value of the sample proportion is the sample proportion.
+
+
+
+
+\vspace{0.5in}
+\noindent
+{\bf Part (c)} What is an algebraic expression for the variance of the sample proportion $\hbox{Var}[ \widehat{p} ]$?
+
+\bigskip
+\noindent
+{\bf Solution} The variance of the sample proportion is:
+\begin{eqnarray*}
+	\hbox{Var}[ \widehat{p} ] & = & \hbox{Var} \left [ \frac{X}{n} \right ]\\
+	\\
+	& = & \frac{ \hbox{E}[X] }{n^2}\\
+	\\
+	& = & \frac{n \cdot p \cdot (1-p)}{ n }\\
+	\\
+	& = & \frac{p \cdot (1-p)}{n}
+\end{eqnarray*}
+
+
+
+
+
+
+\vspace{0.4in}
+\noindent
+{\bf Part (d)} Assuming that $n$ is sufficiently large for the Central Limit Theorem to hold, use the sample proportion $\widehat{p}$ and its expected value and variance to construct a random variable $Z$ that is approximately a standard normal random variable.
+
+\bigskip
+\noindent
+{\bf Solution} Using the standard construction, we have:
+\begin{eqnarray*}
+Z & = & \frac{ \widehat{p} - \hbox{E}[ \widehat{p} ] }{ \sqrt{ \hbox{Var}[ \widehat{p} ] } }\\
+\\
+& = & \frac{ \widehat{p} - p}{\displaystyle \sqrt{ \frac{p \cdot (1-p) }{n} } }
+\end{eqnarray*}
+
+
+
+
+\vspace{0.4in}
+\noindent
+{\bf Part (e)} What is the form of this approximate standard normal random variable $Z$ when the null hypothesis is true?
+
+\bigskip
+\noindent
+{\bf Solution} Under the null hypothesis, $p = \widetilde{p}$, so we have the calligraphically intense formula:
+$$
+Z\ =\ \frac{ \widehat{p} - \widetilde{p}}{\displaystyle \sqrt{ \frac{\widetilde{p} \cdot (1-\widetilde{p}) }{n} } }
+$$
+
+
+
+
+
+
+
+
+
+\newpage
+\section*{Problem 2}
+
+
+
+\subsection*{Problem Statement}
+
+Gazelle has tested 1000 of her new designer carburetors, and found that 27 of them are defective. She wants to achieve a level of quality control so that only 1.5\% of the products are defective. Conduct a statistical test to determine whether or not this data provides evidence that her carburetors are not consistent with this standard.
+
+
+
+\subsection*{Problem Solution} Here, the null value is $\widetilde{p} = 1.5\% = 0.015$, and the sample proportion is:
+\begin{eqnarray*}
+\widehat{p} & = & \frac{27}{1000}\\
+\\
+& = & 0.027
+\end{eqnarray*}
+The standard error of the sample proportion is:
+\begin{eqnarray*}
+\hbox{Std Err} [ \widehat{p} ] & = & \sqrt{ \frac{\widetilde{p} \cdot (1 - \widetilde{p} )}{n} }\\
+\\
+& = & \sqrt{ \frac{0.15 \cdot (1 - 0.15 )}{1,000} }\\
+\\
+& = & 0.00384
+\end{eqnarray*}
+Then the $Z$ statistic is:
+\begin{eqnarray*}
+z & = & \frac{ \widehat{p} - \widetilde{p}}{\displaystyle \sqrt{ \frac{\widetilde{p} \cdot (1-\widetilde{p}) }{n} } }\\
+\\
+& = & \frac{0.027 - 0.015}{0.00384}\\
+\\
+& = & 3.12189
+\end{eqnarray*}
+Since this is a two-sided test, the $p$-value is:
+\begin{eqnarray*}
+p & = & \Pr( Z \leq -3.12189 ) + \Pr(Z \geq 3.12189)\\
+\\
+& = & 0.00090 + 0.00090\\
+\\
+& = & 0.00180
+\end{eqnarray*}
+At the $\alpha = 0.05$ significance level, this is highly statistically significant, and we conclude that this data provides very strong evidence that the proportion of defective carburetors is higher than the desired error rate of 1.5\%.
+
+
+\newpage
+\section*{Problem 3}
+
+
+
+
+\subsection*{Problem Statement}
+
+Gazelle has decided to compare two manufacturing methods for her carburetors. For method A, she tests 1000 carburetors, and finds that 38 are defective. For method B, she tests 500 carburetors, and finds that 31 are defective. Gazelle wants to be able to detect that one approach is better than the other, but she has no reason to favor one method over the other. She will use a two-sample test on population proportions, and will run her test with a significance level of $\alpha = 0.05$.
+
+\bigskip
+\noindent
+{\bf Part (a)} What are the null and alternative hypotheses for this test?
+
+\bigskip
+\noindent
+{\bf Part (b)} What is $\widehat{p}_A$, the estimated proportion of failures for method A? Similarly, what is $\widehat{p}_B$, the estimated proportion of failures for method B? What is $D$, the estimated difference of the population proportions?
+
+\bigskip
+\noindent
+{\bf Part (c)} What is the estimated standard error of $D$?
+
+\bigskip
+\noindent
+{\bf Part (d)} What is the value of the observed test statistic for this test?
+
+\bigskip
+\noindent
+{\bf Part (e)} Perform the test. What do you conclude about the difference in the proportion of failures for method A versus method B?
+
+
+
+\subsection*{Problem Solution}
+
+\noindent
+{\bf Part (a)} What are the null and alternative hypotheses for this test?
+
+\bigskip
+\noindent
+{\bf Solution} The null hypothesis is that the two populations have the same probability of success, so that $p_A = p_B$. Since Gazelle has no reason to favor one over the other, the test will be two-sided. Thus we have:
+\begin{eqnarray*}
+H_0: \mu_A = \mu_B\\
+H_A: \mu_A \neq \mu_B
+\end{eqnarray*}
+
+
+
+
+
+
+\newpage
+\subsubsection*{Problem 3, continued}
+
+\noindent
+{\bf Part (b)} What is $\widehat{p}_A$, the estimated proportion of failures for method A? Similarly, what is $\widehat{p}_B$, the estimated proportion of failures for method B? What is $D$, the estimated difference of the population proportions?
+
+\bigskip
+\noindent
+{\bf Solution} First, for Method A, we have:
+\begin{eqnarray*}
+\widehat{p}_A & = & \frac{38}{1,000}\\
+\\
+& = & 0.038
+\end{eqnarray*}
+Next, for Method B, we have:
+\begin{eqnarray*}
+\widehat{p}_B & = & \frac{31}{500}\\
+\\
+& = & 0.062
+\end{eqnarray*}
+For $d$, we have:
+\begin{eqnarray*}
+d & = & \widehat{p}_A - \widehat{p}_B\\
+\\
+& = & 0.038 - 0.062\\
+\\
+& = & -0.024
+\end{eqnarray*}
+
+
+
+
+
+
+\vspace{0.4in}
+\noindent
+{\bf Part (c)} What is the estimated standard error of $D$?
+
+\bigskip
+\noindent
+{\bf Solution} To calculate the standard error of $D$, we must first calculate $p$, the common probability of success under the null. One way to do this is to use the formula from lecture:
+\begin{eqnarray*}
+\widehat{p} & = & \frac{ n_A}{n_A + n_B} \times \widehat{p}_A + \frac{ n_B}{n_A + n_B} \times \widehat{p}_B\\
+\\
+& = & \frac{1,000}{1,500} \times 0.038\ +\ \frac{500}{1,000} \times 0.062\\
+\\
+& = & 0.046
+\end{eqnarray*}
+I presented this formula to show you that the estimate $\widehat{p}$ is just the weighted average of $\widehat{p}_A$ and $\widehat{p}_A$, using the sample sizes as the weights. However, a computationally simpler approach is to note that under the null hypothesis $p_A$ and $p_B$ are the same, and therefore the two independent samples can be treated as just one giant sample from this null distribution, in which case we can estimate $p$ by counting up all the carburetors that failed, and dividing by the total sample size:
+\begin{eqnarray*}
+\widehat{p} & = & \frac{ 38 + 31 }{1,000 + 500}\\
+\\
+& = & \frac{69}{1,500}\\
+\\
+& = & 0.046
+\end{eqnarray*}
+This is not a conincedence, and you'll always get the same answer using both approaches. I think the first approach is conceptually pleasing, because it's nice to think that the estimate $\widehat{p}$ is just the weighted average of the individual estimates $\widehat{p}_A$ and $\widehat{p}_B$, but the second approach is computationally much easier.
+
+\bigskip
+Now that we have our estimate $\widehat{p}$, we can calculate the estimated standard error:
+\begin{eqnarray*}
+\sqrt{ \widehat{p} \cdot (1-\widehat{p}) \cdot \left ( \frac{1}{n_A} + \frac{1}{n_B} \right ) } & = & \sqrt{ 0.046 \cdot (1-0.046) \cdot \left ( \frac{1}{1,000} + \frac{1}{500} \right ) }\\
+\\
+& = & 0.01147
+\end{eqnarray*}
+
+
+
+
+
+
+
+\newpage
+\subsubsection*{Problem 3, continued}
+
+\noindent
+{\bf Part (d)} What is the value of the observed test statistic for this test, assuming the null hypothesis is true?
+
+\bigskip
+\noindent
+{\bf Solution} The observed value of the test statistic is:
+\begin{eqnarray*}
+z & = & \frac{ d }{\sqrt{ \widehat{p} \cdot (1-\widehat{p}) \cdot \left ( \frac{1}{n_A} + \frac{1}{n_B} \right ) }}\\
+\\
+& = & \frac{ -0.024 }{ 0.01147 }\\
+\\
+& = & -2.09169
+\end{eqnarray*}
+
+
+
+
+\vspace{0.4in}
+\noindent
+{\bf Part (e)} Perform the test. What do you conclude about the difference in the proportion of failures for method A versus method B?
+
+\bigskip
+\noindent
+{\bf Solution} Now we can calculate the $p$-value, using a two-sided approach:
+\begin{eqnarray*}
+p & = & \Pr( Z \leq -2.09169 )\ +\ \Pr( Z \geq 2.09169)\\
+\\
+& = & 0.01823 + 0.01823\\
+\\
+& = & 0.03647
+\end{eqnarray*}
+Thus, $p$ is less than the pre-specified significance level of $\alpha = 0.05$, hence we reject the null hypothesis and conclude that this data provides strong evidence that there is a difference in the defect rate between Method A and Method B, with Method B having the higher probability of a defect.
+
+
+
+
+
+
+
+\newpage
+\section*{Problem 4}
+
+
+
+\subsection*{Problem Statement}
+
+Using the data from Problem 3, construct a confidence interval for the true difference in population probabilities of a defective part.
+
+\subsection*{Problem Solution}
+
+For the confidence interval, we have to do a slightly different calculation for the standard error estimate, using the formula from the notes:
+\begin{eqnarray*}
+\sqrt{ \frac{ \widehat{p}_A \cdot (1-\widehat{p}_A)}{n_A} + \frac{ \widehat{p}_B \cdot (1-\widehat{p}_B)}{n_B} } & = & \sqrt{ \frac{ 0.038 \cdot (1-0.038)}{1,000} + \frac{ 0.062 \cdot (1-0.062)}{500} } \\
+\\
+& = & 0.01236
+\end{eqnarray*}
+Now the confidence interval limits are:
+\begin{eqnarray*}
+L & = & d + Q_Z(0.025) \cdot \sqrt{ \frac{ \widehat{p}_A \cdot (1-\widehat{p}_A)}{n_A} + \frac{ \widehat{p}_B \cdot (1-\widehat{p}_B)}{n_B} }\\
+\\
+& = & -0.024 - 1.96 \times (0.01236)\\
+\\
+& = & -0.04823\\
+\\
+U & = & d + Q_Z(0.975) \cdot \sqrt{ \frac{ \widehat{p}_A \cdot (1-\widehat{p}_A)}{n_A} + \frac{ \widehat{p}_B \cdot (1-\widehat{p}_B)}{n_B} }\\
+\\
+& = & -0.024 + 1.96 \times (0.01236)\\
+\\
+& = & 0.00023
+\end{eqnarray*}
+
+\newpage
+\section*{Problem 5}
+
+\subsection*{Problem Statement}
+
+Tom Gravy has decided to spend his offseason studying hedgehogs. He has observed 150 hedgehogs in his backyard, and classified each according to their coloration:
+$$
+\begin{tabular}{clcrc}
+& Color & & Observed & \\
+\hline
+& Red & & 33 & \\
+& Green & & 41 & \\
+& Blue & & 28 & \\
+& Purple & & 33 \\
+& Plaid & & 15 \\
+\hline
+& Total & & 150
+\end{tabular}
+$$
+According to the famous papyrus scroll {\em Secret Teachings on the Frequency of Colorations of Hedgehogs} by B\=al B\"ul-\^y-q\'ek, mystic high priest, the ratios of the frequencies of the hedgehogs is:
+$$
+\hbox{Red : Green : Blue : Purple : Plaid }\ =\ 4 : 4 : 3: 3 : 1
+$$
+Tom decides to test this claim using Pearson's chi-squared test, with a significance level of $\alpha = 0.05$.
+
+\bigskip
+\noindent
+{\bf Part (a)} Using the relative frequencies proposed by B\=al B\"ul-\^y-q\'ek, calculate the expected counts for Tom's dataset of 150 hedgehogs.
+
+\bigskip
+\noindent
+{\bf Part (b)} Calculate Pearson's chi-squared statistic for this data.
+
+\bigskip
+\noindent
+{\bf Part (c)} What is the correct number of degrees of freedom for this test statistic?
+
+\bigskip
+\noindent
+{\bf Part (d)} Perform the test. What do you conclude about B\=al B\"ul-\^y-q\'ek's hypothesis, based on this data?
+
+
+
+\newpage
+\subsection*{Problem Solution}
+
+\noindent
+{\bf Part (a)} Using the relative frequencies proposed by B\=al B\"ul-\^y-q\'ek, calculate the expected counts for Tom's dataset of 150 hedgehogs.
+
+\bigskip
+\noindent
+{\bf Solutions} Here is a table for you to fill out:
+$$
+\begin{tabular}{clcrcrc}
+& Color & & Observed & & Expected\\
+\hline
+\\
+& Red & & 33 & &  & \\
+\\
+& Green & & 41 & &  & \\
+\\
+& Blue & & 28 & &  & \\
+\\
+& Purple & & 33 & &  & \\
+\\
+& Plaid & & 15 & &  & \\
+\\
+\hline
+\\
+& Total & & 150 & &  & 
+\end{tabular}
+$$
+You can use this space for any work:
+
+
+\newpage
+\subsubsection*{Problem 5, continued}
+
+\noindent
+{\bf Part (b)} Calculate Pearson's chi-squared statistic for this data.
+
+\bigskip
+\noindent
+{\bf Solutions} Here is another table for you to fill out:
+$$
+\begin{tabular}{clcrcrcrc}
+& Color & & Observed & & Expected & & $(O_i - E_i)^2 / E_i$ & \\
+\hline
+\\
+& Red & & 33 & &  & &  & \\
+\\
+& Green & & 41 & &  & &  & \\
+\\
+& Blue & & 28 & &  & &  & \\
+\\
+& Purple & & 33 & &  & &  & \\
+\\
+& Plaid & & 15 & &  & &  & \\
+\\
+\hline
+\\
+& Total & & 150 & &  & & 
+\end{tabular}
+$$
+Here is more space if you need it for any work:
+
+
+
+
+
+
+\newpage
+\subsubsection*{Problem 5, continued}
+
+\noindent
+{\bf Part (c)} What is the correct number of degrees of freedom for this test statistic?
+
+\bigskip
+\noindent
+{\bf Solutions} 
+
+
+
+
+
+\vspace{1in}
+\noindent
+{\bf Part (d)} Perform the test. What do you conclude about B\=al B\"ul-\^y-q\'ek's hypothesis, based on this data?
+
+\bigskip
+\noindent
+{\bf Solutions} 
+
+
+
+
+
+
+
+
+\newpage
+\section*{Problem 6}
+
+
+
+\subsection*{Problem Statement}
+
+Last year, Tom Gravy entered into a lucrative endorsement deal for the menswear fashion product Slugg Bootz. For 100 days, daily sales of Slugg Bootz were recorded, and the results are tabulated:
+$$
+\begin{tabular}{clcrc}
+& Daily Sales & & Number of Days & \\
+\hline
+& 0 & & 5 \\
+& 1 & & 20 \\
+& 2 & & 19 \\
+& 3 & & 19 \\
+& 4 & & 19 \\
+& 5 & & 8 \\
+& 6+ & & 10 & \\
+\hline
+& Total & & 100
+\end{tabular}
+$$
+Thus, there were 5 days where no Slugg Bootz were sold, 20 days where exactly 1 pair of Slugg Bootz were sold, 19 days where 2 pairs of Slugg Bootz were sold, and so on. Tom thinks that this the expected counts for this data can be modeled using a Poisson distribution with $\mu = 3.5$. He decides to test this idea using Pearson's chi-squared test, with a significance level of $\alpha = 0.05$.
+
+\bigskip
+\noindent
+{\bf Part (a)} Using the assumption that the expected daily sales count follows a Poisson distribution with parameter $\mu = 3.5$, calculate the expected counts for this table. Note that the expected count for a particular value will be the Poisson probability for that particular value, multiplied by the total sample size.
+
+\bigskip
+\noindent
+{\bf Part (b)} Calculate the value of the $\chi^2$ statistic for this data, using the expected values that you calculated in Part (a).
+
+\bigskip
+\noindent
+{\bf Part (c)} What are the appropriate degrees of freedom for this test statistic?
+
+\bigskip
+\noindent
+{\bf Part (d)} What do you conclude about how well the observed data fits with the proposed model of a Poisson distribution with mean $\mu = 3.5$?
+
+
+
+
+
+\subsection*{Problem Solution}
+
+\noindent
+{\bf Part (a)} Using the assumption that the expected daily sales count follows a Poisson distribution with parameter $\mu = 3.5$, calculate the expected counts for this table. Note that the expected count for a particular value will be the Poisson probability for that particular value, multiplied by the total sample size.
+
+\bigskip
+\noindent
+{\bf Solution} Here's a table if you would like to fill this out:
+$$
+\begin{tabular}{clcrccc}
+& Daily Sales & & Observed & & Expected\\
+\hline
+\\
+& 0 & & 5 \\
+\\
+& 1 & & 20 \\
+\\
+& 2 & & 19 \\
+\\
+& 3 & & 19 \\
+\\
+& 4 & & 19 \\
+\\
+& 5 & & 8 \\
+\\
+& 6+ & & 10 & \\
+\\
+\hline
+\\
+& Total & & 100
+\end{tabular}
+$$
+
+
+
+
+
+\newpage
+\subsubsection*{Problem 6, continued}
+
+\noindent
+{\bf Part (b)} Calculate the value of the $\chi^2$ statistic for this data, using the expected values that you calculated in Part (a).
+
+\bigskip
+\noindent
+{\bf Solution} Here's a table if you would like to fill this out:
+$$
+\begin{tabular}{clcrcrcrc}
+& Daily Sales & & Observed & & Expected & & $(O_i - E_i)^2 / E_i$ \\
+\hline
+\\
+& 0 & & 5 \\
+\\
+& 1 & & 20 \\
+\\
+& 2 & & 19 \\
+\\
+& 3 & & 19 \\
+\\
+& 4 & & 19 \\
+\\
+& 5 & & 8 \\
+\\
+& 6+ & & 10 & \\
+\\
+\hline
+\\
+& Total & & 100
+\end{tabular}
+$$
+
+
+
+
+
+
+\newpage
+\subsubsection*{Problem 6, continued}
+
+\noindent
+{\bf Part (c)} What are the appropriate degrees of freedom for this test statistic?
+
+\bigskip
+\noindent
+{\bf Solution} 
+
+
+
+
+
+
+\vspace{1.5in}
+\noindent
+{\bf Part (d)} What do you conclude about how well the observed data fits with the proposed model of a Poisson distribution with mean $\mu = 3.5$?
+
+\bigskip
+\noindent
+{\bf Solution} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
+\section*{Problem 7}
+
+This is a continuation of Problem 6.
+
+\subsection*{Problem Statement}
+
+Gazelle does not think that Tom Gravy should use a Poisson model with $\mu = 3.5$ to model the expected counts of the daily sales of Slugg Bootz. Instead, she uses the method of moments to obtain the estimate $\widehat{\mu} = 2.98$, and she uses this estimate to model the expected counts of the daily sales of Slugg Bootz. As before, she will use Pearson's chi-squared test to test the goodness of fit of this model, with a significance level of $\alpha = 0.05$.
+
+\bigskip
+\noindent
+{\bf Part (a)} Using the assumption that the expected daily sales count follows a Poisson distribution with the estimated parameter $\widehat{\mu} = 2.98$, calculate the expected counts for this table. Note that the expected count for a particular value will be the Poisson probability for that particular value, multiplied by the total sample size.
+
+\bigskip
+\noindent
+{\bf Part (b)} Calculate the value of the $\chi^2$ statistic for this data, using the expected values that you calculated in Part (a).
+
+\bigskip
+\noindent
+{\bf Part (c)} What are the appropriate degrees of freedom for this test statistic?
+
+\bigskip
+\noindent
+{\bf Part (d)} Perform the test. What do you conclude about how well the observed data fits with the proposed model of a Poisson distribution with mean $\widehat{\mu} = 2.98$?
+
+
+
+
+\newpage
+\subsection*{Problem Solution}
+
+\noindent
+{\bf Part (a)} Using the assumption that the expected daily sales count follows a Poisson distribution with the estimated parameter $\widehat{\mu} = 2.98$, calculate the expected counts for this table. Note that the expected count for a particular value will be the Poisson probability for that particular value, multiplied by the total sample size.
+
+\bigskip
+\noindent
+{\bf Solution} Here's a table if you would like to fill this out:
+$$
+\begin{tabular}{clcrccc}
+& Daily Sales & & Observed & & Expected\\
+\hline
+\\
+& 0 & & 5 \\
+\\
+& 1 & & 20 \\
+\\
+& 2 & & 19 \\
+\\
+& 3 & & 19 \\
+\\
+& 4 & & 19 \\
+\\
+& 5 & & 8 \\
+\\
+& 6+ & & 10 & \\
+\\
+\hline
+\\
+& Total & & 100
+\end{tabular}
+$$
+
+
+
+
+
+
+
+\newpage
+\subsubsection*{Problem 7, continued}
+
+\noindent
+{\bf Part (b)} Calculate the value of the $\chi^2$ statistic for this data, using the expected values that you calculated in Part (a).
+
+\bigskip
+\noindent
+{\bf Solution} Here's a table if you would like to fill this out:
+$$
+\begin{tabular}{clcrcrcrc}
+& Daily Sales & & Observed & & Expected & & $(O_i - E_i)^2 / E_i$ \\
+\hline
+\\
+& 0 & & 5 \\
+\\
+& 1 & & 20 \\
+\\
+& 2 & & 19 \\
+\\
+& 3 & & 19 \\
+\\
+& 4 & & 19 \\
+\\
+& 5 & & 8 \\
+\\
+& 6+ & & 10 & \\
+\\
+\hline
+\\
+& Total & & 100
+\end{tabular}
+$$
+
+
+
+
+
+
+
+\newpage
+\subsubsection*{Problem 7, continued}
+
+\noindent
+{\bf Part (c)} What are the appropriate degrees of freedom for this test statistic?
+
+\bigskip
+\noindent
+{\bf Solution} 
+
+
+
+
+
+
+
+\vspace{1.5in}
+\noindent
+{\bf Part (d)} Perform the test. What do you conclude about how well the observed data fits with the proposed model of a Poisson distribution with mean $\widehat{\mu} = 2.98$?
+
+\bigskip
+\noindent
+{\bf Solution} 
+
+
+
+
+
+
+
+\newpage
+\section*{Problem 8}
+
+\subsection*{Problem Statement}
+
+Let's return to Gazelle's data from Problem 3:
+$$
+\begin{tabular}{clcrcrcrc}
+\\
+& & & Method A & & Method B & & Total\\
+\hline
+\\
+& Defective & & 38 & & 31  & & 69\\
+\\
+& Not Defective & & 962 & & 469 & & 1,431\\
+\\
+\hline
+\\
+& Total & & 1,000 & & 500 & & 1,500\\
+\end{tabular}
+$$
+Gazelle wants to analyze this data using the method of contingency tables. She will perform the test with a significance level of $\alpha = 0.05$.
+
+\bigskip
+\noindent
+{\bf Part (a)} Construct the estimated cell counts, using the row and column totals.
+
+\bigskip
+\noindent
+{\bf Part (b)} Calculate the chi-squared test statistic for this data.
+
+\bigskip
+\noindent
+{\bf Part (c)} What are the appropriate degrees of freedom for this test?
+
+\bigskip
+\noindent
+{\bf Part (d)} Perform the test. What are your conclusions? How does this compare with your results in Problem 3?
+
+\newpage
+\subsection*{Problem Solution}
+
+\noindent
+{\bf Part (a)} Construct the estimated cell counts, using the row and column totals.
+
+\bigskip
+\noindent
+{\bf Solution} Here's a table if you would like to fill this out:
+$$
+\begin{tabular}{clcrccc}
+& Cell & & Observed & & Expected\\
+\hline
+\\
+& Row 1, Column 1 & & 38 \\
+\\
+& Row 1, Column 2 & & 31 \\
+\\
+& Row 2, Column 1 & & 962 \\
+\\
+& Row 2, Column 2 & & 469 \\
+\\
+\hline
+\\
+& Total & & 1,500
+\end{tabular}
+$$
+Here is some space for you to do any work:
+
+
+
+\newpage
+\subsubsection*{Problem 8, continued}
+
+\bigskip
+\noindent
+{\bf Part (b)} Calculate the chi-squared test statistic for this data.
+
+\bigskip
+\noindent
+{\bf Solution} Here's a table if you would like to fill this out:
+$$
+\begin{tabular}{clcrcrcrc}
+& Cell & & Observed & & Expected & & $(O_i - E_i)^2 / E_i$\\
+\hline
+\\
+& Row 1, Column 1 & & 38 \\
+\\
+& Row 1, Column 2 & & 31 \\
+\\
+& Row 2, Column 1 & & 962 \\
+\\
+& Row 2, Column 2 & & 469 \\
+\\
+\hline
+\\
+& Total & & 1,500
+\end{tabular}
+$$
+
+
+
+
+\newpage
+\subsubsection*{Problem 8, continued}
+
+\noindent
+{\bf Part (c)} What are the appropriate degrees of freedom for this test?
+
+\bigskip
+\noindent
+{\bf Solution}
+
+
+
+\vspace{1.5in}
+\noindent
+{\bf Part (d)} Perform the test. What are your conclusions? How does this compare with your results in Problem 3?
+
+\end{document}

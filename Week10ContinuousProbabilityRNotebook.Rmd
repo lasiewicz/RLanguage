@@ -1,0 +1,561 @@
+---
+title: 'Week 10: Continuous Distributions R Notebook'
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  pdf_document: default
+  html_notebook: default
+  html_document:
+    df_print: paged
+---
+
+# R Stuff
+
+Before we get rolling with today's lecture, we'll see some more features of R that will be useful:
+
+* Some tricks to make your histograms look a little nicer.
+
+* The `exp()` and `log()` functions.
+
+* Drawing curves with the `curve()` function.
+
+
+
+
+
+# A Cool Histogram Trick
+
+Let's generate 100,000 samples from a geometric random variable with a probability of success $p = 0.1$:
+```{r}
+random.sample <- rgeom( 100000, 0.1)
+```
+
+Now we'll make a histogram of this data:
+```{r}
+hist( random.sample,
+      main = "Basic Histogram of Geometric Data",
+      xlab = "Number of failures",
+      prob = TRUE,
+      breaks = 50,
+      col = "seagreen1")
+```
+This histogram is OK, but there are two problems with it:
+
+* First, the leftmost bar is too big.
+
+* All of the information is concentrated at the left, and for most of the graph the value of the histogram is 0.
+
+Let's see the really big values of this random sample:
+```{r}
+random.sample[ random.sample > 80 ]
+```
+So out of 100,000 samples, there were just a few that were greater than 80, but R insists on drawing the histogram to incorporate all the values. This isn't wrong, but we might want to adjust this. So I think it's OK to filter out some of the really extreme values for the sake of making a nicer histogram:
+```{r}
+filtered.sample <- random.sample[ random.sample < 50 ]
+
+hist( filtered.sample,
+      main = "Basic Histogram of Filtered Geometric Data",
+      xlab = "Number of failures",
+      prob = TRUE,
+      breaks = 50,
+      col = "seagreen1")
+```
+OK, that's a little better. You shouldn't filter out too much, but getting rid of just 10 or 20 extreme values can make your graph much nicer, especially if the distribution has a long tail like the geometric distribution does.
+
+Now for the second issue: the leftmost bar is way too big. The problem is that R is binning the values for $X = 0$ and $X = 1$ together for this bar. What would be nice would be to specify the breaks so that the bars are centered on the integer values. For instance, if the breaks for the first bar were -0.5 and +0.5, then only the values of $x = 0$ would be grouped in that bin. We can specify the breaks using the `seq()` command:
+```{r}
+hist( filtered.sample,
+      main = "Nicer Histogram of Filtered Data",
+      xlab = "Number of failures",
+      prob = TRUE,
+      breaks = seq( from = -0.5, to = 50.5, by = 1),
+      col = "seagreen1")
+```
+
+We could write this very generally:
+```{r}
+max.value <- 60
+
+filtered.sample <- random.sample[ random.sample <= max.value ]
+
+hist( filtered.sample,
+      main = "General Histogram of Filtered Data",
+      xlab = "Number of failures",
+      prob = TRUE,
+      breaks = seq( from = -0.5, to = max.value + 0.5, by = 1),
+      col = "seagreen1")
+```
+
+
+
+
+
+
+# The Exponential and Natural Logarithm Functions
+
+R has a rich selection of mathematical functions, which we haven't explored in this course. Of course all your favorites such as the trigonometric functions are available, but many other are also included -- if you need to evaluate the digamma function, R can do it. 
+
+For today's lecture, we'll need two special functions. The first is the exponential function, which is denoted by $e^x$:
+$$
+\exp(x)\ =\ e^{x}
+$$
+Here, $e$ is the number $e = 2.718282\ldots$. It's a very special numerical value that has lots of amazing properties, which we won't explore in this course. R implements the exponential function using the `exp()` function, so for instance if $x = 2.5$ then $e^{x}$ is 12.18249:
+```{r}
+exp(2.5)
+```
+
+### The natural logarithm
+
+For many people, exponential functions are reasonably intuitive, even for such an exotic number as $e = 2.718282\ldots$. However, most people find logarithms completely mysterious. The *natural logarithm* is just the inverse of the exponential function: if $\exp(2.5) = 12.18249$, then $\ln(12.18249) = 2.5$. In other words, the logarithm of a number is just the representation of the number as an exponent of $e$. R has a built-in function to evaluate the natural logarithm, which unfortunately is named `log()`:
+```{r}
+log( 12.18249 )
+```
+We won't be using the `exp()` or `log()` function very much in this course, but they will show a few times today, and so you need to be comfortable with them. Part of the beauty of STAT E-80: Basic Probability Using R is that you don't actually need to understand the mathematical theory of these mysterious entities; you can just treat them as a black box and use the built-in function to perform any numerical evaluations.
+
+
+
+
+### The curve() function
+
+We can use R to draw curves of mathematical functions using the built-in `curve()` function. This function has many different options, but we will only need a few of these options for our study of probability:
+
+* The first input argument is some sort of expression that is a function of the letter `x`. You really have to use the letter `x` for this input argument.
+
+* The next input argument is the smallest value of `x` that you want to draw the curve for.
+
+* The next input argument is the largest value of `x` that you want to draw the curve for.
+
+* The fourth input argument is labelled `lwd`, and this controls the width of the line.
+
+* The fifth input argument is labelled `col`, and this controls the color of the line.
+
+For instance, if we want to draw the curve representing the function $f(x) = x^2$ from $x = 0$ to $x = 4$, we could write:
+```{r}
+curve( x^2, 0, 4, lwd = 2, col = "seagreen3")
+```
+
+Try playing around with this code by changing some of the arguments to see how the code works.
+
+
+We can add curves to pre-existing plots with the `add = TRUE` option. Here we first draw a graph, and then we can superimpose an additional curve on the graph by putting `add = TRUE` into the function call for the additional curve:
+```{r}
+# First, we'll draw a sine curve:
+
+curve( sin(x), 0, 8, lwd = 2, col = "blue" )
+
+# Next, we'll superimpose a cosine curve on top of this:
+
+curve( cos(x), lwd = 2, col = "red", add = TRUE)
+```
+
+You can add even more curves to this graph by using the `add = TRUE` option. However, everything has to be in one code chunk, and once the code chunk comes to an end R will render the graph and no further modifications are possible.
+
+
+# Continuous Distributions
+
+There are some basic techniques that you need to master in order to work with continuous distributions.
+
+First, if you know what kind of distribution you are working with, along with the values of all the parameters, then you should be able to:
+
+* Determine the value of $f(x)$, the density function for the distribution at a given point $x$.
+
+* Determine the value $F(x) = \Pr(X \leq x)$, the cumulative probability for the distribution at a given point $x$.
+
+* Determine the value of $S(x) = \Pr(X > x)$, the cumulative probability for the distribution at a given point $x$.
+
+* Calculate the mean and variance of the distribution using a special formula for that distribution.
+
+You should be able to verify all of these calculations using simulations. The idea here is to simulate a random sample from the specified distribution, and then at the end perform some simple calculations on the simulated data. You should be able to plot a histogram of your simulated data, and also to superimpose a density curve on the histogram.
+
+Finally, I can also ask you to evaluate integrals of continuous density functions. There are two ways that you can do this:
+
+* The first is by calculating either a single cumulative probability, or two cumulative probabilities and subtracting.
+
+* The second is by constructing a simulation and then determining what proportion of simulated values are within the range of the integral.
+
+
+
+
+
+# The Uniform Distribution
+
+Let's take a look at the simplest continuous distribution of all: the uniform distribution on the interval $(0,1)$. This density function has the constant value 1 on this interval, and is 0 everywhere else:
+$$
+f_X(x)\ =\ \left \{ \begin{array}{lcl} 1 & & 0 \leq x \leq 1 \\ 0 & & \hbox{otherwise} \end{array} \right .
+$$
+So the density function just takes on the constant value 1 on the interval 0 to 1, and is 0 everywhere else.
+
+There are 3 R functions that you will find useful for this distribution:
+
+* The density at the point $x$ can be calculated using `dunif(x)`. Of course, since the density is always 1 on the range from 0 to 1, this isn't a very exciting function, but when we get to more interesting distributions the density function will non-trivial.
+
+* The cumulative probability at the point $x$, denoted $F_X(x)\ =\ \Pr(X \leq x)$, can be calculated using `punif(x)`. The survival probability at the point $x$, denoted $S_X(x)\ =\ \Pr(X > x)$, can be calculated by using the `punif(x)` function with the `lower.tail = FALSE` option.
+
+* We can draw a random sample of $n$ independent values from the uniform distribution using the `rexp(n)` function.
+
+
+Before we explore the uniform distribution, let's take a moment to generate a small sample of random values from this distribution:
+```{r}
+runif(8)
+```
+Notice that these are all numbers with decimal expansions. This is very different from our previous probability distributions, where the random values were just integers i.e.\ whole numbers. For instance, let's generate some random values from a geometric distribution:
+```{r}
+rgeom(8, prob = 1/3)
+```
+For a geometric distribution, and indeed any of the probability distributions that we've worked with previously, the realized values were always whole numbers. Now that we are working with continuous distributions, the realized values can be any number within the legal range.
+
+
+Let's get started! We'll begin by generating some random uniform data, and then make a histogram:
+```{r}
+random.uniform.sample <- runif(100000)
+
+hist( random.uniform.sample,
+      main = "Basic Histogram of Random Uniform Data",
+      xlab = "x",
+      ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "lightblue")
+```
+
+We can also superimpose a density curve over this histogram, using the `curve()` function with the `add = TRUE` option:
+```{r}
+hist( random.uniform.sample,
+      main = "Basic Histogram of Random Uniform Data",
+      xlab = "x",
+      ylab = "Densty",
+      prob = TRUE,
+      breaks = 50,
+      col = "lightblue")
+
+# Remember to use the option add = TRUE:
+
+curve( dunif(x), lwd = 2, add = TRUE )
+```
+
+Each type of probability distribution will have its own special formula for the mean and variance. Unfortunately, for continuous distributions deriving these special formulas can require calculus, and that's beyond the prerequisites of this class. So in general each time we meet a new distribution I will just tell you what the formulas are. For a uniform distribution on the interval from 0 to 1, the expected value and variance are:
+\begin{eqnarray*}
+\hbox{E}[X] & = & \frac{1}{2}\\
+\\
+\hbox{Var}[X] & = & \frac{1}{12}\\
+\\
+& = & 0.08333
+\end{eqnarray*}
+Let's check that with our simulated data:
+```{r}
+mean( random.uniform.sample )
+var( random.uniform.sample )
+```
+
+We can calculate the cumulative probability that a uniform distribution is less than some specific value $x$ by using the built-in R function `punif()`. For instance, if we want to determine the probability that a uniform random variable is less than the value $x = 0.4$, we have:
+```{r}
+punif(0.4)
+```
+In fact, for a continuous uniform random variable, the cumulative probability at a point $x$ is just the value of $x$:
+$$
+F_X(x)\ =\ \Pr(X \leq x)\ =\ x
+$$
+We can test this with our simulated data very simply:
+```{r}
+mean( random.uniform.sample < 0.4 )
+```
+This value should be very close to 0.4.
+
+We can do more complicated calculations by subtracting cumulative probabilities. For instance, suppose we want to calculate the probability that a uniform random variable $X$ is greater than 0.3 but less than or equal to 0.5:
+$$
+\Pr(0.3 < X \leq 0.5)\ =\ ???
+$$
+We can convert this into a question about cumulative probabilities:
+$$
+\Pr(0.3 < X \leq 0.5)\ =\ \Pr(X \leq 0.5) - \Pr(X \leq 0.3)
+$$
+Now we can use the `punif()` function to calculate these cumulative probabilities:
+```{r}
+punif(0.5) - punif(0.3)
+```
+
+We can also use our simulated data to verify this calculation:
+```{r}
+mean( (random.uniform.sample > 0.3) & (random.uniform.sample <= 0.5) )
+```
+The simulated approximation should be close to 0.2
+
+
+
+
+# The Exponential Distribution
+
+Now we will study something more complicated than the simple uniform distribution.
+
+### The exponential density function
+
+An *exponential* random variable $X$ with *rate parameter* $r > 0$ has the density function:
+$$
+f_X(x)\ =\ r \cdot e^{-r x},\ \ x > 0,\ r > 0
+$$
+This density function might look a little scary, especially if you are a little rusty about the exponential function $e^x$. 
+
+Let's draw a picture of the density function for an exponential distribution with rate parameter 5:
+```{r}
+curve( 1/8 * exp(-x/8), 0, 25, 
+       main = "Graph of Exponential Density with Rate Parameter 5",
+       xlab = "x",
+       ylab = "Density",
+       lwd = 5, col = "cadetblue4")
+```
+
+R has a full set of built-in functions to enable us to work with this probability distribution:
+
+* The function `dexp(x, rate = r)` will compute the value of the density function for the exponential distribution at the point $x$.
+
+* The function `pexp(x, rate = r)` will compute the value of the cumulative probability function for the exponential distribution at the point $x$. If we use the `lower.tail = FALSE` option, `pexp()` will calculate the survival function i.e.\ the area under the density curve to the right of a particular point $x$.
+
+* The function `rexp(n, rate = r)` will generate $n$ random values from the specified exponential distribution.
+
+
+
+
+
+Let's consider an exponential random variable $X$ with rate parameter $r = 1/8$. Then the density function is:
+\begin{eqnarray*}
+f_X(x) & = & r \cdot e^{-r x}\\
+\\
+& = & \frac{1}{8} \cdot e^{-(1/8) \cdot x}\\
+\\
+& = & \frac{1}{8} \cdot e^{-x/8}
+\end{eqnarray*}
+This density function holds for all positive $x$; for $x$ less than 0, the density is 0.
+
+Let's simulate some data from this exponential random variable with rate parameter $r = 1/8$:
+```{r}
+random.exponential.sample <- rexp(100000, rate = 1/8)
+```
+We can make a histogram of this sample data, and then superimpose the density curve:
+```{r}
+hist( random.exponential.sample,
+      main = "Basic Histogram of Simulated Exponential Data",
+      xlab = "x",
+      ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "aliceblue" )
+
+curve( dexp(x, 1/8), lwd = 2, col = "navy", add = TRUE)
+```
+
+Let's use our filtering trick to make this histogram a little nicer:
+```{r}
+filtered.exponential.sample <- random.exponential.sample[ random.exponential.sample <= 50 ]
+
+hist( filtered.exponential.sample,
+      main = "Histogram of Filtered Simulated Exponential Data",
+      xlab = "x",
+      ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "skyblue" )
+
+curve( dexp(x, 1/8), lwd = 2, col = "navy", add = TRUE)
+```
+
+The density curve for an exponential distribution is always curving downwards like this, and the value of the rate parameter $r$ determines how fast the decrease is, with larger values of $r$ giving faster declines.
+
+
+### Cumulative probability and survival functions
+
+If $X$ is an exponential random variable with rate parameter $r$, then the cumulative probability function $F_X(x) = \Pr(X \leq x)$ is:
+$$
+F_X(x)\ =\ \Pr(X \leq x)\ =\ 1 - e^{-r x}
+$$
+Let's try out this formula. We are working with a random variable $X$ with rate parameter $r = 1/8$, so what is the cumulative probability for the value $x = 10$:
+\begin{eqnarray*}
+F_X(x) & = & \Pr(X \leq x)\\
+\\
+& = & 1 - e^{-r x}\\
+\\
+& = & 1 - e^{-(1/8) \cdot 10}\\
+\\
+& = & 1 - e^{-1.25}\\
+\\
+& = & 
+\end{eqnarray*}
+Let' calculate this in R:
+```{r}
+exponential.cumulative.probability <- 1 - exp(-(1/8) * 10)
+exponential.cumulative.probability
+```
+It's actually a lot nicer to calculate this using the built-in R function `pexp()`:
+```{r}
+pexp( 10, rate = 1/8)
+```
+Let's check this with our simulated data:
+```{r}
+mean( random.exponential.sample <= 10 )
+```
+
+
+We can express this cumulative probability as an integral:
+$$
+\int_0^{10} \frac{1}{8} \cdot e^{-x/8} \cdot dx\ =\ 0.71350
+$$
+Calculus is **not** a prerequisite for this course, so I don't expect you to be able to do this integral by hand. Instead, you should be able to recognize that the expression in the integral is the density function for an exponential random variable with rate parameter 1/8, and then use the `pexp()` function to obtain the numerical value of the integral.
+
+We can use these ideas to perform more complicated calculations. For instance, suppose we want to determine the probability that an exponential random variable with rate parameter 1/8 takes on a value between 6 and 11:
+$$
+\Pr(6 < X \leq 11)\ =\ ???
+$$
+One approach to calculating this is to rewrite the probability statement in terms of cumulative probabilities:
+$$
+\Pr(6 < X \leq 11)\ =\ \Pr(X \leq 11) - \Pr(X \leq 6)
+$$
+Now we can calculate these cumulative probabilities using the `pexp()` function:
+```{r}
+pexp(11, 1/8) - pexp(6, 1/8)
+```
+We can also use our simulated data to provide an approximate answer:
+```{r}
+mean( (random.exponential.sample > 6) & (random.exponential.sample <= 11) )
+```
+This value should be close to 0.22.
+
+
+
+
+
+### Expectation and variance
+
+For an exponential random variable $X$ with rate parameter $r$, the expected value and variance are:
+\begin{eqnarray*}
+\hbox{E}[X] & = & \frac{1}{r}\\
+\\
+\hbox{Var}[X] & = & \frac{1}{r^2}
+\end{eqnarray*}
+Let's see an example of this. Suppose we have an exponential random variable $X$ with rate parameter $r = 1/8$; then we have:
+\begin{eqnarray*}
+\hbox{E}[X] & = & \frac{1}{r}\\
+\\
+& = & \frac{1}{1/8}\\
+\\
+& = & 8\\
+\\
+\hbox{Var}[X] & = & \frac{1}{r^2}\\
+\\
+& = & \frac{1}{(1/8)^2}\\
+\\
+& = & 64
+\end{eqnarray*}
+Let's check this with our simulation data:
+```{r}
+mean( random.exponential.sample )
+var( random.exponential.sample )
+```
+
+We can also reverse this process: I can tell you that a distribution is an exponential distribution with a specified value for the expectation, and you can then use this to determine the value of the rate parameter. For instance, suppose that $W$ is an exponential random variable, and you don't know the rate parameter but you do know that the expected value is $\hbox{E}[W] = 4/3$. Then we can substitute this into our equation for the expectation of an exponential random variable:
+$$
+\hbox{E}[W]\ =\ \frac{4}{3}\ =\ \frac{1}{r}
+$$
+
+Now you can solve this for $r$, and you should find that $r = 3/4$. Now that you know the rate parameter, you can all of our standard methods for working with an exponential distribution. In particular, we can check our calculation by simulating random exponential data with a rate parameter of 3/4, and then seeing if the mean of the random sample really is close to 4/3:
+```{r}
+check.rate.calculation.sample <- rexp(10000, rate = 3/4)
+
+mean( check.rate.calculation.sample )
+```
+This should be close to 1.33.
+
+
+
+
+
+# The Gamma Distribution
+
+Now we are in a position to really leverage the power of R. In this section, you will solve probability and calculus problems that are essentially impossible to do by hand.
+
+The *gamma distribution* with *shape parameter* $a$ and *rate parameter* $r$ has the density function:
+$$
+f_X(x)\ =\ \frac{ r^a \cdot x^{a-1} \cdot e^{-r x}}{\Gamma(a)},\ \ x > 0, \ a > 0,\ r > 0
+$$
+Look scary? It's actually not possible to obtain a formula for the cumulative probability function for the gamma distribution, so you might think that it's not possible to work with this. But in fact we can do everything we did with the exponential and uniform distributions, using the built-in R probability functions for the gamma distribution:
+
+* The function `dgamma(x, shape = a, rate = r)` will compute the value of the density function for the gamma distribution at the point $x$.
+
+* The function `pgamma(x, shape = a, rate = r)` will compute the value of the cumulative probability function for the gamma distribution at the point $x$.
+
+* The function `rgamma(n, shape = a, rate = r)` will generate $n$ random values from the specified gamma distribution.
+
+Let's get to work! We'll study a gamma distribution that has a shape parameter of $a = 5$ and a rate parameter of $r = 1/10$, so that the density function has the form:
+$$
+f_X(x)\ =\ \frac{ (0.1)^5 \cdot x^{5-1} \cdot e^{-0.1 x}}{\Gamma(5)},\ \ x > 0
+$$
+We can make this a little more readable:
+$$
+f_X(x)\ =\ \frac{ x^{4} \cdot e^{-x/10}}{10^5 \cdot \Gamma(5)},\ \ x > 0
+$$
+First, let's do the most basic thing: we'll draw a random sample of 100,000 values from this distribution and then fit a density curve to it:
+```{r}
+number.replications <- 10000
+shape.parameter <- 5
+rate.parameter <- 0.1
+
+random.gamma.sample <- rgamma(number.replications,
+                              shape = shape.parameter,
+                              rate = rate.parameter)
+
+hist( random.gamma.sample,
+      main = "Histogram of Gamma Distribution",
+      xlab = "x",
+      ylab = "Density",
+      prob = TRUE,
+      breaks = 50,
+      col = "antiquewhite1")
+
+curve( dgamma(x, shape = shape.parameter, rate = rate.parameter),
+       lwd = 3,
+       col = "navy",
+       add = TRUE)
+```
+
+What's the probability that this random variable is between 50 and 70? We can use the `pgamma()` function to calculate this for us:
+```{r}
+pgamma(70, shape = shape.parameter, rate = rate.parameter) -
+    pgamma(50, shape = shape.parameter, rate = rate.parameter)
+```
+We can write this as an integral:
+$$
+\int_{50}^{70} \frac{ x^{4} \cdot e^{-x/10}}{10^5 \cdot \Gamma(5)} \cdot dx\ =\ 0.26750
+$$ 
+Let's check this using a simulation:
+```{r}
+random.sample <- rgamma(100000, shape = shape.parameter, rate = rate.parameter)
+
+mean( (random.sample <= 70) & (random.sample > 50) )
+```
+
+
+
+
+The conclusion here is that even though you might not know calculus, and even though we can't derive nice expressions for the cumulative probability function, and even though you might be frightened by the complexity of the gamma density, you can still perform every probability calculation you'll need using the built-in R functions.
+
+
+
+# Specifying Distributions
+
+I now have 3 ways to specify probability distributions:
+
+* I can just tell you what kind of probability distribution it is, along with any parameters. For instance, I could specify a distribution by saying, "This is an exponential distribution with rate parameter 0.2".
+
+* I can specify a probability distribution by telling you what kind of distribution it is, along with the mean and variance, and you would have to then work out the parameters. For instance, I could say, "This is a geometric distribution with expected value 7" and you would have to solve for the parameter $p$.
+
+* I could simply state the probability mass or density function, and you would have to be able to recognize it, as well as picking out the parameter values.
+
+
+
+
+
+
+
+
+
+
+
+
+

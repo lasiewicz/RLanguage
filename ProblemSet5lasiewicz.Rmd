@@ -2,9 +2,9 @@
 title: "Problem Set 5"
 subtitle: 'William J Lasiewicz'
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 ---
 
 
@@ -64,7 +64,8 @@ n<-13
 k<-7
 x<-4
 
-choose(9,4) * choose( 13,3) / choose( 22,7)
+answer <-choose(9,4) * choose( 13,3) / choose( 22,7)
+cat ("probability of observing exactly 4 red balls=",answer)
 ```
 
 
@@ -73,7 +74,8 @@ choose(9,4) * choose( 13,3) / choose( 22,7)
 
 ```{r}
 #dhyper(x,m,n,k)
-dhyper( 4, 9, 13, 7)
+answer<-dhyper( 4, 9, 13, 7)
+cat ("probability of observing exactly 4 red balls=",answer)
 ```
 
 
@@ -146,15 +148,16 @@ Construct a simulation to verify your calculation in Part (b).
 ```{r}
 num<-10*9*8*7*6
 num
-
+# there are 30240
 ```
 **Part (b)**
 30240 cominitation
-1 -probablity none out of 240 are the same
+
 ```{r}
-#probablity none out of 240 are the same
-p<-1-(30239/30240)^240
+
+p<-1 - prod( seq( from = 1, by = -1/30240 , length.out = 240 ) )
 p
+cat ("the probability that at least two employees will be assigned the same ID? =",p)
 
 ```
 
@@ -177,7 +180,9 @@ for(replication.index in 1:number.replications) {
   
   if( any( duplicated(employee.sample) ) ) {
     result.vector[ replication.index ] = TRUE
+    
   }
+  #cat ( result.vector[ replication.index ], "\n")
 }
 
 cat( "The estimated probability of a match is:", mean( result.vector ) )
@@ -212,12 +217,22 @@ m=5
 n=20
 k=5
 x=2
-phyper(x, m, n, k)
-phyper(3, 6, 9, 5)
+dhyper(x, m, n, k)
+
 ```{r}
-#probablity none out of 240 are the same
-p<-phyper(2, 5, 20, 5)
-p
+
+p<-dhyper(2, 5, 20, 5)
+
+cat("(dhyper(2, 5, 20, 5) =" ,p,"\n")
+p1<-dhyper(3, 5, 20, 5)
+cat("(dhyper(3, 5, 20, 5) =" ,p1,"\n")
+p2<-dhyper(4, 5, 20, 5)
+cat("(dhyper(4, 5, 20, 5) =" ,p2,"\n")
+p3<-dhyper(5, 5, 20, 5)
+cat("(dhyper(5, 5, 20, 5)=" ,p3,"\n")
+probablity<-p+p1+p2+p3
+cat("add them up" ,probablity,"\n")
+cat ( " the probablity they will win is " ,probablity)
 
 
 ```
@@ -225,14 +240,34 @@ p
 
 
 **Part (b)**
-10$*.9623377
-=$9.62
+10$*0.2522304
+=$2.52 is the fair value
 
 
 
 **Part (c)**
 
 
+```{r}
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+urn.vector <- c( "red", "red", "red", "red", "red", "white","white", "white", "white", "white","white", "white", "white", "white", "white","white","white", "white", "white", "white","white", "white", "white", "white", "white")
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( urn.vector, 5, replace = FALSE )
+    
+    red.ball.count <- sum( my.sample == "red" )
+    
+    if(red.ball.count >1) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+```
 
 
 
@@ -338,24 +373,26 @@ In a 6-spot Keno ticket, the player selects 6 numbers. The payout for this wager
             x < -(3 though 6)
 
            hyper(x, m, n, k)
-```{r}          
-p6<-dhyper(6, 6, 74, 20)
-cat(p6,"\n")
-p5<-dhyper(5, 6, 74, 20)
-cat(p5,"\n")
-p4<-dhyper(4, 6, 74, 20)
-cat(p4,"\n")
-p3<-dhyper(3, 6, 74, 20)
-cat(p3,"\n")
-Expected.value=(p6*1600)+(p5*50)+(p4*7)+(p3*1)
-cat(Expected.value)
-cat("expected profit = " ,Expected.value-1,"cents")
+```{r}      
+
+  p6<-dhyper(6, 6, 74, 20)
+  cat(p6,"\n")
+  p5<-dhyper(5, 6, 74, 20)
+  cat(p5,"\n")
+  p4<-dhyper(4, 6, 74, 20)
+  cat(p4,"\n")
+  p3<-dhyper(3, 6, 74, 20)
+  cat(p3,"\n")
+  Expected.value=(p6*1600)+(p5*50)+(p4*7)+(p3*1)
+  cat(Expected.value)
+  cat("expected profit = " ,Expected.value-1,"cents")
+  
 ```
 
 **Part (b)**
 
 ```{r}
-number.replications <- 100000 # bigger value as impobable to match 6
+number.replications <- 100000
 
 result.vector <- numeric( number.replications )
 
@@ -363,32 +400,32 @@ urn.vector<-seq( 1, 80)
 
 for( replication.index in 1:number.replications ) {
     
-    my.sample <- sample( urn.vector, 6, replace = FALSE )
-   # cat(my.sample ,"\n")
+    my.sample <- sample( urn.vector, 20, replace = FALSE )
+    #cat(my.sample ,"\n")
        match.numbercount <- sum( my.sample >74 )
     #cat (match.numbercount,"\n")
     #use arbitary numbers 74 - 80 as numbers
-    if(match.numbercount ==6) {
-      result.vector[ replication.index ] =1500
+    if(match.numbercount==6) {
+      result.vector[ replication.index ] =1600
     }
-     if(match.numbercount ==6) {
-      result.vector[ replication.index ] =150
+     if(match.numbercount==5) {
+      result.vector[ replication.index ] =50
      }
-     if(match.numbercount ==4) {
-      result.vector[ replication.index ] = 17
+     if(match.numbercount==4) {
+      result.vector[ replication.index ] = 7
      }
-     if(match.numbercount ==3) {
+     if(match.numbercount==3) {
       result.vector[ replication.index ] = 1
      }
-     if(match.numbercount <3) {
+     if(match.numbercount<3) {
       result.vector[ replication.index ] =0
      }
-    #cat ("result.vector[ replication.index ] ",result.vector[ replication.index ],"\n")
+    
     
 }
 
 mean( result.vector)
-# This doesn't really pan out as you never hit 6
+
 
 ```
 
@@ -422,11 +459,66 @@ Construct a simulation that will verify your calculation in Part (a) i.e. if you
 ### Problem Solution
 
 **Part (a)**
-
-
+```{r}      
+for(i in 1600:1) {
+  p6<-dhyper(6, 6, 74, 20)
+  #cat(p6,"\n")
+  p5<-dhyper(5, 6, 74, 20)
+  #cat(p5,"\n")
+  p4<-dhyper(4, 6, 74, 20)
+  #cat(p4,"\n")
+  p3<-dhyper(3, 6, 74, 20)
+  #cat(p3,"\n")
+  Expected.value=(p6*i)+(p5*50)+(p4*7)+(p3*1)
+  ##cat(Expected.value)
+  #cat("expected profit = " ,Expected.value-1,"cents")
+    if (Expected.value<=.65){
+    cat( "The must change the payot to " ,i)
+    break
+    }
+  
+}
+```
+The must change the payot to  1284, if you want to round to $1200 which is the least whole number rounded to 100 to give them a expected payout less than .65
 
 **Part (b)**
+```{r}
+number.replications <- 100000
 
+result.vector <- numeric( number.replications )
+
+urn.vector<-seq( 1, 80)
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( urn.vector, 20, replace = FALSE )
+    #cat(my.sample ,"\n")
+       match.numbercount <- sum( my.sample >74 )
+    #cat (match.numbercount,"\n")
+    #use arbitary numbers 74 - 80 as numbers
+    if(match.numbercount==6) {
+      result.vector[ replication.index ] =1200
+    }
+     if(match.numbercount==5) {
+      result.vector[ replication.index ] =50
+     }
+     if(match.numbercount==4) {
+      result.vector[ replication.index ] = 7
+     }
+     if(match.numbercount==3) {
+      result.vector[ replication.index ] = 1
+     }
+     if(match.numbercount<3) {
+      result.vector[ replication.index ] =0
+     }
+    
+    
+}
+
+mean( result.vector)
+# my result was 0.57387
+
+```
 
 
 
@@ -453,16 +545,47 @@ Construct a simulation to verify the calculation that you did in Part (a).
 ### Problem Solution
 
 **Part (a)**
+```{r}
+p3<-dhyper(0, 12, 68, 20)
+cat ("probablity of winning for player is  ", p3 ,"\n")
 
-
-
+expectedprofit<- -40*0.02322717 + 1 *(1-0.02322717)
+cat ("expectedprofit = ",expectedprofit,"\n")
+cat (" on average they will make 0.04768603 per game")
+# profit taken from the casions point of view
+```
 
 
 **Part (b)**
 
+```{r}
+number.replications <- 100000
+
+result.vector <- numeric( number.replications )
+
+urn.vector<-seq( 1, 80)
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( urn.vector, 20, replace = FALSE )
+    #cat(my.sample ,"\n")
+       match.numbercount <- sum( my.sample >68 )
+    #cat (match.numbercount,"\n")
+ # profit taken from the casions point of view
+    if(match.numbercount==0) {
+      result.vector[ replication.index ]=-40}
+       else{
+         result.vector[ replication.index ]=1
+       }
+   
+    
+    
+}
+
+mean( result.vector)
 
 
-
+```
 
 \newpage
 # Problem 8
@@ -496,10 +619,40 @@ Your challenge in this problem is to answer three questions:
 ### Problem Solution
 
 
+```{r}
+FelineForrest.vector<-seq( 65, 75)
+DillPickelson.vector<-seq( 66, 76)
+
+number.replications <- 100000
+
+DillPickelsonwin <-0
+FelineForrestwin <-0
+Tie <-0
 
 
 
-
+for( replication.index in 1:number.replications ) {
+    
+    DillPickelson.sample <- sample( DillPickelson.vector, 1, replace = FALSE )
+    FelineForrest.sample <- sample( FelineForrest.vector, 1, replace = FALSE )
+    if (FelineForrest.sample<DillPickelson.sample)
+    {
+      FelineForrestwin=FelineForrestwin+1
+    }
+    if (FelineForrest.sample>DillPickelson.sample)
+    {
+      DillPickelsonwin=DillPickelsonwin+1
+    }
+    if (FelineForrest.sample==DillPickelson.sample)
+    {
+      Tie=Tie+1
+    }
+    
+}
+cat ("probablity Dill Pickelson will win is ",DillPickelsonwin/number.replications, "\n")
+cat ("probablity Feline Forrest will win is ",FelineForrestwin/number.replications, "\n")
+cat ("probablity Tie Probablity ",Tie /number.replications, "\n")
+```
 
 
 

@@ -1,0 +1,943 @@
+---
+title: "Problem Set 8 Solutions"
+subtitle: "STAT E-80: Basic Probability Using R"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Instructions
+
+**Due:** Wednesday, April 10, 2019
+
+#Instructions
+
+First, save this notebook with a title consisting of "ProblemSet8" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet8Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+\newpage
+# Problem 1
+
+In lecture, we saw the infinite series:
+$$
+\sum_{k=0}^\infty x^k\ =\ 1 + x + x^2 + \ldots
+$$
+We used this infinite series to show that the formula for the probability function for the geometric distribution did indeed sum to 1 and thus was a valid probability distribution. In order to derive the expected value of the geometric distribution, we had to use the infinite series:
+$$
+\sum_{k=0}^\infty k \cdot x^k\ =\ 0 + x + 2x^2 + 3x^3 + \ldots
+$$
+I stated in the reading that:
+$$
+\sum_{k=0}^\infty k \cdot x^k\ =\ \frac{x}{(1-x)^2}
+$$
+Now we're going to explore this formula.
+
+
+### Part (a)
+
+Set $x = 3/7$. Then use the expression on the right-hand side of the formula to calculate the value of the infinite series.
+
+**Answer**
+```{r}
+x <- 3/7
+round( x / (1 - x)^2, 5)
+```
+
+
+
+
+### Part (b)
+
+Create a vector of the form:
+$$
+(0, 1, 2, 3, \ldots, 25)
+$$
+Then create a vector of the form:
+$$
+(x^0, x^1, x^2, \ldots, x^{25})
+$$
+Then use these two vectors to calculate the sum of the first 25 terms of the infinite series:
+$$
+\sum_{k=0}^{25} k \cdot x^k\ =\ 0 + x + 2x^2 + 3x^3 + \ldots + 25 x^{25}
+$$
+
+**Answer**
+
+```{r}
+maximum.power <- 25
+x <- 3/7
+```
+
+The first vector is easy -- just use the colon operator:
+```{r}
+first.vector <- 0:maximum.power
+```
+
+The second vector is a little more work, but it's not too bad. You can do it with a `for` loop:
+```{r}
+second.vector <- numeric( maximum.power + 1)
+
+for( vector.index in 0:maximum.power ) {
+    second.vector[ vector.index + 1 ] <- x^vector.index
+}
+
+second.vector
+```
+
+
+
+
+You could calculate `second.vector` using a vectorized operation:
+```{r}
+second.vector <- x^{0:maximum.power}
+second.vector
+```
+
+Now we can do a simple vectorized operation to multiply the corresponding elements of the two vectors:
+```{r}
+sum( first.vector * second.vector )
+```
+
+
+### Part (c)
+
+Print out a list of statements that display the successive cumulative sums of the terms of the infinite series:
+
+* The first statement should print out the numerical value of 0 x^0, whatever that might be.
+
+* The second statement should print out the numerical value of 0 * x^0 + 1 * x^1, whatever that might be.
+
+* The third statement should print out the numerical value of 0 * x^0 + 1 * x^1 + 2 * x^2, whatever that might be.
+
+I'll get you started:
+
+The cumulative total of the first 0 terms is: 0 
+The cumulative total of the first 1 terms is: 0.4285714 
+The cumulative total of the first 2 terms is: 0.7959184
+
+In the end, you should print out 26 statements.
+
+Hint: you can do this very simply using a `for` loop to accumulate a running total.
+
+**Answer**
+
+```{r}
+x <- 3/7
+
+cumulative.total <- 0
+
+for( k in 0:26 ) {
+    cumulative.total <- cumulative.total + k * x^k
+    cat( "The cumulative total of the first", k, "terms is:", cumulative.total, "\n" )
+}
+```
+
+
+
+
+
+
+
+\newpage
+# Problem 2
+
+In this problem, we will do some simple experiments with the geometric distribution.
+
+Let $X$ denote a random variable that has a geometric distribution with a probability of success $p = 0.2$. 
+
+### Part (a)
+
+Calculate the probability of observing 3 failures before the first success i.e. calculate $\Pr(X = 3)$. Don't use the `dgeom()` function, but instead use the algebraic formula from lecture:
+$$
+\Pr(X = k)\ =\ (1-p)^k \cdot p
+$$
+
+**Answer**
+
+```{r}
+probability.success <- 0.2
+(1 - probability.success)^3 * probability.success
+```
+
+
+### Part (b)
+
+Now use the `dgeom()` function to calculate $\Pr(X = 3)$.
+
+**Answer**
+
+```{r}
+dgeom(3, 0.2)
+```
+
+### Part (c)
+
+Use the formulas from lecture and reading to calculate the expected value and variance of the reading.
+
+**Answer**
+
+```{r}
+x.expected.value <- (1 - probability.success) / probability.success
+x.expected.value
+
+x.variance <- (1 - probability.success) / probability.success^2
+x.variance
+```
+
+### Part (d)
+
+Construct a simulation to confirm your calculations in parts (a), (b), and (c):
+
+* Run at least 10,000 simulation replications.
+
+* In each simulation, model the process of generating a geometric random variable by using a `while()` loop to repeatedly sample until the first success. You are welcome to use the code in the Lecture 9 R Notebook.
+
+* Finally, calculate the proportion of simulations where the value of the random variable is 3 (that's parts (a) and (b)), and then report the mean and variance.
+
+**Answer**
+
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    number.failures <- 0
+    failure.status <- "Failure"
+    
+    while( failure.status == "Failure" ) {
+        failure.status <- sample( c("Success", "Failure"), 1,
+                                  prob = c(probability.success, 
+                                           1 - probability.success))
+        if( failure.status == "Failure" ) {
+            number.failures <- number.failures + 1
+        }
+    }
+    result.vector[ replication.index ] <- number.failures
+}
+
+cat( "Probability of exactly 3 failures:", mean( result.vector == 3 ), "\n" )
+
+cat( "Mean of geometric random variable:", mean( result.vector ), "\n" )
+cat( "Variance of geometric random variable:", var( result.vector ), "\n" )
+```
+The estimated probability of exactly 3 failures before the first success should be close to 0.1024, the estimated mean should be close t0 4, and the estimated variance should be close to 20.
+
+
+
+### Part (e)
+
+Make a histogram of the `result.vector` from your simulation. Make sure you provide a main title, label the x axis, and use the `prob = TRUE` option. Also, choose a cool color from the R Colors document.
+
+**Answer**
+
+```{r}
+hist( result.vector,
+      main = "Problem 2 Simulation Results",
+      xlab = "Number of failures",
+      prob = TRUE,
+      breaks = 50,
+      col = "plum" )
+```
+
+
+
+
+
+
+
+\newpage
+# Problem 3
+
+Recall that the *cumulative probability* of a value $k$ is the probability that a random variable is less than or equal to that value; we could say that it is the probability that the random variable is at most the value $k$. In the reading, I showed that there is a nice formula for the cumulative probability for a geometric distribution with probability of success $p$:
+$$
+\Pr(X \leq k)\ =\ 1 - (1-p)^{k+1}
+$$
+
+### Part (a)
+
+Let $X$ be a geometric random variable with probability of success $p = 0.06$. Using the formula above, calculate the probability that $X$ is at most 5.
+
+**Answer**
+
+```{r}
+1 - (1 - 0.06)^(5+1)
+```
+
+### Part (b)
+
+Use the built-in R function `pgeom()` to calculate the cumulative probability that $X$ is at most 5.
+
+**Answer**
+
+```{r}
+pgeom(5, 0.06)
+```
+
+
+### Part (c)
+
+Write a simulation to confirm your calculations in parts (a) and (b). Use a `while` loop and the `sample()` function to explicitly model the process of repeating the process until the first success.
+
+**Answer**
+
+```{r}
+number.replications <- 10000
+
+probability.success <- 0.06
+
+result.vector <- numeric( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    number.failures <- 0
+    failure.status <- "Failure"
+    
+    while( failure.status == "Failure" ) {
+        
+        failure.status <- sample( c("Success", "Failure"), 1,
+                                prob = c(probability.success, 
+                                         1 - probability.success) )
+        
+        if( failure.status == "Failure" ) {
+            number.failures <- number.failures + 1
+        }
+    }
+    
+    result.vector[ replication.index ] <- number.failures
+}
+
+mean( result.vector <= 5 )
+```
+
+
+### Part (d)
+
+The survival function for a random variable is $\Pr(X > k)$, the probability that a random variable is strictly greater than some value $k$. The formula for the survival function for a geometric random variable is:
+$$
+\Pr(X > k)\ =\ (1 - p)^{k+1}
+$$
+Let $X$ be a geometric random variable with probability of success $p = 0.14$. Use this algebraic formula to calculate the probability that $X$ is strictly greater than 8.
+
+**Answer**
+
+```{r}
+(1 - 0.14)^(8+1)
+```
+
+### Part (e)
+
+Use the `pgeom()` function with the `lower.tail == FALSE` option to calculate the probability that a geometric random variable with probability of success $p = 0.14$ is strictly greater than 8.
+
+**Answer**
+
+```{r}
+pgeom(8, 0.14, lower.tail = FALSE)
+```
+
+
+### Part (f)
+
+Construct a simulation to confirm your calculations in parts (d) and (e).
+
+**Answer**
+
+```{r}
+number.replications <- 10000
+
+probability.success <- 0.14
+
+result.vector <- numeric( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    number.failures <- 0
+    failure.status <- "Failure"
+    
+    while( failure.status == "Failure" ) {
+        
+        failure.status <- sample( c("Success", "Failure"), 1,
+                                prob = c(probability.success, 
+                                         1 - probability.success) )
+        
+        if( failure.status == "Failure" ) {
+            number.failures <- number.failures + 1
+        }
+    }
+    
+    result.vector[ replication.index ] <- number.failures
+}
+
+mean( result.vector > 8 )
+```
+
+
+
+\newpage
+# Problem 4
+
+### Part (a)
+
+Suppose $X$ is a geometric random variable, with an unknown probability of success $p$. However, you know that the expected value of the random variable is 7. Determine $p$, the probability of success.
+
+**Answer** The expected value of a geometric random variable is:
+$$
+\hbox{E}[X]\ =\ \frac{1-p}{p}
+$$
+
+We can solve for $p$ in this equation, and we obtain:
+$$
+p\ =\ \frac{ 1 }{1 + \hbox{E}[X]}
+$$
+
+For our problem, the problem statement tells us that $\hbox{E}[X] = 7$. Thus,
+\begin{eqnarray*}
+p & = & \frac{ 1 }{1 + \hbox{E}[X]}\\
+\\
+& = & \frac{ 1 }{1 + 7}\\
+\\
+& = & \frac{1}{8}
+\end{eqnarray*}
+
+Let's check this:
+\begin{eqnarray*}
+\hbox{E}[X] & = & \frac{1 - \left ( \frac{1}{8} \right )}{ \left ( \frac{1}{8} \right )}\\
+\\
+& = & \frac{ \left ( \frac{7}{8} \right ) }{ \left ( \frac{1}{8} \right ) }\\
+\\
+& = & 7
+\end{eqnarray*}
+So that checks out!
+
+
+
+
+
+
+
+
+### Part (b)
+
+Verify your answer in part (a) by generating 10,000 random observations from a geometric distribution with the probability of success that you calculated, and then seeing if the mean of these observations is close to 7. You can use the `rgeom()` function for this.
+
+```{r}
+mean( rgeom( 100000, 1/8 ) )
+```
+
+### Part (c)
+
+Suppose $X$ is a geometric random variable, with an unknown probability of success $p$. However, you know that the variance of the random variable is 70/9. Determine $p$, the probability of success.
+
+**Answer** I'll be honest -- this was a little complicated. I wouldn't object if you had simply found an answer by trial-and-error. However, there is a formal mathematical solution to this problem, and I'll show you that approach now.
+
+The variance of a geometric random variable is:
+$$
+\hbox{Var}[X]\ =\ \frac{1-p}{p^2}
+$$
+
+We can multiply through by $p$, and we obtain:
+$$
+\hbox{Var}[X] \cdot p^2 + p - 1\ =\ 0
+$$
+
+This is a quadratic equation in $p$, and the solution is:
+$$
+p = \frac{-1 \pm \sqrt{ 1 + 4 \cdot \hbox{Var}[X]} }{2 \cdot \hbox{Var}[X] }
+$$
+
+Let's evaluate that nasty looking square root. We subsitute in the value for $\hbox{Var}[X]$:
+\begin{eqnarray*}
+\sqrt{ 1 + 4 \cdot \hbox{Var}[X]} & = & \sqrt{ 1 + 4 \times \frac{70}{9} }\\
+\\
+& = & \sqrt{ \frac{289}{9} }\\
+\\
+& = & \frac{17}{3}
+\end{eqnarray*}
+
+So now we have:
+\begin{eqnarray*}
+p & = & \frac{-1 + \left( \frac{17}{3} \right ) }{2 \times \left ( \frac{70}{9} \right )}\\
+\\
+& = & \frac{ \left ( \frac{14}{3} \right ) }{ \left ( \frac{140}{9} \right )}\\
+\\
+& = & 0.3
+\end{eqnarray*}
+
+Let's check our work. If we substitute $p = 0.3$ into our expression for the variance, we should get back 70/9:
+\begin{eqnarray*}
+\hbox{Var}[X] & = & \frac{1 - p}{p^2}\\
+\\
+& = & \frac{1 - 0.3}{0.3^2}\\
+\\
+& = & \frac{0.7}{0.09}\\
+\\
+& = & \frac{70}{9}
+\end{eqnarray*}
+
+It will be useful to know the decimal form of 70/9:
+```{r}
+70/9
+```
+So the variance is 7.78.
+
+
+As I mentioned, that was a lot of math! It's OK if you just searched for a value of $p$ that would give a variance of 70/9.
+
+
+
+
+
+
+### Part (d)
+
+Verify your answer in part (c) by generating 10,000 random observations from a geometric distribution with the probability of success that you calculated, and then seeing if the variance of these observations is close to 70/9. You can use the `rgeom()` function for this.
+
+```{r}
+var( rgeom( 100000, 0.3 ) )
+```
+This value should be very close to 7.78.
+
+
+
+
+
+
+
+\newpage
+# Problem 5
+
+###Part (a)
+
+Marie Antoinette is playing roulette in a European casino, and for each spin she bets on the first column. Calculate the probability that a single bet on the first column will win, and store this value in a variable called `first.column.win.probability`.
+
+**Answer**
+
+```{r}
+first.column.win.probability <- 12/37
+first.column.win.probability
+```
+
+###Part (b)
+
+Marie decides to play roulette until she wins a game. What is the exact probability that Marie will lose 5 games before she wins?
+
+**Answer**
+
+If we are counting the number of times that Marie loses before she wins, then this is a geometric distribution, where the probability of success will be the value that you calculated in part (a).
+```{r}
+dgeom(5, first.column.win.probability)
+```
+
+###Part (c)
+
+What is the probability that she will lose at least 3 games before her first win?
+
+**Answer**
+
+One way to do this is to use the `pgeom()` function:
+```{r}
+pgeom(2, first.column.win.probability, lower.tail = FALSE)
+```
+
+Or you could use this formula:
+$$
+S(3)\ =\ (1 - p)^{2 + 1}
+$$
+Evaluating this in R we have:
+```{r}
+(1-first.column.win.probability)^3
+```
+
+###Part (d)
+
+What is the expected value and the variance of the number of losses that Marie will have before her first win?
+
+**Answer**
+
+For the expected value, we have:
+```{r}
+(1 - first.column.win.probability) / first.column.win.probability
+```
+
+For the variance we have:
+```{r}
+(1 - first.column.win.probability) / (first.column.win.probability^2)
+```
+
+###Part (e)
+
+Construct a simulation that will verify your answers to parts (b), (c), and (d):
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    number.losses <- 0
+    loss.status <- "Lose"
+    
+    while( loss.status == "Lose" ) {
+        
+        loss.status <- sample( c("Win", "Lose"), 1,
+                                  prob = c(first.column.win.probability, 
+                                           1 - first.column.win.probability))
+        
+        if( loss.status == "Lose" ) {
+            number.losses <- number.losses + 1
+        }
+    }
+    result.vector[ replication.index ] <- number.losses
+}
+
+cat( "Probability of exactly 5 losses:", mean( result.vector == 5 ), "\n" )
+cat( "Probability of more than 2 losses:", mean( result.vector >= 3 ), "\n" )
+cat( "Estimated mean:", mean( result.vector ), "\n" )
+cat( "Estimated variance:", var( result.vector ), "\n" )
+```
+
+###Part (f)
+
+Make a histogram of the `result.vector` from your simulation. Make sure you provide a main title, label the x axis, and use the `prob = TRUE` option. Also, choose a cool color from the R Colors document.
+
+**Answer**
+
+```{r}
+hist( result.vector,
+      main = "Problem 6 Simulation Results",
+      xlab = "Number of non-matches",
+      prob = TRUE,
+      breaks = 36,
+      col = "cyan2" )
+```
+
+
+
+\newpage
+# Problem 6
+
+### Problem Statement
+
+Every day the philosopher Z'a'phma purchases an 8-spot Keno ticket at his local convenience store.
+
+###Part (a)
+
+What is the probability that a single ticket will have some sort of positive payout? (Remember that an 8-spot Keno ticket will payout if there are 4 or more matches.) Calculate this value, and store it in a variable named `winning.keno.probability`.
+
+**Answer**
+
+```{r}
+winning.keno.probability <- phyper(3, 8, 72, 20, lower.tail = FALSE)
+winning.keno.probability
+```
+
+###Part (b)
+
+What is the probability that Z'a'phma will not have a winning Keno ticket over a whole week? You can calculate this probability using the tools that we learned in the second lecture. (Hint: in order for Z'a'phma to not have a winning Keno ticket during the whole week, he has to lose every day, and all the days are independent.)
+
+**Answer**
+
+```{r}
+(1 - winning.keno.probability)^7
+```
+
+### Part (c)
+
+Now we'll think about this in terms of the geometric distribution. Suppose Z'a'phma decides to start playing Keno on a Sunday, and each day he buys one ticket. Let $X$ denote the number of losing tickets that Z'a'phma has before he gets a winning ticket. Then $X$ is a geometric random variable, where the probability of success is the value that you calculated in part (a). The probability that Z'a'phma doesn't get a winning ticket is just $\Pr(X \geq 7)$. Calculate this value, either by using the algebraic formula, or by using the `pgeom()` function with the `lower.tail = FALSE` option.
+
+Hint: be very careful about the inequality sign. The survival function is $\Pr(X > k)$, so the inequality is strict (i.e. it doesn't include the case $X = k$). If Z`a`phma loses for all 7 days of the week, what is the appropriate value of $k$?
+
+**Answer**
+
+If we use the algebraic formula for the survival probability, this is:
+```{r}
+(1 - winning.keno.probability)^7
+```
+
+If we use the `pgeom()` function, this is:
+```{r}
+pgeom(6, winning.keno.probability, lower.tail = FALSE)
+```
+
+###Part (d)
+
+What is the expected number of days that Z'a'phma has to play in order to get his first winning ticket?
+
+**Answer**
+
+```{r}
+(1-winning.keno.probability) / winning.keno.probability
+```
+
+
+###Part (e)
+
+Construct a simulation to confirm your answers in parts (b), (c), and (d). Try to model the process as closely as you can: use the `sample()` function without replacement to model purchasing an 8-spot Keno ticket, then use a `while()` loop to model the process of playing until a win occurs. You can store the number of losing Keno tickets in the `result.vector`, and that when you've finished the main simulation loop you can find the proportion of simulations where Z`a`phma had 7 or more losses before the first win. Also, you can calcualate the mean number of losing tickets.
+
+**Answer**
+
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+urn.vector <- c( rep("Red", 8), rep("White", 72) )
+
+for(replication.index in 1:number.replications) {
+    
+    number.losses <- 0
+    loss.status <- "Lose"
+    
+    while( loss.status == "Lose" ) {
+        
+        keno.sample <- sample( urn.vector, 20, replace = FALSE)
+        
+        number.matches <- sum( keno.sample == "Red" )
+        
+        if( number.matches >= 4 ) {
+            loss.status <- "Win"
+        } else {
+            number.losses <- number.losses + 1
+        }
+    }
+    result.vector[ replication.index ] <- number.losses
+}
+
+cat( "Estimated probability of not winning during the week:",
+     mean( result.vector >= 7 ), "\n" )
+
+cat( "Estimated mean number of failures before first win:",
+     mean( result.vector ), "\n" )
+
+```
+The estimated probability of not winning during the week should be close to 0.47, and the estimated mean value should be close to 8.77.
+
+### Part (f)
+
+Create a histogram of your result vector. Remember to label the $x$ axis, give the graph a main title, and use the `prob = TRUE` option. Looking at the graph, do you think that it is impossible for Z'a'phma to have to play for 3 weeks before he gets a winning ticket?
+
+```{r}
+hist( result.vector,
+      xlab = "Winning Keno Ticket",
+      main = "Z`a`phma Keno Tickets",
+      prob = TRUE,
+      breaks = 50,
+      col = "khaki1")
+```
+
+
+
+\newpage
+# Problem 7
+
+In the classic Birthday Problem, we asked how many people need to be in a room so that there was a 50\% probability that at least 2 of them have the same probability. One of the subtle points of this question is that we don't select any particular birthday in advance. Instead, we simply assemble the group and see if there is any match, and any day out of the 365 days in a year is just as good as any other.
+
+What if we *did* pre-select a particular day, say November 2, and then just asked people if their birthdays matched that day? This is a very different experiment, because now it doesn't matter if 2 people in the room both have a birthday on say April 28. Instead, the only birthday that can match is November 2. Now what is the number of people required so that the probability of a match is 50%? Think about this for a few moments before we investigate this -- what is your intuition about this number?
+
+To solve this problem, notice that the number of people required to obtain a match with a pre-specified birthday is in fact a geometric distribution: if we assume that birthdays are uniformly distributed, then the probability of a success is 1/365. So our question becomes: for a geometric random variable with probability of success $p = 1/365$, how large does $k$ have to be so that $\Pr(X <= k)$ is at least 0.5?
+
+###Part (a)
+
+Recall that we can express the cumulative probability function for a geometric distribution as:
+$$
+\Pr(X \leq k)\ =\ 1 - (1-p)^{k+1}
+$$
+Thus, we want to solve the inequality:
+$$
+1 - (1-p)^{k+1}\ \geq\ 0.5
+$$
+Find the smallest value of $k$ such that this equality is true, given that $p = 1/365)$. You can either solve this exactly, using algebra, or just perform a trial-and-error search.
+
+**Answer**
+
+```{r}
+k <- log( 0.5 ) / log(1 - 1/365) - 1
+k
+```
+
+###Part (b)
+
+Confirm your solution in part (a) by using the `pgeom()` function to show that your choice of $k$ really does lead to a cumulative probability that is greater than 0.5.
+
+**Answer**
+
+```{r}
+pgeom(252, 1/365)
+```
+
+###Part (c)
+
+Construct a simulation to verify your calculation. You should explicitly model the process of sampling from a uniform distribution of 365 birthdays, and keep of track of how many times you don't get a match before you get the first match. 
+
+Hint: This simulation might take a little while to run: each individual simulation replication can take a long time to run, because it can be time-consuming to model the geometric distribution for such a rare event. So at first you should use just a few replications, say 10 or 20, just to make sure that your code is working properly, and only once you've tested it should you try to run a large number of replications.
+
+
+**Answer**
+
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    number.non.matches <- 0
+    match.status <- "No Match"
+    
+    while( match.status == "No Match" ) {
+        
+        match.status <- sample( c("Match", "No Match"), 1,
+                                  prob = c(1/365, 
+                                           364/365))
+        
+        if( match.status == "No Match" ) {
+            number.non.matches <- number.non.matches + 1
+        }
+    }
+    result.vector[ replication.index ] <- number.non.matches
+}
+
+mean( result.vector <= 252)
+mean( result.vector )
+var( result.vector )
+```
+
+
+###Part (d)
+
+Make a histogram of the `result.vector` from your simulation. Make sure you provide a main title, label the x axis, and use the `prob = TRUE` option. Also, choose a cool color from the R Colors document.
+
+**Answer**
+
+```{r}
+hist( result.vector,
+      main = "Problem 6 Simulation Results",
+      xlab = "Number of non-matches",
+      prob = TRUE,
+      breaks = 50,
+      col = "seagreen2" )
+```
+
+
+
+
+
+
+
+
+
+
+\newpage
+# Problem 8
+
+Now we're going to adjust the classic Birthday Problem.
+
+One of the objections that people sometimes make to the argument in the classic Birthday Problem is that we assume that birthdays are uniformly distributed across the days of the year, and this generally isn't true. 
+
+### Part (a)
+
+Before, we simulated people's birthdays by sampling values from a uniform distribution on the numbers 1 through 365, and interpreting these numerical values as representing days of the year. For this problem, instead of a uniform distribution, use a binomial distribution with $n = 365$ and $p = 0.5$. You can still interpret the numerical values as days of the year, but they won't be uniformly distributed. With this non-uniform distribution on birthdays, find the smallest number of people in a room such that there is a 50\% probability that at least two people will have the same "birthday". You should use the `rbinom()` function to generate your random sample of birthdays.
+
+With a uniform distribution on birthdays, we were able to do an exact calculation to obtain the answer, which we then verified using the simulation. I am not aware of any such method when the distribution of birthdays is not uniform; perhaps it exists, but I don't know about it. So the only way that I can think of to solve this problem is to use a simulation. You are welcome to borrow any code from before, either mine or yours, and in fact it should only require a simple modification to incorporate the binomial distribution. Then you'll just have to search by trial-and-error.
+
+```{r}
+number.replications <- 10000
+
+sample.size <- 8
+
+result.vector <- numeric( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    birthday.sample <- rbinom(sample.size, 365, 0.5)
+    
+    result.vector[ replication.index ] <- any( duplicated( birthday.sample ) )
+}
+
+mean( result.vector )
+```
+
+
+### Part (b)
+
+You should find that the number in part (a) is much lower than what we found before (with a uniform distribution of birthdays, 23 people were required). Draw a random sample of 10,000 "birthdays" from a binomial distribution with $n = 365$ and $p = 0.5$, and then display a histogram of the distribution. Can you see from the histogram why your answer in part (a) is so much lower than the value we obtained with a uniform distribution of birthdays?
+
+**Answer**
+
+```{r}
+random.birthday.sample <- rbinom(10000, 365, 0.5)
+
+hist( random.birthday.sample,
+      main = "Distribution of binomial birthdays",
+      xlab = "Birthday",
+      xlim = c(0,365),
+      prob = TRUE,
+      col = "lavenderblush3" )
+```
+
+
+### Part (c)
+
+Now we will place a different non-uniform distribution on the birthdays. This time, use a geometric distribution, with $p = 0.05$. Use the `rgeom()` function to generate a random sample of "birthdays", and then test to see if the sample contains any duplicates. How large does the sample have to be so that there is a 50% chance of a duplicate?
+
+```{r}
+number.replications <- 100000
+
+sample.size <- 8
+
+result.vector <- numeric( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    birthday.sample <- rgeom(sample.size, 0.05)
+
+    result.vector[ replication.index ] <- any( duplicated( birthday.sample ) )
+}
+
+mean( result.vector )
+```
+
+```{r}
+365 * 0.5 * 0.5
+
+(1 - 0.08) / 0.08^2
+```
+
+
+### Part (d)
+
+Draw a random sample of 10,000 "birthdays" from a binomial distribution with $n = 365$ and $p = 0.05$, and then display a histogram of the distribution. Can you see from the histogram how your answer in part (c) is different from both the value we obtained with a uniform distribution of birthdays, and also the value we obtained with a binomial distribution of birthdays?
+
+
+```{r}
+random.birthday.sample <- rgeom(10000, 0.05)
+
+hist( random.birthday.sample,
+      main = "Distribution of geometric birthdays",
+      xlab = "Birthday",
+      xlim = c(0,365),
+      prob = TRUE,
+      breaks = seq(from = -0.5, to = 350.5, by = 5),
+      col = "antiquewhite1" )
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

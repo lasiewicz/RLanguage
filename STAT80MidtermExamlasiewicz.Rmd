@@ -1,0 +1,751 @@
+---
+title: "Midterm Exam"
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+# Instructions
+
+This exam will be released at 7:30 PM on Wednesday, March 13, and is due at 5:00 PM on Wednesday, March 20. There is no time limit for the exam, and you are welcome to download the exam as soon as it becomes available and work on it as long as you wish, as long as you upload it within by the deadline.
+
+This exam is open-book, open-notes, and open-assignment, and you are encouraged to use the available code to design your solutions to the problems. All the problems are based on material that we've covered in class and the problem sets. If you want to, you are welcome to use general resources such as other textbooks, Wikipedia, Khan academy, or the R documentation, although I don't think that they will be necessary or even particularly helpful. However, you may not seek out assistance on any issue that is specific to this exam, and all the work that you submit must be your own. You must also electronically sign the honor pledge below for your exam to be considered complete.
+
+# Honor Pledge
+
+I promise that all the work on this exam is my own, and I have neither received nor given assistance on any of the questions.
+
+**Signature:**  
+William J Lasiewicz
+
+
+\newpage
+# Problem 1
+
+The Chevalier de Mere has invented a new game. He has four urns, each filled with numbered balls:
+
+* The first urn has 5 balls, numbered 1 through 5.
+
+* The second urn has 6 balls, numbered 1 through 6.
+
+* The third urn has 7 balls, numbered 1 through 7.
+
+* The fourth urn has 8 balls, numbered 1 through 8.
+
+In the game, a player selects one ball at random from each urn. If at least one of the balls has the number 1, the player wins \$2; otherwise, the player receives nothing. The initial wager is \$1.
+
+### Part (a)
+
+What is the probability of winning the game?
+
+**Answer**
+The probablity of at least one,  is 1- probablity of none
+
+
+
+```{r}
+1-((4/5)*(5/6)*(6/7)*(7/8))
+```
+
+
+
+### Part (b)
+
+Is this a fair game?
+
+**Answer*
+pefectly fair game
+expected value is probablity of winning * amount of win
+=.5*2
+expected profit is 1-(.5*2)
+1-1 =0
+Expected profit is 0,  This game is as fair as it gets.
+
+
+### Part (c)
+
+Construct a simulation to verify your probability calculation in part (a), along with demonstrating your answer in part (b).
+
+**Hint:** since each of the urns is essentially a different probability distribution, you'll need a separate line of code for each one to model the sampling process. Once you have the four numbers you should then put them into a vector and the rest of the problem should be familiar.
+
+**Answer**
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+profit.vector <- numeric( number.replications )
+
+for(replication.index in 1:number.replications) {
+    firsturn.ball <- sample( 1:5, 1 )
+    secondurn.ball <- sample( 1:6, 1 )
+    thirdurn.ball <- sample( 1:7 , 1 )
+    fourthurn.ball <- sample( 1:8, 1 )
+    
+    if ((firsturn.ball == 1) || (secondurn.ball == 1) || (thirdurn.ball == 1) || (fourthurn.ball  == 1)) {
+        result.vector[ replication.index ] <- FALSE
+        profit.vector[ replication.index ] <- -1
+    }
+    else
+    {
+      result.vector[ replication.index ] <- TRUE
+        profit.vector[ replication.index ] <- 1
+    }
+}
+
+cat( "Average number of times winning:", mean( result.vector ), "\n" )
+cat( "Average profit:", mean( profit.vector ), "\n" )
+cat ("My run gave me Average number of times winning: 0.5034 Average profit: 0.0068 which is very consistant")
+```
+
+
+
+
+
+
+\newpage
+# Problem 2
+
+### Part (a)
+
+The planet Xlaqtl orbits the star Zarkon-4QZ, but it is unknown how many Xlaqtl days occur in a single Xlaqtl year. Fortunately, we know the sacred prophecy of the great Xlaqtl prophet Z'a'phma: "Truly it is said, that if 87 of the people of Xlaqtl come into a room, then the probability that at least two of them will have the same birthday is at least 60\%." By the central planning of the Xlaqtl government, Xlaqtl birthdays are uniformly distributed, so that each person is equally likely to be born on any particular Xlaqtl day.
+
+### Part (a)
+
+Calculate an exact value for the largest number of days in the Xlaqtl year so that the sacred prophecy of the prophet Z'a'phma is true. (You can use trial-and-error to determine this.)
+
+**Answer**
+# for this problem,  I will use the birthday formalua and loop though until I get the right answer
+
+```{r}
+number.replications <- 10000
+
+for(x in number.replications:1) {
+  answer <- 1 - prod( seq( from = 1, by = -1/x, length.out = 87
+                 ) )
+  #
+  if (answer >= .60){
+    cat(answer ,"\n")
+    break
+  }
+}
+cat ("the Xlaqtl year is " ,x, " days long" )
+
+```
+
+
+
+
+### Part (b)
+
+Construct a simulation to verify your calculation in part (a).
+
+**Answer**
+```{r}
+
+# My iterative approch told me that with a 4111 day long year I got a probablity of 0.6000629 
+
+number.replications <- 10000
+
+# We'll need a vector to store the results of our simulations:
+
+result.vector <- logical( number.replications )
+
+
+# Now we're going to run this experiment repeatedly:
+
+for(replication.index in 1:number.replications) {
+  
+  # For each time through the for loop, we generate a new random sample:
+  #we use 87 as the given answer above
+  
+  birthday.sample <- sample(1:4111, 87, replace = TRUE)
+  
+  # Now let's test to see if the random sample has any duplicate elements. If
+  # if does, then set the corresponding value of result.vector equal to TRUE.
+  # Otherwise, do nothing, because by default when we created result.vector it
+  # will be populated with FALSE values
+  
+  if( any( duplicated(birthday.sample) ) ) {
+    result.vector[ replication.index ] = TRUE
+  }
+}
+
+# As before, we calculate the proportion of TRUE elements by using
+# the mean() function:
+
+cat( "The estimated probability of a match is:", mean( result.vector ) )
+# the answer I got running this was 0.6022
+```
+
+
+
+
+
+\newpage
+# Problem 3
+
+A specialized piece of machinery consists of 10 components. Each component can fail with common probability $p$, and all the components are independent of one another. If even one component fails, then the whole machine will fail. The manufacturer would like to determine the value of $p$ such that the overall probability of the machine failing is 5\%.
+
+### Part (a)
+
+Calculate an exact value of $p$, and store this in a variable named `problem.3.p`. It's possible to solve for $p$ exactly using algebra, but if you don't feel comfortable with this you are welcome to use trial-and-error guessing, although if you do this you should try to get a very accurate estimate.
+
+**Answer**
+
+.05=1-((problem.3.p)^10))
+-.95=-problem.3.p)^10
+.95=problem.3.p^10
+root(.95, 10)=problem.3.p
+0.9948838031=problem.3.p
+
+```{r}
+problem.3.p<-0.9948838031
+cat ("problem.3.p is equal to ",problem.3.p , "\n")
+
+# check out my rusty algebra
+
+check<-1-((problem.3.p)^10)
+cat ("if check is = .05 I did this correct" , check)
+
+```
+
+
+### Part (b)
+
+Construct a simulation to validate your calculation in part (a).
+
+**Answer**
+
+```{r}
+problem.3.p<-0.9948838031
+number.replications <- 10000
+
+
+result.vector <- logical( number.replications )
+
+
+
+for( replication.index in 1:number.replications ) 
+  {
+    machine.sample <- 10
+    for( s in 1:10) {
+      x1 <- runif(1, 0, 1)
+      if( x1>=problem.3.p ) {
+        machine.sample[ s ] <- FALSE
+      }
+      else
+      {
+         machine.sample[ s ] <- TRUE
+      }
+    }
+
+    if( all(machine.sample == TRUE) ) {
+    result.vector[ replication.index ] <- TRUE
+    }
+    else
+    {
+      result.vector[ replication.index ] <- FALSE
+    }
+  }
+
+successrate<-mean( result.vector )
+failurerate<-1-successrate 
+cat ("mean results or success rate =",successrate)
+
+cat ("\n","failure rate = ",failurerate)
+cat ("\n","\n"," This result is very close to .05")
+
+```
+
+
+
+
+\newpage
+# Problem 4
+
+Pierre de Fermat has been having some money problems, so he has opened his own casino, with a special feature: his roulette wheel has a 000 pocket, in addition to the usual 0 and 00 pockets. The positive numbers on the wheel still range from 1 to 36, so there are now a total of 39 pockets.
+
+### Part (a)
+
+Blaise Pascal is playing roulette at Fermat's casino, and he places a combined bet of \$3 on the even numbers and \$5 on the third column. What is the expected value of the profit of this bet? (Recall that the payout for a \$1 bet on the even numbers is \$2 and the payout for a \$1 bet on the third column in \$3.)
+
+**Answer**
+
+36 numbers
+18 even
+12 in third column,  6 even
+on 6 in third column payout will be 15
+on 6 in third column payout will be 21
+on 12 even not in third column payout will be 6
+15 left payout is 0
+```{r}
+x.support.vector <- c(15, 21, 6, 0)
+x.probablity.vector <- c(6/39, 6/39, 12/38, 15/38)
+x.expected.value <- sum( x.support.vector * x.probablity.vector )
+cat ("x.expected.value ", x.expected.value, "\n")
+x.expectedprofit=x.expected.value -8
+cat ("expected profit", x.expectedprofit, "\n")
+
+
+```
+
+
+
+
+
+### Part (b)
+
+What is the variance of Pascal's bet?
+
+**Answer**
+
+
+```{r}
+x.support.vector <- c(15, 21, 6, 0)
+x.probablity.vector <- c(6/39, 6/39, 12/38, 15/38)
+x.expected.payout <- sum( x.support.vector *
+                                      x.probablity.vector )
+x.expected.value <- sum( x.support.vector * x.probablity.vector )
+
+
+variance <- sum( (x.support.vector - x.expected.payout)^2 * x.probablity.vector )
+cat(" the variance is ",variance)
+
+
+```
+
+
+
+
+
+
+### Part (c)
+
+Construct a simulation to verify your results in parts (a) and (b).
+
+**Answer**
+
+```{r}
+
+third.column.vector <- c(3,6,9,12,15,18,21,24,27,30,33,36)
+
+even.vector <- c(2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36)
+
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, let's spin the roulette wheel:
+    
+    roulette.outcome <- sample(1:39, 1, replace = TRUE )
+    
+    
+    
+    payout <- 0
+    
+    ## First we'll check to see if the Second Dozen
+    ## bet won:
+    
+    if( roulette.outcome %in% third.column.vector ) {
+        
+       
+        
+        payout <- payout + 15
+        
+    }
+    
+    if( roulette.outcome %in% even.vector ) {
+        
+     
+        
+        payout <- payout + 6
+    }
+    
+    ## Now we store the total payout
+    ## in result.vector:
+    
+    result.vector[ replication.index ] <- payout
+}
+cat( "The estimated value of his profit is:", 
+     (mean(result.vector)-8), "\n" )
+cat( "The estimated variance of the payout is:", 
+     round( var( result.vector ), 2), "\n" )
+```
+
+
+
+
+\newpage
+# Problem 5
+
+When Dill Pickelson is not playing golf, he enjoys making artisanal gourmet pickles. Dill has 25 vats of pickles that are fermenting using his secret recipe, but he thinks that some of them might have problems. Unfortunately he doesn't have enough resources to test all 25 pickle vats, so he decides to sample a limited number of the vats and test them.
+
+
+### Part (a)
+
+Suppose that 5 of the pickle vats have problems. If Dill draws a sample of size 4, what is the probability that he will detect at least one of the problem pickle vats?
+
+**Answer**
+Assuming a "bad" vat contains all bad pickles.
+
+            from the lecture
+But a better approach is to use the built-in function `dhyper()`, which takes 4 arguments:
+
+* The first argument is $x$, the number of bad vats observed in the sample.
+
+* The second argument is $m$, the number of bad vats in the population.
+
+* The third argument is $n$, the number of good vats in the population.
+
+* The fourth argument is $k$, the number of balls in the sample.
+         
+```{r}
+      
+
+gettingnobadvate<- dhyper( 0, 5, 20, 4 )
+cat("probablity of getting no bad vats ",gettingnobadvate , "\n")
+# use complement rule
+cat( "\n")
+cat("the probability that he will detect at least one of the problem pickle vats=" ,1-gettingnobadvate)
+
+```
+          
+
+
+
+
+### Part (b)
+
+Construct a simulation to verify your result in part (a).
+
+**Answer**
+
+
+```{r}
+vat.vector <- c( rep("good", 20), rep("bad", 5) )
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( vat.vector, 4, replace = FALSE )
+    
+    bad.pickle.count <- sum(my.sample == "bad")
+    
+    if( bad.pickle.count >0 ) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+cat("the proportion of time he found at least one bad vat is " ,mean( result.vector ))
+
+```
+
+
+
+
+### Part (c)
+
+Determine how many samples Dill should draw in order to have at least a 80\% probability of detecting at least one vat with problems.
+
+**Answer**
+```{r}
+# I will use an iterative approace to find the answer
+for( pickle.index in 1:25 ) {
+  gettingnobadvate<- dhyper( 0, 5, 20, pickle.index )
+  proofgettingabadvat=1-gettingnobadvate
+  if (proofgettingabadvat>=.8){
+    samplestodo<-pickle.index
+    break
+  }
+}
+
+         
+cat("he will have to sample ",samplestodo , "vats to get a ",proofgettingabadvat, " probablity")
+
+```
+
+
+
+
+
+### Part (d)
+
+Construct a simulation to verify your calculation in part (c).
+
+**Answer**
+
+```{r}
+vat.vector <- c( rep("good", 20), rep("bad", 5) )
+number.replications <- 10000
+
+result.vector <- logical( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( vat.vector, 7, replace = FALSE )
+    
+    bad.pickle.count <- sum(my.sample == "bad")
+    
+    if( bad.pickle.count >0 ) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+cat("the proportion of time he found at least one bad vat is " ,mean( result.vector ))
+
+```
+
+
+
+
+\newpage
+# Problem 6
+
+In Keno, an 8-spot ticket is one in which a player selects 8 numbers. As usual, a sample of size 20 is drawn without replacement from an urn containing numbered balls, with the numbers ranging from 1 through 80. The payout for the game depends on how many of the player's numbers match the numbers in the sample of size 20. In Massachusetts Keno, the payouts for a $1 bet are:
+
+|Match|Payout|
+|:---:|-----:|
+|  8  | $15,000 |
+|  7  |   1,000 |
+|  6  |      50 |
+|  5  |      10 |
+|  4  |       2 |
+
+The payouts scale proportionately to the size of wager, so a \$2 wager would receive payouts that are 2 times as large, a \$10 wager would receive payouts that are 10 times as large, and so.
+
+### Part (a)
+
+Calculate the probability of a winning 8-spot ticket. That is, calculate the probability that an 8-spot ticket will have some positive payout.
+
+**Answer**
+
+```{r}
+
+p8<-dhyper(8, 8, 72, 20)
+p7<-dhyper(7, 8, 72, 20)
+p6<-dhyper(6, 8, 72, 20)
+p5<-dhyper(5, 8, 72, 20)
+p4<-dhyper(4, 8, 72, 20)
+
+probablity.winningticket<-p8+p7+p6+p5+p4
+cat ("probability that an 8-spot ticket will have some positive payout is ",probablity.winningticket)
+
+```
+
+
+
+### Part (b)
+
+Calculate the expected payout and expected profit for a \$5 8-spot Massachusetts Keno ticket.
+
+```{r}
+
+p8<-dhyper(8, 8, 72, 20)
+p7<-dhyper(7, 8, 72, 20)
+p6<-dhyper(6, 8, 72, 20)
+p5<-dhyper(5, 8, 72, 20)
+p4<-dhyper(4, 8, 72, 20)
+
+
+expected.payout=((p8*15000)+(p7*1000)+(p6*50)+(p5*10)+(p4*2))*5
+cat ("the expected payout ",expected.payout,"\n")
+expected.profit= expected.payout -5
+cat ("the expected profit ",expected.profit)
+
+```
+
+
+
+### Part (c)
+
+Construct a simulation to verify your answers in parts (a) and (b).
+
+**Answer**
+
+```{r}
+number.replications <- 100000
+
+result.vector <- numeric( number.replications )
+
+urn.vector<-seq( 1, 80)
+
+for( replication.index in 1:number.replications ) {
+    
+    my.sample <- sample( urn.vector, 20, replace = FALSE )
+
+       match.numbercount <- sum( my.sample >72 )
+
+    #use arbitary numbers 73 - 80 as numbers
+    if(match.numbercount==8) {
+      result.vector[ replication.index ] <- 75000
+    }
+     if(match.numbercount==7) {
+      result.vector[ replication.index ] <- 5000
+     }
+     if(match.numbercount==6) {
+      result.vector[ replication.index ] <-  250
+        }
+     if(match.numbercount==5) {
+      result.vector[ replication.index ] <-  50
+     }
+     if(match.numbercount==4) {
+      result.vector[ replication.index ] <- 10
+     }
+    
+    
+}
+
+mean( result.vector)
+cat ("the expected payout in the simulaton ",mean( result.vector),"\n")
+expected.profit= expected.payout -5
+cat ("the expected profit in the simulaton",mean( result.vector)-5)
+
+```
+
+
+\newpage
+# Problem 7
+
+Chicken Curry is one of the best players in the NBA. In any game, the total number of points that Chicken scores follows this probability distribution:
+
+|Points|Probability|
+|:----:|:---------:|
+| 20 | 0.15 |
+| 25 | 0.25 |
+| 30 | 0.35 |
+| 35 | 0.15 |
+| 40 | 0.10 |
+
+Chicken Curry's great rival in the NBA is Kobe Beef. In any game, the total number of points that Kobe scores follows this probability distribution:
+
+|Points|Probability|
+|:----:|:---------:|
+| 20 | 0.10 |
+| 25 | 0.20 |
+| 30 | 0.40 |
+| 35 | 0.20 |
+| 40 | 0.10 |
+
+You should assume that the total number of points that Chicken scores is independent from the total number of points that Kobe scores.
+
+### Part (a)
+
+Chicken and Kobe are both playing in a game tomorrow. Use the Law of Total Probability to calculate the probability that Chicken and Kobe will score the same number of points.
+
+**Answer**
+
+```{r}
+#this is easy as you just have to muliply the probablty of each scoring the same score
+Probablity.tie<-(.15*.1)+(.25*.2)+(.35*.4)+(.15*.2)+(.1*.1)
+cat("the probablity of a tie is ",Probablity.tie)
+```
+
+
+
+
+### Part (b)
+
+Construct a simulation to validate your calculation in part (a)
+
+**Answer**
+
+```{r}
+number.replications <- 10000
+
+result.vector <- numeric( number.replications )
+
+for(replication.index in 1:number.replications) {
+    kobe.score <- sample (c(20,25,30,35, 40),1,replace=TRUE, prob = c(0.1, 0.2, 0.4,0.2,0.1) )
+    chicken.score <- sample ( c(20,25,30,35, 40),1,replace=TRUE, prob = c(0.15, 0.25, 0.35,0.15,0.1) )
+    
+    if( kobe.score  == chicken.score ) {
+        result.vector[ replication.index ] <- TRUE
+    }
+}
+
+cat( "Kobe ties Chicken in simulation:", mean( result.vector ), "\n" )
+```
+
+
+
+
+\newpage
+# Problem 8
+
+Champion golfer Feline Forrest and his arch-rival Dill Pickelson are playing a 4-round tournament against each other! Each day from Thursday through Sunday both Feline and Dill will play 18 holes of golf, and the player's overall score for the tournament is the sum of his four daily scores.  For each day, Feline's scores range from 65 through 75, with all values equally likely, and each day's score is independent of the others.  For each day, Dill's scores range from 66 through 76, with all scores equally likely, and each day's score is independent of the others.
+
+
+In golf, a player's score is an integer (i.e.\ a whole number) and the player with the *lowest* score wins.
+
+Your challenge in this problem is to answer three questions:
+
+* What is the probability that Feline will win the 4-day tournament?
+
+* What is the probability that Dill will win the 4-day tournament?
+
+* What is the probability that at the end of 4 daysthe two will tie i.e.\ have the same score?
+
+In principle, it would be possible to calculate the exact values for these numbers using the Law of Total Probability, but this would be extremely laborious to do. Instead, you should build a simulation to provide approximate answers to these three questions. 
+
+**Answer**
+
+```{r}
+number.replications <- 10000
+# Here are the three result vectors:
+
+feline.win.vector <- logical( number.replications )
+dill.win.vector <- logical( number.replications )
+tie.vector <- logical( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    # all I had to do is change the code to take 4 out of the same, change replace to true and add them up
+    feline.score <- sum(sample(65:75, 4,replace=TRUE))
+    dill.score <- sum(sample(66:76, 4,replace=TRUE))
+    if( feline.score < dill.score ) {
+        feline.win.vector[ replication.index ] <- TRUE
+    } else if (dill.score < feline.score) {
+        dill.win.vector[ replication.index ] <- TRUE
+    } else {
+        tie.vector[ replication.index ] <- TRUE
+    }
+}
+
+mean( feline.win.vector )
+mean( dill.win.vector )
+mean( tie.vector )
+cat ("The probability that Feline will win the 4-day tournament is ",mean( feline.win.vector ),"\n")
+cat ("The probability that Dill will win the 4-day tournament is ",mean( dill.win.vector ),"\n")
+cat ("The probability that Dill will Tie ",mean( tie.vector ),"\n")
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

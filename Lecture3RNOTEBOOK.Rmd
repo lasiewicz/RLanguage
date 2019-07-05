@@ -1,0 +1,531 @@
+---
+title: "Lecture 3: Expectations and Fair Values R Notebook"
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+
+
+# More R Stuff
+
+### The `seq()` function
+
+We've seen how to use the colon operator to define a range of values. For instance, we can construct a vector consisting of the range of values from 2 to 9 this way:
+```{r}
+2:9
+```
+
+But sometimes we want more. In particular, the colon operator always increments values by 1, and we might want to increment by something else -- perhaps we want a range of values where the increment is 2, or perhaps we want the increment to be 0.5. A simple solution for this is the function `seq()`. There are many different options for this function, but for this course I'm going to suggest a simplified approach:
+
+* We specify the starting value using the parameter `from`.
+
+* We specify the increment by using the parameter 'by'.
+
+* We specify the length of the sequence by using the parameter 'length.out'.
+
+Thus, to create a sequence of length 6 starting at the value 1.3 and decreasing by an increment of -0.7, we would write:
+```{r}
+seq( from = 1.3, by = -0.7, length.out = 6)
+```
+
+
+
+### The `duplicated()` function
+
+To run a simulation for solving the Birthday Problem, we're going to need a new function, called `duplicated()`. This function takes an input argument vector and returns a logical vector that is true if the corresponding element in the original vector is a duplicate of some other previous element. Let's see this function at work:
+```{r}
+duplicated( c(1, 2, 3, 1, 1) )
+```
+
+In this example, the output vector is TRUE in positions 4 and 5, and that's because the input vector had values of 1, which were duplicates of the first element.
+
+Notice that if there are no duplicates in the list, then `duplicated()` will return a logical vector consisting entirely of FALSE values:
+
+```{r}
+duplicated( c(1, 2, 3, 4, 5) )
+```
+
+We'll actually find it more useful to use `duplicated()` in conjunction with the `any()` function. Since `any()` returns TRUE if at least one element is TRUE, we can use these two functions to determine if at least one element is a duplicate. For instance, we know that our first example did indeed have at least one duplicated element, so this should evaluate to TRUE:
+```{r}
+any( duplicated( c(1, 2, 3, 1, 1) ) )
+```
+
+Conversely, the second example did not have any duplicated elements, so this code should evaluate to FALSE:
+```{r}
+any( duplicated( c(1, 2, 3, 4, 5) ) )
+```
+
+
+
+
+### Non-uniform sampling
+
+We know how to use the `sample()` function to randomly sample from a vector. For instance, if we have a vector consisting of four numbers, then `sample()` can generate a random sample drawn from this input vector:
+```{r}
+sample( c(1, 8, 17, -24), 40, replace = TRUE)
+```
+When we use `sample()` this way, it always samples *uniformly* -- that is, each element of the input vector is equally likely to be randomly selected. But what if we don't want a uniform distribution? Instead, we might want to select of the objects in the input vector more often or less often than others. To do this, we include an optional parameter named `prob`, which is a vector the same length as the input vector and contains the desired sampling probabilities. Thus, suppose in this example that we want to sample the number 17 with probability 50%, the numbers 1 and -24 with probability 20% each, and the number 8 with probability 10%. Then we could do this:
+```{r}
+sample( c(1, 8, 17, -24), 100, replace = TRUE, prob = c(0.2, 0.1, 0.5, 0.2) )
+```
+
+If you look at the output from this code, you should see a lot of occurences of 17, some occurences of 1 and -24, and a few of 8.
+
+
+
+### Printing out results: the `cat()` and `round()` functions
+
+So far, when we've finished a simulation, we've just printed out a number, typically the mean of some vector. It would be nice to be able to present our results in a more readable form, especially if we are reporting multiple different results from a simulation. There are many different ways to print out messages in R, but for this course I'm going to recommend using the `cat()` function, which takes an arbitrary number of input arguments and prints them out on a line. For instance, we can print out a simple string:
+```{r}
+cat( "Hi Mom!" )
+```
+We can print out multiple strings:
+```{r}
+cat( "Hi Mom!", "Hi Dad!" )
+```
+Notice that `cat()` automatically places a space between the strings; you can override this if you want to. On the other hand, `cat()` does **not** put a carriage return at the end of a line, and it will print out multiple commands on the same line:
+```{r}
+cat( "Hi Mom!" )
+cat( "Hi Dad!" )
+```
+The solution to this is to explicitly include a carriage return, which we write as "\\n" in R:
+```{r}
+cat( "Hi Mom!\n" )
+cat( "Hi Dad!" )
+```
+
+What makes `cat()` very useful for us is that it will evaluate any R function calls before it prints the results to the screen. For instance, let's create a vector with some random values:
+```{r}
+cat.test.vector <- sample( 1:20, 100, replace = TRUE )
+```
+
+Now let's print out the mean and variance of this vector:
+```{r}
+cat( "The mean of cat.test.vector is:", mean(cat.test.vector), "\n" )
+cat( "The standard deviation of cat.test.vector is:", sd(cat.test.vector), "\n" )
+```
+This looks a lot better than before! Rather than just print out some numbers, now we can provide context for what we're reporting.
+
+The only issue with `cat()` is that sometimes it can print out too many digits. You can see that with our result for the standard deviation: there are a lot of digits after the decimal place. To control this, we can use the `round()` function, which takes two arguments: a numeric value, and the number of digits after the decimal place. Then the `round()` function will return a numeric value with the specified number of digits. So, to print out the standard deviation with only two digits, we have:
+```{r}
+cat( round( sd(cat.test.vector), 2 ) )
+```
+Putting this all together, we have:
+```{r}
+cat( "The mean of cat.test.vector is:", mean(cat.test.vector), "\n" )
+cat( "The standard deviation of cat.test.vector is:",
+     round( sd(cat.test.vector), 2 ), "\n" )
+```
+
+
+### Character vectors
+
+Although most of our focus in R will be focused on numeric and logical values, sometimes it's useful to be able to work with character strings. A "string" is a sequence of characters, enclosed in quotes, like this:
+```{r}
+"This is a string."
+```
+Character strings can be stored in a vector:
+```{r}
+c( "This", "is", "a", "character", "vector" )
+```
+Notice that the character vector treats every element as a separater object, and it doesn't combine the individual elements to make a sentence. As usual, the standard rule applies: all the elements in a vector have to be of the same type. So, if one element is a character string, then everything is going to be a character string:
+```{r}
+c( "I", "will", "trick", "R", "with", "the", "number", 12)
+```
+Notice that here R automatically converted the numeric value 12 into a character representation, so that the vector can comply with the rule that all the values have to be the same type.
+
+Character strings can be input arguments to functions and operators when appropriate. For instance, we've already used the `c()` function to combine individual strings into a vector. Conversely, we can't use arithmetic operations on strings, even when we can interpret the strings as numbers; this code will generate an error:
+```{r error = TRUE}
+"5" + "3"
+```
+
+We'll often be interested in testing strings for equality, and here we can use the usual "==" operator:
+```{r}
+a <- "Hedgehog"
+
+if( a == "Armadillo") {
+  cat( 'The string "a" is equal to the string "Armadillo"')
+} else if (a == "Hedgehog") {
+  cat( 'The string "a" is equal to the string "Hedgehog"' )
+}
+
+```
+
+
+
+
+
+
+# The Birthday Problem
+
+Now let's move onto the Birthday Problem. Here we have a random sample of people in a room, and we want to know how large this collection of people has to be so that the probability is 50\% that at least 2 people will have the same birthday. Remember that we don't specify the particular birthday in advance. Instead, the particular date of the birthday can be any day of the year, and all we are interested in is whether or not at least 2 people have the same birthday, whatever it is. We also make the simplifying assumption that each day of the year is equally likely to be a birthday.
+
+
+### The exact solution
+
+We saw in lecture that we could calculate the probability exactly, and for $n = 23$ we have:
+$$
+\Pr(A)\ =\ 1 - \left ( \frac{365}{365} \right ) \times \left ( \frac{364}{365} \right ) \times \ldots \times \left ( \frac{365 - 23 + 1}{365} \right )
+$$
+
+Let's think about that big complicated product on the right-hand side. How can we program R to calculate this? Notice that we have a sequence of numbers, starting with 365/365 = 1, and decreasing by increments of -1/365. Finally, there are 23 such terms. So we can use the `seq()` function to generate such a sequence:
+```{r}
+seq( from = 1, by = -1/365, length.out = 23 )
+```
+Now that we have this sequence, we want to multiply all the numbers together and then subtract the product from 1:
+```{r}
+1 - prod( seq( from = 1, by = -1/365, length.out = 23 ) )
+```
+So this is the exact answer for the probability of at least one duplicated birthday in a group of 23 people.
+
+
+### Simulating the birthday problem
+
+We can check this calculation by simulation. We'll generate multiple samples of 23 birthdays, and then check to see if any two are equal using the `duplicated()` function:
+```{r}
+
+# As before, let's first set the number of replications:
+
+number.replications <- 10000
+
+# We'll need a vector to store the results of our simulations:
+
+result.vector <- logical( number.replications )
+
+
+# Now we're going to run this experiment repeatedly:
+
+for(replication.index in 1:number.replications) {
+  
+  # For each time through the for loop, we generate a new random sample:
+  
+  birthday.sample <- sample(1:365, 23, replace = TRUE)
+  
+  # Now let's test to see if the random sample has any duplicate elements. If
+  # if does, then set the corresponding value of result.vector equal to TRUE.
+  # Otherwise, do nothing, because by default when we created result.vector it
+  # will be populated with FALSE values
+  
+  if( any( duplicated(birthday.sample) ) ) {
+    result.vector[ replication.index ] = TRUE
+  }
+}
+
+# As before, we calculate the proportion of TRUE elements by using
+# the mean() function:
+
+cat( "The estimated probability of a match is:", mean( result.vector ) )
+```
+
+
+
+
+
+# Random variables
+
+### Expectation of the finite random variable
+
+To calculate the expectation of a random variable, we multiply each realized value by the probability that the random variable will take on that value, and then add all of these terms together. Because R operates on vectors component-wise, this is easy to do. Let's look at the example from lecture. First, let's define a vector with the realized values of the random variable:
+```{r}
+x.support.vector <- c(0, 1, 5, 20)
+```
+
+Next, we'll define a vector with the corresponding probabilities for each of the values in the support:
+```{r}
+x.probability.vector <- c(0.55, 0.3, 0.1, 0.05)
+```
+
+Now we can multiply each value by its corresponding probability:
+```{r}
+x.support.vector * x.probability.vector
+```
+
+Then we can add these values together using the `sum()` function:
+```{r}
+sum( x.support.vector * x.probability.vector )
+```
+
+Let's store this computation in a variable:
+```{r}
+x.expected.value <- sum( x.support.vector * x.probability.vector )
+x.expected.value
+```
+
+Let's simulate this:
+```{r}
+number.replications <- 10000
+
+result.vector <- 
+  sample(
+    x.support.vector,
+    number.replications,
+    replace = TRUE,
+    x.probability.vector
+  )
+
+cat( "The simulated expected value is:", mean( result.vector ) )
+```
+When you run this code, you should get a value very close to 1.8.
+
+
+Now we'll investigate the linearity of the expectation operator. We'll start with the case where we multiply a random variable with a constant. Consider the random variable $U = 3 \times X$. What is the expected value?
+```{r}
+# Since U = 3 * X, we multiply each value in the support of X by 3
+u.support.vector <- 3 * x.support.vector
+
+# But we don't change the probability vector at all:
+u.probability.vector <- x.probability.vector
+
+# Now we can use our standard method for calculating the expected value:
+u.expected.value <- sum( u.support.vector * u.probability.vector )
+
+cat( "The expected value of U is:", u.expected.value)
+``` 
+
+Of course, we can simulate this result as well:
+```{r}
+number.replications <- 10000
+
+# Now we'll sample from v.support.vector instead of x.support.vector:
+
+result.vector <- 
+  sample(
+    u.support.vector,
+    number.replications,
+    replace = TRUE,
+    u.probability.vector
+  )
+
+cat( "The simulated expected value is:", mean( result.vector ) )
+```
+The simulated value should be very close to 5.4.
+
+
+Now let's consider a case where we add a constant to the random variable $X$. Suppose the random variable $V$ is defined by adding 0.2 to $X$, so that $V = X + 0.2$. What is the expected value?
+```{r}
+# The support of V is just each value in the support of X with 0.2 added to it:
+v.support.vector <- x.support.vector + 0.2
+
+# As before, the probability vector for V remains unchanged:
+
+v.probability.vector <- x.probability.vector
+
+# Now we can use our standard method for calculating the expected value:
+v.expected.value <- sum( v.support.vector * v.probability.vector )
+
+cat( "The expected value of V is:", v.expected.value)
+```
+
+As usual, let's simulate this:
+```{r}
+number.replications <- 10000
+
+# Now we'll sample from v.support.vector instead of x.support.vector:
+
+result.vector <- 
+  sample(
+    v.support.vector,
+    number.replications,
+    replace = TRUE,
+    v.probability.vector
+  )
+
+cat( "The simulated expected value is:", mean( result.vector ) )
+```
+The simulated value should be very close to 2.0.
+
+
+Let's put these two insights together. Let's define a new variable $W = 3 * X + 0.2$:
+```{r}
+w.support.vector <- 3 * x.support.vector + 0.2
+
+w.probability.vector <- x.probability.vector
+
+# Now we can calculate the expected value of W:
+
+w.expected.value <- sum( w.support.vector * w.probability.vector )
+
+cat( "The expected value of W is:", mean( w.expected.value ), "\n" )
+```
+
+Now let's simulate that:
+```{r}
+number.replications <- 10000
+
+result.vector <- 
+  sample(
+    w.support.vector,
+    number.replications,
+    replace = TRUE,
+    w.probability.vector
+  )
+
+cat( "The simulation estimate for E[W] is:", mean( result.vector ) )
+```
+The simulation estimate should be close to 5.6.
+
+
+
+Finally, let's take a look at $X^2$:
+```{r}
+x.squared.support.vector <- x.support.vector^2
+x.squared.probability.vector <- x.probability.vector
+
+x.squared.support.vector * x.squared.probability.vector
+sum( x.squared.support.vector * x.squared.probability.vector )
+```
+So the expected value of $X^2$ is 22.8. Notice that this **not** the same as the square of the expected value of $X$.
+
+
+
+
+# An Urn Example
+
+First, here's the calculation of the expected value:
+```{r}
+(0 * 5/12) + (1 * 4/12) + (3 * 3/12)
+```
+
+We'll look at 3 different ways to simulate this expected value.
+
+First, let's model the urn directly:
+```{r}
+number.replications <- 10000
+
+payout.vector <- numeric( number.replications )
+
+
+# Here we're going to build a virtual urn, with 5 character strings to represent
+# the 5 white balls, 4 character strings to represent the 4 red balls, and
+# 3 character strings to represent the 3 yellow balls:
+
+urn.vector <- c( "White", "White", "White", "White", "White",
+                 "Red", "Red", "Red", "Red",
+                 "Yellow", "Yellow", "Yellow" )
+
+for( replication.index in 1:number.replications ) {
+  
+  selected.ball <- sample( urn.vector, 1, replace = TRUE )
+  
+  if( selected.ball == "White" ) {
+    urn.game.payout <- 0
+  } else if( selected.ball == "Red" ) {
+    urn.game.payout <- 1
+  } else {
+    urn.game.payout <- 3
+  }
+  
+  payout.vector[ replication.index ] <- urn.game.payout
+}
+
+cat( "The approximate estimated expected payout is:", mean( payout.vector) )
+```
+The simulated value should be close to 1.08.
+
+
+Another approach is to use non-uniform sampling to sample the colors. Also, we can directly assign the payout to `payout.vector` instead of using the intermediate variable `urn.game.payout`:
+```{r}
+number.replications <- 10000
+
+payout.vector <- numeric( number.replications )
+
+# Here we're going to build a virtual urn, with 5 character strings to represent
+# the 5 white balls, 4 character strings to represent the 4 red balls, and
+# 3 character strings to represent the 3 yellow balls:
+
+for( replication.index in 1:number.replications ) {
+  
+  selected.ball <- sample( c("White", "Red", "Yellow"),
+                           1, 
+                           replace = TRUE,
+                           prob = c(5/12, 4/12, 3/12) )
+  
+  if( selected.ball == "White" ) {
+    payout.vector[ replication.index ] <- 0
+  } else if( selected.ball == "Red" ) {
+    payout.vector[ replication.index ] <- 1
+  } else {
+    payout.vector[ replication.index ] <- 3
+  }
+}
+
+cat( "The approximate estimated expected payout is:", mean( payout.vector) )
+```
+
+Finally, we can just forget about the balls entirely, and just model the payout random variable directly:
+```{r}
+number.replications <- 10000
+
+payout.vector <- numeric( number.replications )
+
+# Here we're going to build a virtual urn, with 5 character strings to represent
+# the 5 white balls, 4 character strings to represent the 4 red balls, and
+# 3 character strings to represent the 3 yellow balls:
+
+for( replication.index in 1:number.replications ) {
+  
+  # Now when we sample from the payout random variable, we can immediately assign
+  # it to the payout.vector:
+  
+  payout.vector[ replication.index ] <- 
+    sample( c(0, 1, 3),
+            1, 
+            replace = TRUE,
+            prob = c(5/12, 4/12, 3/12) )
+}
+
+cat( "The approximate estimated expected payout is:", mean( payout.vector) )
+```
+
+
+
+
+
+# Fair Values and Stock Prices
+
+### Stocks
+
+
+Let's calculate the fair value of the stock price for the example from lecture:
+```{r}
+stock.prices <- c(55, 50, 45, 40, 35, 30)
+
+stock.probabilities <- c(0.10, 0.10, 0.25, 0.25, 0.20, 0.10)
+
+expected.stock.price <- sum( stock.prices * stock.probabilities )
+
+expected.stock.price
+```
+
+
+```{r}
+profit.vector <- c(17, 12, 7, 2, -3, -8)
+
+expected.profit <- sum( profit.vector * stock.probabilities )
+
+expected.profit
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,950 @@
+---
+title: "Week 2 R Notebook"
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+
+#Introduction to R
+
+STAT E-80 is a class on probability theory, and it's **not** a class on R. However, we will be using R to investigate probability theory. We will only be working with a subset of R, and I've worked hard to reduce our R toolkit to the absolute minimum. Nonetheless, there is still a lot to learn, and unfortunately there will be a bit of a learning curve as we get started. The good news is that once we get past the first couple of weeks we will have almost all the R that we'll need, and we can spend more of our time on the probability theory. But first, we're going to have a short course on R. Don't worry if you don't get everything in the first pass; you'll need some time to digest these concepts, and most of all you'll need to see these ideas operating on an actual problem, which we will do at the end of this notebook.
+
+###Basic Data Types
+
+In this course, we will primarily be working with two fundamental types of data values:
+
+* **Numeric** data values are numbers, and these don't have to be whole numbers, but can have decimal expansions.
+
+* **Logical** data values are simply the values `TRUE` and `FALSE`.
+
+There are other basic data types, but these are the two types that we will be primarily concerned with in this class.
+
+###Variables and Assignment
+
+A *variable* is a named container that can hold a value, either numeric or logical. To assign a value to a variable, we use the *assignment operator*, which is written as an arrow pointing to the left like this:
+```{r}
+a <- 6
+```
+When R executes this code, it first evaluates the expression on the right-hand side, which in this case is pretty simple: it's just the numeric value 6. Then, if the variable `a` does not already exist, R will create this variable and associate the value 6 with it. Then, later on, when we reference this variable, R will determine that it has the value 6, and will return this value:
+```{r}
+a
+```
+If the variable already exists, then R will overwrite the previous value. Let's now assign the value 10 to the variable `a`:
+```{r}
+a <- 10
+```
+Now when we evaluate the variable, it has the new value of 10, and the old value of 6 has been overwritten:
+```{r}
+a
+```
+
+Variables are important because they enable us to store computations and values for use in future computations. For instance, we can create a new variable `b` that is calculated using the stored value of `a`:
+```{r}
+b <- a + 5
+```
+
+Now when we evaluate `b`, it will have the value of 15:
+```{r}
+b
+```
+
+Notice that even if we use the variable `a` to assign a value to the variable `b`, once this is done, then it doesn't matter if the value of `a` is altered. For instance, let's now assign the value of -5 to `a`:
+```{r}
+a <- -5
+```
+
+The variable `b` still has the value 15:
+```{r}
+b
+```
+
+
+Variables don't have to be numeric. For instance, we can assign a logical value to `a`:
+```{r}
+a <- FALSE
+```
+Now when we evaluate `a`, it has the value `FALSE`, and the old numeric value of -5 has been overwritten:
+```{r}
+a
+```
+
+You can also use a single equals sign '=' to perform assignment, so that this is fine:
+```{r}
+a = 7
+```
+
+In some situations there are subtle differences between the assignment operator '<-' and the equals sign '=', but this is a fine point, and we won't investigate it any further in this course. I would recommend that you stick with '<-' for STAT E-80 just for the sake of uniformity, but if you really want to use an equals sign for assignment, go ahead. 
+
+
+### Arithmetic Operations
+
+We can use R to perform basic arithmetic operations, in essence treating it as a very fancy scientific calculator. Addition, subtraction, multiplication, and division are all
+accomplished using standard symbols. Let's assign the value 8 to the variable `a` and the value 5 to the variable `b`:
+```{r}
+a <- 8
+b <- 5
+```
+
+Then we can perform all of our standard arithmetic operations. For instance, we can add `a` and `b`
+```{r}
+a + b
+```
+
+Now let's subtract `b` from `a`:
+```{r}
+a - b
+```
+
+We can multiply `a` and `b`:
+```{r}
+a * b
+```
+
+We can divide `a` by `b`:
+```{r}
+a / b
+```
+
+We can also raise numbers to a power using the `^` symbol:
+```{r}
+a^3
+```
+
+All of these arithmetic operations take two numbers as inputs, and return another number as output. But we can also have *comparison* operators, which take two numbers as inputs and returns a logical value such as `TRUE` or `FALSE`:
+```{r}
+a > 9
+```
+
+We indicate "less than or equal to" by using a less-than sign '<' followed by an equals sign '=':
+```{r}
+b <= 10
+```
+
+Of course, we can do arithmetic on numbers, and then use a comparison operator to compare the values:
+```{r}
+2 * a >= b + 1
+```
+
+If we want to compare two elements to see if they are equal, we can't use a single equals sign '=', because we've just seen that works like an assignment operator. Instead, we have to use a double equals sign '==':
+```{r}
+6 == 3 + 3
+```
+```{r}
+4 == 2 + 5
+```
+
+To test for inequality, we use the expression '!=':
+```{r}
+4 != 5
+```
+
+```{r}
+6 != 6
+```
+
+
+
+There is an important issue to be aware of when working with complex expressions. Consider the expression 5/6^2. How should we interpret this?
+
+* One way to think of this is that we first divide 5 by 6, and then square the result, which will give a value of 25/36 = 0.69444.
+
+* The other approach is to first square the 6, and then divide 5 by this result, which will give a value of 5/36 = 0.13889
+
+These are very different answers, and so we need some way to determine which is the correct interpretation. The answer is that the second option is the correct one, because the exponentiation operator `^` takes precedence over the division operator `/`. In general, this concept is known as *operator precedence*, and we can think of this as which operator "binds more tightly". That is, in the expression `5/6^2`, the exponentiation operator `^` binds more tightly to the 6 than the division operator `/` does, and thus the ambiguous expression `5/6^2` is ultimately parsed as `5/(6^2)`.
+
+The general rules for arithmetic operations are:
+
+* The exponentiation operator binds the most tightly of all.
+
+* Multiplication and division come next.
+
+* Addition and subtraction bind less tightly than multiplicatoin and division.
+
+* Comparison operators such as '>' or '<=' bind less tightly than arithmetic operations.
+
+* The assignment operator '<-' binds the least tightly of all.
+
+If an expression has two operators with the same level of precedence competing for a term, then the expression is evaluated left-to-right. Thus, the expression `3 - 4 - 5` is parsed as `(3-4)-5`, which equals `-6`,and not `3 - (4-5)`, which equals `+4`.
+
+My personal feeling about operator precedence is: when in doubt, don't try to work out the precedence relations. Just use parentheses to explicitly force the structure that you want. In general, I will always encourage you to not worry about writing the sleekest, most minimal, most compressed code, and instead to always write code that you can easily verify to be correct. Thus, if I were trying to express the concept "Square the value 6, and then divide 5 by this value" I would personally prefer to write `5/(6^2)` even though I know that `5/6^2` would be fine, because then I know that it's right, and I don't have to worry about working out the operator precedence relations properly.
+
+
+
+### Logical Operations
+
+Just as with numerical values, we can perform operations on the logical values `TRUE` and `FALSE`. The three most important logical operators are `!`, `&`, and `|`, which I admit might not be familiar to you. The exclamation point `!` indicates `not`, which takes a logical value and inverts it. That is, if we apply `!` to `TRUE`, then it returns `FALSE`, and if we apply `!` to `FALSE`, it returns `TRUE`:
+```{r}
+! TRUE
+```
+```{r}
+! FALSE
+```
+
+The `&` operator takes two logical values and returns the value `TRUE` if both values are `TRUE`, and `FALSE` if either of them is `FALSE` (including the case where both values are `FALSE`):
+```{r}
+TRUE & TRUE
+```
+
+```{r}
+TRUE & FALSE
+```
+
+```{r}
+FALSE & TRUE
+```
+
+```{r}
+FALSE & FALSE
+```
+
+Finally, the `|` operator takes two logical values and return `TRUE` if at least one of the values is `TRUE` (including the case where both values are `TRUE`), and returns `FALSE` only if both input values are `FALSE`:
+```{r}
+TRUE | TRUE
+```
+
+```{r}
+TRUE | FALSE
+```
+
+```{r}
+FALSE | TRUE
+```
+
+```{r}
+FALSE | FALSE
+```
+
+Of course, the logical operators can work with variables as well. First, let's set up some logical variables:
+```{r}
+# We will set the variable a to the logical value TRUE:
+
+a <- TRUE
+
+# We will set the variable b to the logical value FALSE:
+
+b <- FALSE
+```
+
+Now try to predict what each expression will evaluate to:
+```{r}
+!a
+```
+
+```{r}
+!b
+```
+
+```{r}
+a & b
+```
+
+```{r}
+a | b
+```
+
+Just as with arithmetic operators, there is a hierarchy of precedence among logical operators. Here the situation is a little simpler: the `!` operator binds the most tightly,  the `&` and `|` are equal in precedence (but lower than `!`), and finally evaluation procedes left-to-right. Thus, we can construct a complex expression such as:
+```{r}
+!a | b
+```
+
+Once again, when you want to write a complex expression I encourage you to not rely on careful parsing of precedence relations, but instead to use parentheses to explicitly force the operations that you want. Thus, I think a better way to write the expression we just saw is:
+```{r}
+(!a) | b
+```
+
+
+
+
+
+
+### An Introduction to Functions in R
+
+A *function* is a mathematical object that takes some set of inputs, known as "arguments", and returns some sort of output. Elementary algebra presents us with lots of functions; for instance, here's an example of a linear function:
+$$
+f(x)\ =\ 2x - 5
+$$
+A more complicated function is the *quadratic* function", an example of which is:
+$$
+f(x)\ =\ x^2 - 3x + 7
+$$
+You might remember all sorts of special functions from high school, for instance the trigonometric functions, or the logarithm function, and R implements all these standard numerical functions along with many others from more advanced mathematics. However, R also has many different types of functions that are not necessarily numeric, and can operate on other types of data. There is no requirement that a function only take one input argument, and in fact many R functions can take multiple arguments that allow the programmer to adjust and customize their operation. A large part of mastering R is learning about the extensive library of functions that are available. In STAT E-80, we will only work with a limited set of these functions, but they will be crucial for our work, and you'll need to become comfortable with these functions.
+
+By the way, the term "input argument" is redundant, because by definition an argument to a function is always an input value; there are no other kinds of "arguments" for a function other than the input values. But I like using this terminology because it reinforces the meaning of the jargon, and for me this redundancy is a feature, not a bug.
+
+
+### The `sum()` and `prod()` functions
+
+If you think about it, the addition operator is a function: it takes two numeric values as its input arguments, and returns the sum of its inputs as its output value. We don't usually think of addition as a "function", but that's really just because of how we write it. In fact, we could write addition explicitly as a function, and R does just that with the `sum()` function:
+```{r}
+sum( 3, 4 )
+```
+
+The `sum()` function is a little unusual, because it can actually take an arbitrary number of arguments, and it will add them all together:
+```{r}
+sum( 1, 2, 3, 4, 5 )
+```
+
+The `prod()` function is very similar to the `sum()` function, except that now the function multiplies all of its arguments together:
+```{r}
+prod( 1, 2, 3, 4, 5 )
+```
+
+
+
+
+
+# The Logical Functions `all()` and `any()`
+
+Just as we saw that there are logical operators, so too there are also logical functions. Two very important logical functions are `all()` and `any()`, which are generalizations of the `&` and `!` operators, respectively. The `all()` function takes an arbitrary number of input arguments, and returns `TRUE` if all of the arguments are `TRUE`, and `FALSE` if at least one of the arguments is `FALSE`:
+```{r}
+all( TRUE, TRUE, TRUE, TRUE, TRUE )
+```
+
+```{r}
+all( TRUE, TRUE, TRUE, FALSE, TRUE )
+```
+You should convince yourself that the `all()` function is basically like the `&` operator, in that it returns `TRUE` only if each input argument is `TRUE`.
+
+The other logical function is `any()`, and this takes an arbitrary number of logical input arguments and returns `TRUE` if at least one of them is `TRUE` (including the case where all of them are `TRUE`):
+```{r}
+any( FALSE, FALSE, FALSE, FALSE, TRUE )
+```
+
+```{r}
+any( FALSE, FALSE, FALSE, FALSE, FALSE )
+```
+You should convince yourself that the `any()` function is basically like the `!&` operator, in that it returns `FALSE` only if each input argument is `FALSE`.
+
+
+
+
+
+
+
+### Vectors
+
+A *vector* is a one-dimensional ordered sequence of values, all of which have to be of the same basic data type. For instance, a vector might consist of the values 1, 3, 5, 7, and 9. Or it could have the logical values `FALSE`, `FALSE`, `TRUE`, `FALSE`, and `TRUE`; note that values can be duplicated in a vector. 
+
+
+
+### Initializing Vectors
+
+Sometimes we will want to create an "empty" vector to store the results of a computation. We can create an empty numeric vector using the `numeric()` function, where we specify the length of the vector. For instance, to create a numeric vector of length 10, we have:
+```{r}
+numeric( 10 )
+```
+
+Notice that when we call the `numeric()` function the output is a vector where every element is has the value 0. 
+
+We can also create "empty" logical vectors, using the `logical()` function. Once again, all we have to specify is the length of the vector:
+```{r}
+logical( 10 )
+```
+
+Notice that when we call the `logical()` function the output is a vector where every element is has the value `FALSE`. 
+
+
+### The colon operator
+
+One of the simplest ways to construct a numeric vector is a tool known as the "colon operator". To use the colon operator, you specify two integer values, separated by a colon. (Remember that an integer is a whole number.) The colon operator will then generate a vector starting with the first value and ending with the second value, including all the integer values in between. Thus, to create a vector that starts at the value 1 and goes up to 5, we have:
+```{r}
+1:5
+```
+
+The colon operator can also go down. To create a vector that starts at 10 and goes down to 0, we have:
+```{r}
+10:0
+```
+
+One very useful application of the colon operator will be to represent the faces of a die, which range from 1 to 6:
+```{r}
+1:6
+```
+
+We can also use the colon operator to represent all the days in a year:
+```{r}
+1:365
+```
+
+
+
+### The `c()` function
+
+The most general method for constructing a vector is to use the `c()` function, where "c" is short for "concatenate". This function takes a sequence of objects and combines them into a vector like this:
+```{r}
+c( 5, 8, 3, 2, 7)
+```
+
+We can also use the `c()` function to construct logical vectors:
+```{r}
+c( FALSE, TRUE, FALSE, FALSE, TRUE)
+```
+
+The `c()` function provides us with the greatest flexibility, because the objects in it can be arbitrary, and don't have to follow a regular pattern as is the case with the colon operator. However, you must keep in mind the fundamental constraint on vectors: the elements of a vector must all be of the same type or class. Even the `c()` function cannot violate this rule, and if you try to do sneaky to get around it R will convert values to make sure that this rule is always enforced. For instance, suppose you try to construct a numeric values but insert a logical value of `TRUE` somewhere:
+```{r}
+c( 5, 7, 3, TRUE, 4)
+```
+Do you see what happened? R converted the `TRUE` value to a 1, so that all the values are now numeric.
+
+
+### The `sum()` and `prod()` Functions for Vectors
+
+We've seen that the `sum()` function can take an arbitrary number of numeric input arguments, and returns the numeric sum of these values:
+```{r}
+sum( 1, 4, 6, 2, 7 )
+```
+But `sum()` can also operate directly on a numeric vector, in which case it returns the sum of the elements of its input argument:
+```{r}
+number.vector <- c(1, 4, 6, 2, 7)
+
+# Now let's add up the values of all the elements in this vector:
+
+sum( number.vector )
+```
+
+The `prod()` function can also operate on a vector input, and returns the product of all the elements of the input argument:
+```{r}
+prod( number.vector )
+```
+
+
+
+
+### The `sample()` function
+
+The `sample()` function will be extremely important for much of our work, and we'll use it constantly. The function takes three arguments:
+
+* The first argument is a vector, and this represents all the possible experimental outcomes i.e. the first argument is a vector representation of the sample space.
+
+* The second argument is a number, and this represents the number of random draws from the sample space that we are to perform.
+
+* The third argument is a parameter named `replace`, and for the moment you should always set this equal to `TRUE`, so that you write `replace = TRUE`. (Here you have to use the equals sign, not the assignment operator '<-'.) We'll discuss this option in a few weeks, but for right now always set it equal to `TRUE`.
+
+Let's use `sample()` to (virtually) roll a fair die 5 times. The sample space is the set of numbers 1, 2, 3, 4, 5, and 6, so we will represent this with a vector consisting of these numbers:
+```{r}
+1:6
+```
+Next, we want to roll the die 5 times, so the second argument must be the value 5. Finally, when we roll a die, we are effectively sampling with replacement, so we should set `replace` equal to `TRUE`. Thus, the command is:
+```{r}
+sample( 1:6, 5, replace = TRUE )
+```
+Try running this code chunk a few times; you should find that each time you do it you get back a numeric vector with 5 elements, but the actual numbers will be different.
+
+
+### Vector Indexing
+
+By definition, a vector is a sequence of values. Sometimes we will want to refer to the value at a particular position in this sequence. To do this, we use what is called *vector indexing*, in which the vector is followed by a pair of square brackets containing the desired position. For instance, suppose we have the range 10 through 20, and we wish to access the third value. Then we can write:
+```{r}
+test.range.vector <- 10:20
+test.range.vector[3]
+```
+Since the value inside the square brackets is 3, this expression will return the value of the third element of the vector `test.range.vector`. This vector remains unchanged by the operation of indexing, because all it does is to return the value of the element at the third position. Don't make the mistake of thinking that this will actually remove the element at the third position -- no, no, no! The original vector is still the same, and the indexing prodecure won't alter it.
+
+
+
+
+### Vectorized Operations
+
+If we have two vectors, then we can use arithmetic and logical operations on them just as with single values. The rule is that R will always perform the operations component-wise, which means that the operation is applied to the first elements in both vectors, and then to the second elements in the vectors, and so on. For instance, suppose we have two numeric vectors and we add them. Then the result will be a vector where the first element is the sum of the first elements of the two input vectors, the second element is the sum of the second elements of the input vectors, etc.:
+```{r}
+# Let's make a simple numeric vector
+
+x <- c( 1, 2, 3, 4, 5 )
+
+# Now let's make a second vector
+
+y <- c( 6, 2, 4, 8, -7 )
+
+# Now let's add the two vectors
+
+x + y
+```
+
+Make sure that you understand how this sum of vectors is computed.
+
+We can perform vectorized operation with multiplication. Using the vectors `x` and `y` that we have just defined, can you guess what the result of multiplying these two vectors together will be?
+```{r}
+x * y
+```
+
+We can also perform vectorized logical operations, and they work exactly the same as with arithmetic operations.
+```{r}
+x <- c( TRUE, FALSE, TRUE, TRUE, FALSE)
+
+y <- c( TRUE, TRUE, FALSE, TRUE, FALSE)
+
+x & y
+```
+
+We can also use vectorized operations to construct a logical vector that consists of the results of testing a numeric vector. For instance, suppose we have a numeric vector, and we want to obtain a logical vector that has the value of `TRUE` when the corresponding element of the numeric vector is greater than 5. Then we can write:
+```{r}
+# First, let's make the numeric vector
+
+x <- c( 4, 8, 6, 1, 9 )
+
+x > 5
+```
+
+We'll see later that this is a very useful technique, because we can then use this to determine the proportion of elements in the original numeric vector that are greater than 5.
+
+
+### Two Important Techniques
+
+There are two very important techniques that we'll use frequently, and you need to become comfortable with them. They aren't particularly tricky, but they might not be obvious at first glance, and so it's important to work through them carefully to make sure you really understand them.
+
+The first technique is to take a numeric vector and return the logical value `TRUE` if and only if *at least one* of the elements of the vector has a particular value. For instance, let's suppose we have a vector `test.vector.1`:
+```{r}
+test.vector.1 <- c( 4, 6, 8, 2, 3, 1, 5, 9, 4, 2)
+```
+We would like to write code that will return the value `TRUE` if at least one of the elements of `test.vector.1` is equal to the value 5. You can check this vector and see that the seventh element of this vector is indeed equal to 5, so our code should return `TRUE` with this vector. The first step is to use a vectorized operation where we test each element of `test.vector.1` for equality with 5:
+```{r}
+logical.vector.1 <- (test.vector.1 == 5)
+logical.vector.1
+```
+
+Notice here that for `logical.vector.1` all the elements are `FALSE` except for the seventh, which is `TRUE`, and this corresponds to the 5 in `numeric.vector.1`. Now we apply the `any()` function, which returns `TRUE` if at least one element in the input vector is `TRUE` and `FALSE` otherwise:
+```{r}
+any( logical.vector.1 )
+```
+So the code worked properly -- we knew beforehand that it should return `TRUE`, and it did!
+
+What would happen if we had a vector that didn't have any elements that equaled the particular value? For instance, consider this vector:
+```{r}
+test.vector.2 <- c( 4, 6, 8, 2, 3, 1, 7, 9, 4, 2)
+```
+None of the elements of `test.vector.2` have the value 5. So when we run our vectorized comparison, every element will be `FALSE`:
+```{r}
+logical.vector.2 <- (test.vector.2 == 5)
+logical.vector.2
+```
+Now when we apply the `any()` function to `logical.vector.2`, it will return `FALSE`, because there is not even one value that is `TRUE`:
+```{r}
+any( logical.vector.2 )
+```
+Again, we can put all of this into one line of code:
+```{r}
+any( test.vector.2 == 5 )
+```
+
+
+We actually didn't need the `logical.vector.1` vector. In fact, we could put all of this on one line:
+```{r}
+any( test.vector.1 == 5 )
+```
+
+This is typically how I will write this code, so be sure that you are totally clear about how it works.
+
+The second technique is very similar to the first method that we just saw. Here, instead of returning `TRUE` if and only if at least one element of the vector is equal to a particular value, now we want to write an expression that will return `TRUE` if and only if *every* element of the vector is equal to some particular value. The only difference here is that instead of using the function `any()`, we'll use the function `all()`. Let's see how this works.
+
+Let's suppose that we want to write code that will return `TRUE` if and only if every element in a vector is equal to the value 7. To start, let's consider a vector that does indeed have every element equal to the value 7:
+```{r}
+test.vector.3 <- c(7, 7, 7, 7, 7, 7, 7, 7)
+test.vector.3
+```
+Now we'll perform a vectorized comparison to compare this vector to the value 7; remember that this operation will be performed component-wise, so the comparison will be made for each element of the vector:
+```{r}
+logical.vector.3 <- (test.vector.3 == 7)
+logical.vector.3
+```
+Now when we apply the `all()` function to `logical.vector.3` this will evaluate to `TRUE` because every element of `logical.vector.3` is `TRUE`:
+```{r}
+all( logical.vector.3 )
+```
+What happens if we have a vector that has just one element different from 7?
+```{r}
+test.vector.4 <- c(7, 7, 7, 7, 7, 3, 7, 7)
+```
+Now when we perform the vectorized comparison we obtain a vector with every element equal to `TRUE` except for one:
+```{r}
+logical.vector.4 <- (test.vector.4 == 7)
+logical.vector.4
+```
+And then when we apply `all()` to 'logical.vector.4' it will evaluate to `FALSE` because not all the elements are equal to `TRUE`:
+```{r}
+all( logical.vector.4 )
+```
+Once again, let's put this all into one line of code:
+```{r}
+all( test.vector.4 == 7 )
+```
+
+
+
+
+
+
+
+
+
+
+### Flow of Control: the `if` statement
+
+Our R programs will consist of a sequence of statements or commands written in a file, and when presented with such a sequence R does the obvious and natural thing: it starts with the first statement and evaluates it, then moves onto the second statement and evaluates that, then the third statement, and so on. In other words, given a set of statements, R will evaluate them sequentially. But sometimes we might not want R to do this. There are two ways in which R might not execute statements sequentially:
+
+* First, there might be a situation where if some condition is `TRUE`, then R should execute one set of commands, but if the condition is `FALSE` then R should execute a different set of commands. This is known as *conditional branching*.
+
+* Second, we might have a block of commands that we would like R to execute repeatedly. This is called *iteration*, which is just a fancy word for "repetition".
+
+To start with, we'll look at conditional branching, and we'll consider only the simplest form of this, known as an `if` statement. The `if` statement has two components:
+
+* First, it has a *condition*, which is simply something that evaluates to `TRUE` or `FALSE`.
+
+* Next, it has a block of R commands, delimited by a pair of curly braces, which are executed only if the conditiona evaluates to `TRUE`.
+
+Here's a simple example of an `if` statement. See if you can figure out how it generates the output:
+```{r}
+a <- 4
+
+if( a == 4 ) {
+  message( "Hello Mom!" )
+}
+```
+
+Do you see how that worked? We first assigned the value 4 to the variable `a`. Then we had an `if` statement:
+
+* The `if` statement first tested the condition that `a` equals 4, which is `TRUE`.
+
+* Since the condition is `TRUE`, the block of code contained within the curly braces is executed. This is just the single command to print out the message "Hi Mom".
+
+Now consider this example, and see if you can figure out how it works:
+```{r}
+b <- 4
+
+if( b == 10 ) {
+  message( "Hello Mom!" )
+}
+```
+
+Now do you see how that worked? We first assigned the value 4 to the variable `b`. Then we had an `if` statement:
+
+* The `if` statement first tested the condition that `b` equals 10, which is `FALSE`.
+
+* Since the condition is `FALSE`, the block of code contained within the curly braces is **not** executed. Thus, nothing is printed out.
+
+
+
+
+### Flow of Control: the `for` loop
+
+In lecture we saw that the probability of an event is defined as the frequency  of that event over the course of a long run of replications of an experiment, and so we're going to need a way to generate long runs of repeated experimental outcomes. The process of repeating a block of R commands is called "iteration", and this will be central to everything that we do, because it will be how we actually calculate probabilities using simulations.
+
+In this course, we will see several ways to iterate in R, but for the moment we will learn about the most basic form of iteration, which is known as a `for` loop. A `for` loop has three components:
+
+1. The loop variable,
+
+2. The loop sequences, which is a vector of values for the loop variable, and
+
+3. The "body" of the loop, indicated by a pair of curly braces, which contains a set of R code statements.
+
+The `for` loop operates by repeatedly assigning the values in the loop sequence to the loop variable and then executing the code in the loop body:
+
+* In the first iteration, the loop variable is assigned the value of the first element in the loop sequence, and then each statement in the loop body is executed with the loop variable having that value.
+
+* Once R reaches the end of the loop body, it assigns the second value of the loop sequence to the loop variable, and then each statement in the loop body is executed with the loop variable having this value.
+
+* Once R reaches the end of the loop body, it assigns the third value of the loop sequence to the loop variable, and then each statement in the loop body is executed with the loop variable having this value.
+
+* The looping process continues until all the values in the loop sequence have been assigned to the loop variable and all the code executed, at which point the `for` loop ends.
+
+Here's a simple example of a `for` loop. See if you can figure out how it generates the output:
+```{r}
+for( i in 1:6 ) {
+  message( "The value of the variable is: ", i)
+}
+```
+
+In this example, the loop variable is the variable `i`, and the loop sequence is the vector created by the colon operator command `1:6`. The loop body is just the single message command. Here's how this `for` loop works:
+
+* First, the loop variable `i` is assigned the first value in the loop sequence, which is just 1. Then the `message` command is executed with the loop variable `i` having the value of 1.
+
+* Next the loop variable `i` is assigned the second value in the loop sequence, which is 2. Then the `message` command is executed with the loop variable `i` having the value of 2.
+
+* Next the loop variable `i` is assigned the third value in the loop sequence, which is 3. Then the `message` command is executed with the loop variable `i` having the value of 3.
+
+* The loop continues this process until the loop variable `i` is assigned the last value in the loop sequence, which is 6. Once the `message` command is executed with this value of `i`, the loop terminates.
+
+We'll be using iteration throughout this course, and the `for` loop is the simplest version, so make sure you really understand this process, because it will serve as the foundation for everything else we do!
+
+
+
+
+
+### The `sum()` and `prod()` Functions
+
+There are two very useful function for us when working with numerical vectors. The first first is the `sum()` funciton, which takes a numeric vector as its input and returns the sum of the elements of the vector. For instance:
+```{r}
+sum( c(1, 2, 3, 4, 5, 6) )
+```
+
+Another useful function is the `prod()` function, which again takes a numeric vector as its input argument and this time returns the product of the elements of this input. For instance:
+```{r}
+prod( c(1, 2, 3, 4, 5, 6) )
+```
+
+
+
+
+
+### The `mean()` Function
+
+The `mean()` function will be very useful for us, and it is simple to understand: it takes a vector of values, and calculates the average value of this collection. For instance:
+```{r}
+# Let's construct a vector consisting of the range of values from 1 to 6:
+
+x <- 1:6
+
+# Now we can calculate the mean of these values, which is 3.5:
+
+mean( x )
+```
+
+There is an interesting feature of the `mean()` function: if we apply it to a logical vector (i.e. one that consists of `TRUE` and `FALSE` values), it will return the proportion of `TRUE` values in the vector. For instance:
+```{r}
+x <- c( FALSE, TRUE, FALSE, FALSE, TRUE)
+
+mean( x )
+```
+The vector `x` has length 5, and two of the five elements are `TRUE`, so the propotion of `TRUE` elements in the vector is 2/5, or 0.4. Strictly speaking, this is weird -- after all, the `mean()` function is supposed to be calculating the average of a set of numeric values, but here we only have the logical values `TRUE` and `FALSE`, which are not numeric at all. What actually happens is that R will interpret `TRUE` as 1 and `FALSE` as 0, and if you make that conversion then the `mean()` function does indeed operate correctly.
+
+
+We can use this interesting property of the `mean()` function to calculate the proportion of elements in a numeric vector that satisfy some condition. For instance, let's start with a vector that consists of the values 1 through 5:
+```{r}
+range.vector <- 1:5
+```
+
+Now we'll use vectorized operations to create a new logical vector that has the value `TRUE` at a position if the corresponding element of `range.vector` is strictly less than 3:
+```{r}
+less.than.3.vector <- (range.vector < 3)
+less.than.3.vector
+```
+You should stop for a moment and make sure that you understand how this code works. Now we can calculate the proportion of elements in `less.than.3.vector` that are `TRUE` using the `mean()` function:
+```{r}
+mean( less.than.3.vector )
+```
+In this example, 2 out of the 5 values of `less.than.3.vector` are `TRUE`, and thus the proportion of `TRUE` values in `less.than.3.vector` is 40%, or 0.4. However, given how we constructed `less.than.3.vector`, this also means that 40% of the values in `range.vector` are strictly less than 3.
+
+
+
+
+# Our First Simulation
+
+Now let's build our first simulation. In this simulation, we'll obtain an approximate answer to the question: what is the probability of rolling two fair dice and so that their sum equals 8? In lecture, we calculated this theoretically, and we obtained the value 5/36 = 0.13889.
+```{r}
+5/36
+```
+
+
+Can we replicate this result with a simulation?
+```{r}
+# First, let's specify the number of replications
+
+number.replications <- 10000
+
+# Next, we need to create a vector to store the results of our calculations:
+
+results.vector <- numeric( number.replications )
+
+# Remember that when we initialize a numeric vector this way, all the entries
+# are initially 0.
+
+# We can perform our experiment repeatedly, using a for loop:
+
+for( replication.index in 1:number.replications ) {
+  
+  # We'll roll two dice and sum them:
+  
+  dice.roll.sum <- sum( sample( 1:6, 2, replace = TRUE ) )
+  
+  if( dice.roll.sum == 8 ) {
+    results.vector[ replication.index ] <- TRUE
+  }
+}
+
+# Now that we've finised all our experimental replications, let's determine the
+# proportion that had a sum equal to 8.
+
+mean( results.vector )
+```
+You should find that this simulation returns a value close to the true value of 0.139.
+
+In this example, we explicitly "rolled" two (virtual) dice, and then showed that the proportion of experiments where the sum of the dice equalled 8 was very close to the theoretical value that we calculated. 
+
+
+
+
+
+
+
+\newpage
+#The Chevalier de Mere's Dice Games
+
+Now we can start to use R to solve the problems that we examined in lecture. We'll start with the Chevalier de Mere's dice games.
+
+### Problem 1: Obtaining a 1 when rolling 4 dice
+
+The first dice game that we considered was to roll 4 dice, and the player wins if at least one of the dice has the value 1. We saw in lecture that we could calculate this probability exactly:
+$$
+\Pr(\ \hbox{Win}\ )\ =\ 1 - \left(\ \frac{5}{6} \right)^4
+$$
+
+Let's first use R to evaluate this expression:
+```{r}
+1 - (5/6)^4
+```
+
+
+
+
+Now let's construct a simulation to model this game:
+```{r}
+# First, we'll set the number of replications of the game:
+
+number.replications <- 10000
+
+# Next, we create the vector that will hold the results of each experiment.
+# Remember that when we create a vector with the logical() function, 
+# all the elements have the initial value of FALSE.
+
+result.vector <- logical( number.replications )
+
+# Now we can run a for loop over all replications
+
+for( replication.index in 1:number.replications ) {
+  
+  # Here we directly simulate rolling 4 dice
+  
+  dice.roll <- sample( 1:6, 4, replace = TRUE )
+  
+  # Now we'll use some vectorized operations. When we run the test "dice.roll == 1",
+  # this will create a logical vector in which each element will be TRUE if and only if
+  # the corresponding element in the dice.roll vector is equal to 1. We then apply the
+  # any() function to this logical vector, and this will return TRUE if and only if
+  # at least element in the logical vector is TRUE. Thus, this will model rolling 
+  # four dice and returning TRUE if and only if at least one of them is a 1.
+  
+  if( any(dice.roll == 1) ) {
+    result.vector[ replication.index ] <- TRUE
+  }
+}
+
+mean( result.vector )
+```
+So we've used the computer to generate a long-run sequence of experimental outcomes, and the proportion of TRUE values represents the frequency with which the Chevalier de Mere will win his bet, and thus this is a probability. Note that this is only an approximation, and it won't be exact. This approach will also generate a different value each time we run it, although if we set the number of experimental replications high enough it will be very close to the exact value.
+
+
+
+The book has an alternative approach to constructing a simulation based on vectorized operations:
+```{r}
+
+# Let's start by setting the number of replications.
+
+number.replications <- 10000  
+
+# We'll "roll" each die repeatedly, which means that we'll generate a random
+# sample using the sample() function:
+
+die.1.vector <- sample( c(1:6), number.replications, replace = TRUE)
+die.2.vector <- sample( c(1:6), number.replications, replace = TRUE)
+die.3.vector <- sample( c(1:6), number.replications, replace = TRUE)
+die.4.vector <- sample( c(1:6), number.replications, replace = TRUE)
+
+# Now we'll use vectorized operations to test to see if at least one of the
+# dice was a 1:
+
+result.vector <-
+  (die.1.vector == 1) | (die.2.vector == 1) |
+  (die.3.vector == 1) | (die.4.vector == 1)
+
+# Notice that result.vector is actually a logical vector; that is, it consists of
+# the values TRUE or FALSE.
+
+# When we apply the mean() function to a logical vector, it will return the
+# proportion of elements in the vector that are TRUE
+
+mean( result.vector )
+```
+
+
+
+
+
+
+### Problem 2: obtaining double 1s in 24 rolls
+
+Now let's think about the second game, in which two dice are rolled 24 times, and the player wins if at least one pair of dice shows a pair of 1s. We saw in lecture that the exact probability can be calculated as:
+$$
+\Pr(\ \hbox{Win}\ )\ =\ 1 - \left( \frac{35}{36} \right )^{24} 
+$$
+
+Let's calculate this value in R:
+```{r}
+1 - (35/36)^24
+```
+
+We can obtain an approximate solution to this problem by using a simulation approach:
+```{r}
+# First, let's specify the number of replications
+
+number.replications <- 10000
+
+# We'll also need a vector to store the results of our simulation:
+
+result.vector <- logical( number.replications )
+
+# Now we'll create a for loop that will iterate over all the replications:
+
+for( replication.index in 1:number.replications ) {
+  
+  # We simulate rolling each die 24 times
+  
+  die.1.vector <- sample( 1:6, 24, replace = TRUE )
+  die.2.vector <- sample( 1:6, 24, replace = TRUE )
+  
+  # Now we will use a vectorized logical operation that will return TRUE
+  # only if both dice have the value 1.
+  
+  result.vector[ replication.index ] <- any( (die.1.vector == 1) & (die.2.vector == 1) )
+}
+
+mean( result.vector )
+```
+
+
+Here's another approach that doesn't use vectorization, but instead has a nested `for` loop:
+```{r}
+# First, let's specify the number of replications
+
+number.replications <- 10000
+
+# We'll also need a vector to store the results of our simulation. Remember that
+# when we create a logical vector this way, all the elements of the vector
+# will initially have the value `FALSE`:
+
+result.vector <- logical( number.replications )
+
+# Now we'll create a for loop that will iterate over all the replications:
+
+for( replication.index in 1:number.replications ) {
+
+  for( roll.index in 1:24 ) {
+    
+    # This simulates rolling a pair dice once
+    
+    dice.roll.vector <- sample( 1:6, 2, replace = TRUE )
+    
+    # Now we test to see if the two dice both came up as a 1:
+    
+    if( all(dice.roll.vector == 1) ) {
+      result.vector[ replication.index ] <- TRUE
+    }
+  }
+}
+
+mean( result.vector )
+```
+
+

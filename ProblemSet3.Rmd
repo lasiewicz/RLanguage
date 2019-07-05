@@ -1,0 +1,245 @@
+---
+title: "Problem Set 3 Solutions"
+subtitle: 'Type your name here'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+
+#Instructions
+
+**Due:** Wednesday, February 20, 2019
+
+
+First, save this notebook with a title consisting of "ProblemSet3" and then your last name, with no spaces. So, for Bob Bunny, the file should be called "ProblemSet3Bunny". Also, type your name in the subtitle on line 2 above. Each problem will have a problem statement, followed with space for you to answer. Type your work in the code chunk where it says, "Type your answer in here". If we ask a question that has a numeric answer (for example, "How much money does Bob Bunny owe?"), then you should write some text in the notebook with your answer; don't assume that just the R printout is sufficient.
+
+When you're all done, knit the notebook to a PDF, and upload both the notebook and the PDF to Canvas. (Note: The notebook will have the file extension ".rmd".)
+
+
+
+# Problem 1
+
+### Problem Statement
+
+In lecture, we saw that if there are 23 people in a room, there is a 50\% chance that at least 2 of them will have the same birthday. Now we would like to determine how many people have to be in the room in order that there is a 90\% probability that at least 2 of them will have the same birthday.
+
+**Part a)**
+
+Using the exact method, calculate the smallest number of people in the room so that the probability of at least two people having the same birthday is 90\%. You'll have to solve this by trial-and-error: make a guess for the number, see if the resulting probability is too high or too low, adjust your guess, try again . . .
+
+**Part b)**
+
+Using a simulation approach, calculate an approximate value for the smallest number of people in the room so that the probability of at least two people having the same birthday is 90\%.
+
+
+### Problem Solution
+
+**Part a)**
+
+
+
+
+
+
+**Part b)**
+
+
+
+
+
+
+# Problem 2
+
+### Problem Statement
+
+WiDgT is a dynamic new disruptive startup dedicated to producing the finest hand-crafted artisinal widgets using only all-organic, gluten-free, fair trade ingredients. The company has 200 employees, and would like to randomly assign each employee a five-digit identification number, where each employee is equally likely to be assigned any particular five-digit sequence. 
+
+
+**Part a)**
+
+Using the mathematical methods we saw in lecture, calculate the exact probability that at least two employees will be assigned the same identification number.
+
+
+**Part b)**
+
+Construct a simulation to show that you calculated the correct value in Part a).
+
+
+
+
+### Problem Solution
+
+**Part a)**
+
+
+
+
+**Part b)**
+
+
+
+
+
+
+# Problem 3
+
+### Problem Statement
+
+A large urn contains 100 balls of four colors: 60 are red, 20 are white, 15 are blue, and 5 are purple. The balls are completely mixed up, and the player draws one ball at random.
+
+* If the ball is red, then the player receives nothing.
+
+* If the ball is white, then the player receives a payout of $2.
+
+* If the ball is blue, then the player receives a payout of $5.
+
+* If the ball is purple, then the player receives a payout of $10.
+
+The player pays $1 for each play of the game.
+
+**Part a)** Calculate the exact values of the expected value of the profit.
+
+**Part b)** Construct a simulation to verify that your answer in Part a) was correct.
+
+
+### Problem Solution
+
+**Part a)**
+
+
+
+
+
+
+**Part b)**
+
+
+
+
+
+
+
+# Problem 4
+
+### Problem Statement
+
+The Chevalier de Mere has a new dice game. In this game, the player pays an initial wager of \$2 then rolls two dice 20 times, and wins a payout of *P* if both dice come up as 1 at least once.
+
+**Problem** Calculate the value of the payout *P* that makes this game fair. Save your answer in a variable named `fair.value.payout`.
+
+**Hint:** First, calculate the probability of winning the game, then use the formula from lecture.
+
+### Problem Solution
+
+
+
+# Problem 5
+
+### Problem Statement
+
+Construct a simulation to validate your answer in Problem 4. That is, show that if the players play the game using the winning payout that you calculated and stored in the variable `fair.value.payout', then the expected profit will be 0.
+
+### Problem Solution
+
+
+
+
+
+
+
+# Problem 6
+
+### Problem Statement
+
+**Part a)** The Chevalier de Mere is holding a party with 30 guests, and he devises a fun new party game to play with his friend Pierre de Fermat. Each of the 30 guests announces his or her birthday, and if any two guests have the same birthday, then Fermat has to pay the Chevalier 1000 euros. How much should the Chevalier pay Fermat as an initial wager for the game to be fair? Store your answer in the variable `fair.value.wager`.
+
+**Part b)** Develop a simulation that demonstrates that your calculation in Problem 5 was correct. That is, show that if the Chevalier does payout the value that you saved in the variable `losing.payout` each time he loses the game, then the expected value of his winnings is 0.
+
+
+**Hint** Once again, calculate the winning probability of the game, and then use the formula in lecture.
+
+
+### Problem Solution
+
+ 
+**Part a)** 
+
+
+
+**Part b)** 
+
+
+# Problem 7
+
+### Problem Statement
+
+Based on a careful analysis, Blaise Pascal has decided that the stock of WiDgT will have 4 possible prices one month from now:
+
+* The stock will be \$110 with probability 0.10
+
+* The stock will be \$100 with probability 0.15
+
+* The stock will be \$90 with probability 0.30
+
+* The stock will be \$80 with probability 0.30
+
+* The stock will be \$70 with probability 0.15
+
+**Part a)**
+
+Assuming that Pascal's probability model is true, what would be a fair price for the stock?
+
+
+
+**Part b)**
+
+Suppose the stock is currently selling for \$84. Assuming that Pascal's model is correct, calculate his expected profit in one month if he purchases one share of stock today.
+
+
+
+**Part c)**
+
+Assuming that Pascal's probability model is true, what is the probability that if he purchases one share of the stock at \$84 today he will lose money one month from now?
+
+### Problem Solution
+
+
+**Part a)**
+
+
+
+
+**Part b)**
+
+
+
+**Part c)**
+
+
+
+
+
+
+
+
+
+
+
+# Problem 8
+
+### Problem Statement
+
+Construct a simulation that will verify that if Pascal purchases the stock today for \$84, his expected profit will be the value that you calculated in Part b) in Problem 7.
+
+### Problem Solution
+
+
+
+
+
+
+
+

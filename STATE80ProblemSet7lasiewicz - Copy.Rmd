@@ -1,0 +1,677 @@
+---
+title: "Problem Set 7"
+subtitle: 'STAT E-80: Basic Probability Using R'
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+
+
+# Problem 1
+
+
+A certain disease occurs in 1.5\% of the population. A diagnostic test for this disease has sensitivity 90\% and specificity 85\%.
+
+###Part (a)
+
+
+What is the probability of a false positive with this test?
+
+**Answer**
+```{r}
+falsepositive<-1-.85
+print(falsepositive)
+
+
+```
+
+
+
+
+###Part (b)
+
+What is the probability of a false negative for this test?
+**Answer**
+1-.9 = .1
+
+###Part (c)
+
+Using Bayes' theorem, calculate the positive predictive value for this test.
+
+**Answer**
+
+```{r}
+sensitivity <- 0.90
+specificity <- 0.85
+prevalence <- 0.015
+
+answer <- (sensitivity * prevalence) / ( (sensitivity * prevalence) +
+                                   ((1-specificity) * (1-prevalence) ) )
+print(answer)
+
+```
+
+###Part (d)
+
+Construct a simulation to verify that your answer in part (c) is correct. You are welcome to borrow the code from the Lecture 8 R notebook and modify it.
+
+**Answer**
+```{r}
+number.replications <- 100000
+
+# We specify the sensitivity, specificity, and prevalence just once,
+# and then use these variables in the code. That way, if we want to
+# use different values, it's easy to make the changes.
+
+sensitivity <- 0.90
+specificity <- 0.85
+prevalence <- 0.015
+
+# We need two result vectors, one for disease status,
+# and the other for the test result.
+
+disease.vector <- character( number.replications )
+test.vector <- character( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, we simulate the disease status
+    
+    disease.status <- sample( c("Diseased", "Healthy"), 1,
+                              prob = c(prevalence, 1-prevalence) )
+    
+    # Now we simulate the test result; this will depend on
+    # the disease status of the patient
+    
+    if( disease.status == "Diseased" ) {
+        
+        # For a subject with disease, we use the sensitivity
+        # to randomly sample the test result
+        
+        test.result <- sample( c("Positive", "Negative"), 1,
+                               prob = c(sensitivity, 1 - sensitivity) )
+        
+    } else {
+        
+        # For a subject without disease, we use the specificity
+        # to randomly sample the test result
+        
+        test.result <- sample( c("Positive", "Negative"), 1,
+                               prob = c(1-specificity, specificity) )
+    }
+    
+    # Now that we have the disease status and the test result,
+    # let's store these in the result vectors:
+    
+    disease.vector[ replication.index ] <- disease.status
+    test.vector[ replication.index ] <- test.result
+}
+
+# Finally, we use our standard 
+filtered.vector <- disease.vector[ test.vector == "Positive" ]
+mean( filtered.vector == "Diseased" )
+
+
+
+```
+
+
+
+
+# Problem 2
+
+Justin uses hashtags in 70\% of his text messages, while Caitlin uses hashtags in 35\% of her messages. Caitlin sends 55\% of the text messages between the two, while Justin sends 45\% of the messages. Now you observe the message:
+
+*yo wassup wuz u @ that crazee partee?!? lol*
+
+### Part (a)
+
+Using Bayes' theorem, calculate the conditional probability that Caitlin sent the message.
+
+**Answer**
+```{r}
+prob.hashtag.justin <- 0.7
+prob.hashtag.caitlin <- 0.35
+prob.caitlin <- 0.55
+prob.justin <- 1 - prob.caitlin
+
+answer<-(prob.hashtag.caitlin * prob.caitlin) / 
+    ( (prob.hashtag.caitlin * prob.caitlin) + (prob.hashtag.justin * prob.justin) )
+print(answer)
+```
+
+
+###Part (b)
+
+Construct a simulation to show that your calculation in part (a) is correct.
+
+**Answer**
+
+
+
+Now let's simulate this. This is essentially exactly the same as our simulation for the disease screening problem, except that we've changed the variable names to reflect the problem statement.
+```{r}
+number.replications <- 100000
+
+prob.hashtag.justin <- 0.7
+prob.hashtag.caitlin <- 0.35
+prob.caitlin <- 0.55
+
+# We need two result vectors, one to keep track of
+# the sender of the message, and the other to keep track
+# of the presence or absence of a hashtag.
+
+sender.vector <- character( number.replications )
+hashtag.vector <- character( number.replications )
+
+# The sender of the message in this problem is analogous
+# to the disease status in the screening problem, while
+# the hashtag is analogous to the diagnostic test.
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, we randomly generate the sender of the message
+    
+    sender <- sample( c("Caitlin", "Justin"), 1,
+                              prob = c(prob.caitlin, 1-prob.caitlin) )
+    
+    # Next, we randomly generate the presence or absence of a hashtag, given
+    # that the sender
+    
+    if( sender == "Caitlin" ) {
+        hashtag.status <- sample( c("Yes", "No"), 1,
+                               prob = c(prob.hashtag.caitlin, 1 - prob.hashtag.caitlin) )
+    } else {
+        hashtag.status <- sample( c("Yes", "No"), 1,
+                               prob = c(prob.hashtag.justin, 1-prob.hashtag.justin) )
+    }
+    
+    # Now we store the sender and hashtag.status in result vectors:
+    
+    sender.vector[ replication.index ] <- sender
+    hashtag.vector[ replication.index ] <- hashtag.status
+    
+}
+
+# Finally, we use standard filtering method. First, we extract those
+# elements of the sender vector that had a hashtag in their email.
+
+filtered.vector <- sender.vector[ hashtag.vector == "Yes" ]
+
+# Next, we determine the proportion of the filtered values
+# that were really sent by Caitlin
+
+mean( filtered.vector == "Caitlin" )
+```
+
+
+
+# Problem 3
+
+An insurance company finds that 85\% of the policyholders are good drivers, and 15\% of the policyholders are bad drivers. A good driver has a 10\% probability of having a car accident in one year, while a bad driver has a 35\% probability of having a car accident in one year.
+
+### Part (a)
+
+The Chevalier de Mere had an accident last year. Use Bayes' theorem to calculate the probability that he is a bad driver.
+
+**Answer**
+```{r}
+
+
+prob.gooddriver.wreck <- .1
+prob.baddriver.wreck <- .35
+
+prob.gooddriver <-.85
+prob.baddriver <- 1-prob.gooddriver
+
+
+answer<-(prob.baddriver.wreck * prob.baddriver) / 
+    ( (prob.baddriver.wreck* prob.baddriver) + (prob.gooddriver.wreck * prob.gooddriver) )
+print(answer)
+```
+
+```{r}
+number.replications <- 100000
+
+prob.gooddriver.wreck <- .1
+prob.baddriver.wreck <- .35
+
+prob.gooddriver <-.85
+prob.baddriver <- 1-prob.gooddriver
+
+# We need two result vectors, one to keep track of
+# the driver of the message, and the other to keep track
+# of the presence or absence of a driver.
+
+driver.vector <- character( number.replications )
+driver.status <- character( number.replications )
+wreck.vector <- character( number.replications )
+
+
+for( replication.index in 1:number.replications ) {
+    
+    # First, we randomly good or bad driver
+    
+    driver <- sample( c("BAD", "GOOD"), 1,
+                              prob = c( 1-prob.gooddriver,prob.gooddriver) )
+    
+    # Next, we randomly generate the presence or absence of a driver, given
+    # that the driver
+    
+    if( driver == "BAD" ) {
+        driver.status <- sample( c("WRECKEDCAR", "DIDNTWRECKCAR"), 1,
+                               prob = c(prob.baddriver.wreck, 1 - prob.baddriver.wreck) )
+    } else {
+        driver.status <- sample( c("WRECKEDCAR", "DIDNTWRECKCAR"), 1,
+                               prob = c(prob.gooddriver.wreck, 1-prob.gooddriver.wreck) )
+    }
+    
+    # Now we store the driver and driver.status in result vectors:
+    
+    driver.vector[ replication.index ] <- driver
+    wreck.vector[ replication.index ] <- driver.status
+    
+}
+
+# Finally, we use standard filtering method. First, we extract those
+# elements of the driver vector that had a driver in their email.
+
+filtered.vector <- driver.vector[ wreck.vector == "WRECKEDCAR" ]
+
+# Next, we determine the proportion of the filtered values
+# that were wrecked by bad drivers
+
+mean( filtered.vector == "BAD" )
+```
+
+
+
+
+
+# Problem 4
+
+In this problem, we will perform some simple explorations with the binomial distribution.
+
+Suppose we have a binomial distribution with $n = 8$ trials and a probability of success of $p = 0.35$. 
+
+### Part (a)
+
+The standard probability formula for the binomial distribution is:
+$$
+\Pr(X = k)\ =\ {n \choose k} \cdot p^k \cdot (1-p)^{n-k}
+$$
+Using this formula, calculate the probability of observing exactly 4 successes for the binomial distribution specified above.
+**Answer**
+```{r}
+answer=choose(8,4)*(.35)^4*(1-.35)^4
+print(answer)
+```
+
+
+
+
+
+
+### Part (b)
+
+Using the built-in function `dbinom()`, calculate the probability of observing exactly 4 successes for the binomial distribution specified above.
+
+**Answer**
+```{r}
+dbinom( 4, 8, 0.35)
+```
+
+
+
+### Part (c)
+
+Using the built-in function `pbinom()`, calculate the probability of observing no more than 3 successes for this binomial distribution.
+
+**Answer**
+
+```{r}
+pbinom( 3, 8, 0.35)
+```
+
+### Part (d)
+
+Calculate the expected value and variance of this binomial distribution.
+
+**Answer**
+```{r}
+expectedvalue=.35*8
+print (expectedvalue)
+varience=8*.35*(1-.35)
+print (varience)
+
+```
+
+
+
+### Part (e)
+
+Construct a simulation to verify your answers for parts (a) through (d). In this simulation, you should directly model the concept that a binomial random variable is a sum of Bernoulli random variables. To do this, for each replication of the `for` loop you should use the `sample()` function to generate 8 independent Bernoulli random variables with probability of success $p = 0.35$, and then add them together. Do NOT use the `rbinom()` function to generate the random binomial value, because that's too easy -- instead, really try to capture the idea that the binomial distribution is just a sum of Bernoulli random variables.
+
+**Answer**
+```{r}
+number.replications <- 10000
+
+number.trials <- 8
+probability.success <- 0.35
+
+result.vector <- numeric( number.replications )
+
+for( replication.index in 1:number.replications ) {
+    
+    random.value <- sum (random.sample <- sample( c(1,0), number.trials, replace = TRUE,
+                             prob = c(probability.success, 1 - probability.success) ))
+    
+    result.vector[ replication.index ] <-  random.value }
+
+
+cat ("calculate the probability of observing exactly 4 successes ")
+cat (mean( result.vector==4 ))
+cat ("calculate the probability of observing at least 3 successes ")
+cat (mean( result.vector <=3 ))
+cat( "Expected value (exact):", number.trials * probability.success, "\n" )
+cat( "Expected value (simulated):", mean( result.vector ), "\n" )
+
+cat( "Variance (exact):", number.trials * probability.success * (1-probability.success), "\n" )
+cat( "Variance (simulated):", var( result.vector ), "\n" )
+
+
+```
+
+
+
+# Problem 5
+
+Each day for 3 weeks, the philosopher Z'aph'ma goes to his local convenience store and purchases an 8-spot Massachusetts State Lottery Keno ticket.
+
+### Part (a)
+
+An 8-spot Keno ticket will win some money if at least 4 of the selected numbers match the 20-number sample. What is the probability that an individual 8-spot Keno ticket will win some money i.e.\ have a positive payout? Calculate this value using the `phyper()` function, and store the value in the variable `winning.keno.prob`. Remember that we're only interested in whether or not the ticket wins some money; we don't care about how much the payout is.
+
+**Answer**
+```{r}
+winning.keno.prob <- 1 - pbinom(4, 20, 4/20)
+print (winning.keno.prob)
+```
+
+
+
+
+### Part (b)
+
+What is the probability that Z`aph`ma will have at least 3 winning tickets during the 3-week period that he purchases Keno tickets? Calculate this using the `pbinom()` function and the `winning.keno.prob` value that you calculated in part (a).
+
+**Answer**
+
+
+```{r}
+1-pbinom(3,21,winning.keno.prob)
+
+```
+
+
+
+### Part (c)
+
+Construct a simulation to verify your calculation in part (c):
+
+* Start out the usual way, by defining the number of replications and a logical vector to store your simulation results. Then begin a `for` loop, and for each time through, do this:
+
+    * To simulate playing Keno for 3 weeks, use the `rhyper()` function to draw 21 random values from a hypergeometric distribution. Store this random sample in a variable called `random.sample`.
+
+    * Count how many elements in `random.sample` are greater than or equal to 4, and store this value in a variable called `number.winning.tickets`.
+
+    * Test to see if `number.winning.tickets` is greater than or equal to 3, and if it is, store the value `TRUE` in your result vector.
+
+* When the `for` loop is done, calculate the proportion of `TRUE` values in your result vector.
+
+
+**Answer**
+
+
+```{r}
+number.replications <- 10000
+winning.keno.prob <- 1 - pbinom(4, 20, 4/20)
+print (winning.keno.prob)
+number.trials <- 21
+probability.success <- winning.keno.prob
+
+result.vector <- logical( number.replications )
+
+for(replication.index in 1:number.replications) {
+    
+    random.sample <- sample( c(1,0), number.trials, replace = TRUE,
+                                       prob = c(probability.success, 
+                                                1 - probability.success) )
+    number.winning.tickets<-sum( random.sample )
+    
+    if( number.winning.tickets > 3 ) {
+        result.vector[replication.index ] <- TRUE
+    }
+}
+
+mean( result.vector )
+answer <- mean( result.vector )
+cat ("Z'aph'ma will get 3 or more winning tickets with a simulated probablity of " , answer  )
+```
+
+
+# Problem 6
+
+In the game of Chuck-A-Luck, the player places a \$1 wager, selects a number from 1 to 6 and then rolls 3 dice. If the selected number comes up exactly once out of the three dice, the player gets the initial wager back, along with an additional \$1. If the selected number comes up exactly twice out the three dice, then the player gets the initial wager back, along with an additional \$2. Finally, if the selected number comes up on all three of the dice, the player gets the initial wager back, plus an additional \$10.
+
+###Part (a)
+
+Calculate the expected profit for Chuck-A-Luck. Use the `dbinom()` function to calculate the selected number coming up once, twice, or three times on the three dice.
+
+**Answer**
+```{r}
+profit.vector=c(-1,1,2,10)
+probablity.vector<-
+                  c(dbinom( 0, 3, (1/6)),
+                  dbinom( 1, 3, (1/6)),
+                  dbinom( 2, 3, (1/6)),
+                  dbinom( 3, 3, (1/6)))
+
+
+
+expected.profit <- sum(probablity.vector*profit.vector)
+cat ("expected profit = " ,expected.profit)
+```
+
+
+###Part (b)
+
+Construct a simulation to verify that your calculation in part (a) of the expected profit was correct. Again, do not use the `rbinom()` function, but instead use `sample()` to directly model the action of rolling three dice.
+
+**Answer**
+```{r}
+# First, we'll set the number of replications of the game:
+
+number.replications <- 10000
+
+# Next, we create the vector that will hold the results of each experiment. Remember
+# that when we create a vector with the logical() function, all the elements have
+# the initial value of FALSE.
+
+result.vector <- numeric( number.replications )
+
+# Now we can run a for loop over all replications
+
+for( replication.index in 1:number.replications ) {
+  
+
+  chuck.a.luck.value <- sum(sample(c(1,0),3,replace = TRUE,prob=c(1/6,5/6)))
+  if (chuck.a.luck.value==0){
+     result.vector[ replication.index ] <- -1
+  }
+  else if (chuck.a.luck.value==1){
+     result.vector[ replication.index ] <- 1
+  }
+  else if (chuck.a.luck.value==2){
+     result.vector[ replication.index ] <- 2
+  }
+  else if (chuck.a.luck.value==3){
+     result.vector[ replication.index ] <- 10
+  }
+  
+  
+}
+
+mean( result.vector )
+```
+
+
+
+
+
+
+
+
+# Problem 7
+
+We usually specify a binomial distribution by assigning values to $n$, the number of trials, and $p$, the probability of success. Suppose you don't know either $n$ or $p$, but you do know that the expected value of the distribution is 6, and also that the variance is 1.5:
+\begin{eqnarray*}
+\hbox{E}[X] & = & 6\\
+\\
+\hbox{Var}[X] & = & 1.5
+\end{eqnarray*}
+
+### Part (a)
+
+Using the values of the expected value and variance, calculate the values of $n$ and $p$. Hint: look in the lecture for the algebraic expressions for the mean and variance of a binomial distribution, and then think about what the algebraic expression is for the variance divided by the mean.
+
+**Answer**
+
+first I always wondered what something like this was suppose to mean
+\begin{eqnarray*}
+\hbox{E}[X] & = & 6\\
+\\
+\hbox{Var}[X] & = & 1.5
+\end{eqnarray*}
+
+what is hbox suppose to mean ?
+
+
+lets call that v and execped value = E
+v=n * P * ( 1 - P )
+E=N*P
+For variance
+solve for P
+v=n * P * ( 1 - P )
+1.5=n * P * ( 1 - P )
+-10np^2+10np-15=0
+I can then solve this with quadradic formula,  but I would get two values,  so this one just doesn't make much sense, can't wait to see solution
+
+Expected value
+
+Solve for N
+np(1/p)=v
+np=v(1-p)
+n=(v(1-p))/p
+Expected value
+much easier
+p=E/N
+N=E/p
+
+
+
+
+
+
+
+
+
+
+### Part (b)
+
+Using the values of $n$ and $p$ that you obtained in part (a), conduct a simulation to show that the resulting binomial distribution really does have an expected value of 6 and a variance of 1.5. Once again, don't use the built-in `rbinom()` function to generate random binomial values, but instead use the `sample()` function to generate $n$ independent Bernoulli random variables, each with common probability of success $p$. Once you've finished the simulation, calculate the mean and variance of the `result.vector` and show that they are very close to the values specified in the problem statement.
+
+**Answer**
+I don't see how this works given a quadratic solution for part a,  will wait for soltuion
+
+
+
+
+
+# Problem 8
+
+Chicken Curry takes 40 shots, and for each shot he scores a basket with probability $p = 0.42$. Kobe Beef is a total ball hog, and he takes 55 shots, but for each each shot he scores a basket with probability $p = 0.35$. Assume that all the shots are independent of one another. What is the probability that Kobe will score more baskets than Chicken? Answer this by constructing a simulation. You'll have to determine how to model Chicken's number of baskets, as well as Kobe's number of baskets, and then what to do with the results.
+
+**Answer**
+```{r}
+# First, we'll set the number of replications of the game:
+
+number.replications <- 10000
+
+
+
+result.vector.kobescoremore<-numeric ( number.replications )
+result.vector.tie<- numeric( number.replications )
+# Now we can run a for loop over all replications
+
+for( replication.index in 1:number.replications ) {
+  
+ 
+  kobe.score<- sum(sample(c(1,0),40,replace = TRUE,prob=c(.58,.42)))
+  chicken.score<- sum(sample(c(1,0),55,replace = TRUE,prob=c(.35,.65)))
+  kobe.total<-sum(kobe.score)
+  chicken.total<-sum(chicken.score)
+
+  if (kobe.total>chicken.total){
+  result.vector.kobescoremore[ replication.index ]<-1
+
+    result.vector.tie[ replication.index ]<-0
+  }
+  else if (kobe.total<chicken.total){
+  result.vector.kobescoremore[ replication.index ]<-0
+  result.vector.tie[ replication.index ]<-0
+  }
+  else {result.vector.tie[ replication.index ]<-1}
+  
+  
+}
+
+kobe.scoresmore.prob<-mean( result.vector.kobescoremore)
+tie<-mean( result.vector.tie)
+cat ("probablity of tie = ")
+cat (tie)
+cat ("\n")
+cat("Kobe will score more with probablity" ,kobe.scoresmore.prob)
+cat ("\n")
+cat("Chicken will score more with probablity" ,1-kobe.scoresmore.prob-tie)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

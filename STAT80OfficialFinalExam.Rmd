@@ -1,0 +1,330 @@
+---
+title: "Official Final Exam"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+date: "Spring 2019"
+subtitle: 'STAT E-80: Basic Probability Using R'
+---
+
+
+
+
+# Problem 1
+
+A hospital clinic has 45 patients each day. Each patient is classified as either "moderate" or "acute", with acute patients occuring 18\% of the time, and all patients are independent of one another.
+
+### Part (a)
+
+If the clinic has more than 11 acute patients in one day, this places a considerable strain on staff resources, and the clinic is considered to be overloaded. Use the built-in probability functions in R to determine the probability that the clinic will be overloaded in any given day?
+
+**Answer**
+
+
+
+
+### Part (b)
+
+Construct a simulation to verify your calculation in part (a). You should directly model the process of drawing a sample of 45 patients by using the `sample()` function.
+
+**Answer**
+
+
+
+
+### Part (c)
+
+Over a period of 20 days, what is the probability that the clinic will be overloaded at least four times?
+
+**Answer**
+
+
+
+
+
+### Part (d)
+
+Construct a simulation to verify your calculation in part (d).
+
+
+
+
+
+# Problem 2
+
+Psychiatrists often need to use a trial-and-error approach to treatment: after a diagnosis, the physician determines an initial prescription, and if this doesn't work the treatment is adjusted, and this process continues until a satisfactory result is obtained. Suppose that each attempt is independent of the others, and that for all trials there is a constant probability $p$ that the data indicates that the average number of failed attempts before a successful result is obtained is 2.3. (Note that this number does not include the final successful attempt.)
+
+### Part (a)
+
+What probability distribution is appropriate to model the number of unsuccesful treatment attempts? What is the value of this parameter?
+
+**Answer**
+
+
+
+
+### Part (b)
+
+What is the probability that at least 4 unsuccessful attempts will be made before treatment is resolved?
+
+**Answer**
+
+
+
+
+
+### Part (c)
+
+Construct a simulation to verify your calculations in part (b), as well as to show that the expected value is 2.3.
+
+**Answer**
+
+
+
+
+
+
+# Problem 3
+
+There are 30 tissue samples in the analysis lab, but some of them might be contaminated, so 6 of them are selected for forensic review.
+
+### Part (a)
+
+If there really are 5 contaminated samples out of the 30 total tissue samples, what is the probability of detecting at least one in the forensic review?
+
+**Answer**
+
+
+
+
+### Part (b)
+
+Construct a simulation to verify your calculation in part (a).
+
+**Answer**
+
+
+
+### Part (c)
+
+What is the smallest size of the forensic sample so that there is at least an 80\% probability of detecting 2 or more contaminated samples? (Hint: you'll have to do some trial-and-error searching by hand to find this value.)
+
+**Answer**
+
+
+
+
+
+### Part (d)
+
+Construct a simulation to verify your calculation in part (c).
+
+**Answer**
+
+
+
+
+
+
+# Problem 4
+
+The waiting time for a patient to see a physician at the allergies clinic has a probability density function of the form:
+$$
+f_X(x)\ =\ r \cdot e^{-rx},\ \ x >0,\ r>0
+$$
+The expected value of the waiting time is 43 minutes.
+
+
+### Part (a)
+
+What sort of probability distribution is this? What is the value of the parameter $r$?
+
+**Answer**
+
+
+
+### Part (b)
+
+What is the probability that a patient will have to wait at least 1 hour?
+
+**Answer**
+
+
+
+
+### Part (b)
+
+Construct a simulation to verify your calculation in part (a).
+
+
+
+
+# Problem 5
+
+Consider this integral:
+$$
+\int_{0.1}^{0.3} \frac{ 5.8^{1.4} \cdot x^{0.4} \cdot e^{-5.8} }{\Gamma(1.4) } \cdot dx
+$$
+
+### Part (a)
+
+What sort of density function is being integrated? What are the parameters of this density function?
+
+**Answer**
+
+
+### Part (b)
+
+Evaluate the integral using the appropriate built-in probability functions in R.
+
+**Answer**
+
+
+
+
+
+### Part (c)
+
+Evaluate the integral by constructing a simulation to verify your calculation in part (b).
+
+**Answer**
+
+
+
+
+
+# Problem 6
+
+Systolic blood pressures are normally distributed, with a mean of 125 and a standard deviation of 10.
+
+### Part (a)
+
+The conventional threshold for a diagnosis of high-blood pressure is a systolic blood pressure of at least 140. Using the built-in probability functions in R, calculate the probability that a randomly selected patient will exceed this threshold.
+
+**Answer**
+
+
+### Part (b)
+
+Construct a simulation to verify your result in part (a).
+
+**Answer**
+
+
+### Part (c)
+
+Now suppose that an intervention results reducing the mean systolic blood pressure to 118, leaving the variance the same. Use the built-in probability functions in R to determine the probability that a randomly chosen patient will have a systolic blood pressure over the threshold value for high blood pressure.
+
+**Answer**
+
+
+
+### Part (d)
+
+Construct a simulation to verify your calculation in part (c).
+
+**Answer**
+
+
+
+
+
+
+
+# Problem 7
+
+Costs for a single patient in the cardiac clinic follow this probability distribution:
+
+|Cost|Probability|
+|---:|:---------:|
+|20000|0.10|
+|12000|0.35|
+| 8000|0.25|
+| 4000|0.15|
+| 2000|0.15|
+
+### Part (a)
+
+What are the mean and variance of the cost for a single patient?
+
+**Answer**
+
+
+### Part (b)
+
+Each week, there are 120 patients in the cardiac clinic. What are the expected value and variance of the total costs for all 120 patients in one week? (Note: the total cost is the sum of the costs for the 120 patients.)
+
+**Answer**
+
+
+### Part (c)
+
+What is an approximate probability distribution for these total weekly costs? You don't have to do any calculations, but you should explain how you justify your conclusion.
+
+**Answer**
+
+
+### Part (d)
+
+Simulate data to model the total costs for a week. Your simulation should draw a sample of 120 independent observations from the probability distribution for costs, sum them, and store them. Then create a histogram of your data, and superimpose a density curve with the mean and variance that you calculated in part (a).
+
+
+**Answer**
+
+
+
+
+
+
+# Problem 8
+
+Administrators at the hospital want to open a new walk-in clinic, but are undecided about two formats: it could either be open 5 days a week, but with limited hours and staff, or it could be open 4 days a week, but with longer hours and more staff. If the clinic is open 5 days a week, the number of patients is can serve will be uniformly distributed, with 43 as the minimum number of patients in one day and 59 as the maximum number of patients in one day. On the other hand, if the clinic is open for only 4 days a week, the number of patients will also be uniformly distributed, but now with 54 as the daily minimum and 72 as the daily maximum.
+
+You have been asked to develop a simulation model to determine which approach will result in the greater expected number of patients served in one week.
+
+To run this simulation, you should have two result vectors, one to hold the simulated weekly total number of patients for the first approach, and the second to store the simulated weekly total number of patients for the second approach. Make sure you keep track of the different probability distributions for the daily number of patients, as well as the number of days each clinic is open. Don't try to solve this using any of the formal mathematical tools that we've developed -- instead, just build the simulation, and use that to answer the question.
+
+
+**Answer**
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
